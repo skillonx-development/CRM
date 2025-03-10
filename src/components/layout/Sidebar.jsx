@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
     Home,
     BarChart2,
@@ -13,9 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function Sidebar({ activeTab, setActiveTab }) {
-    const [collapsed, setCollapsed] = useState(false);
-
+function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const menuItems = [
         { id: 'dashboard', icon: Home, label: 'Dashboard' },
         { id: 'analytics', icon: BarChart2, label: 'Analytics' },
@@ -115,6 +112,7 @@ function Sidebar({ activeTab, setActiveTab }) {
                 </motion.button>
             </div>
 
+            {/* Rest of the component remains the same */}
             <nav className="mt-6">
                 <ul className={`space-y-2 ${collapsed ? 'px-2' : 'px-4'}`}>
                     {menuItems.map((item) => (
@@ -141,6 +139,7 @@ function Sidebar({ activeTab, setActiveTab }) {
                                             animate="visible"
                                             exit="hidden"
                                             variants={textVariants}
+                                            className="ml-3"
                                         >
                                             {item.label}
                                         </motion.span>
@@ -178,6 +177,7 @@ function Sidebar({ activeTab, setActiveTab }) {
                                             animate="visible"
                                             exit="hidden"
                                             variants={textVariants}
+                                            className="ml-3"
                                         >
                                             {item.label}
                                         </motion.span>
