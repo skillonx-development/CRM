@@ -1,32 +1,56 @@
-import { Search, Bell, Settings } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Bell, Search, User } from 'lucide-react';
 
 function Header() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const currentPath = location.pathname.substring(1); // Remove the leading slash
+
+    const dashboards = [
+        { id: 'admin', label: 'Admin' },
+        { id: 'marketing', label: 'Marketing' },
+        { id: 'sales', label: 'Sales' },
+        { id: 'tech', label: 'Tech' }
+    ];
+
     return (
-        <header className="h-16 border-b border-border-dark flex items-center justify-between px-6">
-            <div className="flex items-center w-1/3">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text-muted" />
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        className="bg-background-sidebar border border-border-dark rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-1 focus:ring-primary"
-                    />
-                </div>
+        <header className="bg-background-card border-b border-border-dark p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+                {dashboards.map((dashboard) => (
+                    <button
+                        key={dashboard.id}
+                        onClick={() => navigate(`/${dashboard.id}`)}
+                        className={`px-4 py-2 rounded-lg transition-colors ${currentPath === dashboard.id
+                            ? 'bg-primary text-white'
+                            : 'text-text-muted hover:bg-background-hover'
+                            }`}
+                    >
+                        {dashboard.label}
+                    </button>
+                ))}
             </div>
 
             <div className="flex items-center space-x-4">
-                <button className="p-2 rounded-lg hover:bg-background-hover">
-                    <Bell className="h-5 w-5 text-text-muted" />
-                </button>
-                <button className="p-2 rounded-lg hover:bg-background-hover">
-                    <Settings className="h-5 w-5 text-text-muted" />
-                </button>
-                <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                    <span className="text-text font-bold text-sm">JC</span>
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="bg-background border border-border-dark rounded-lg py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-text-muted" />
                 </div>
+
+                <button className="p-2 rounded-lg hover:bg-background-hover relative">
+                    <Bell className="h-5 w-5 text-text-muted" />
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-status-error rounded-full"></span>
+                </button>
+
+                <button className="p-1 rounded-full bg-primary-dark hover:bg-primary">
+                    <User className="h-5 w-5 text-white" />
+                </button>
             </div>
         </header>
-    )
+    );
 }
 
-export default Header
+export default Header;

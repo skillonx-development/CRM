@@ -1,10 +1,10 @@
+import Sidebar from './Sidebar'
 import Header from './Header'
 import { useState } from 'react'
-import Sidebar from './Sidebar'
 import { motion } from 'framer-motion'
 
-function Layout({ children }) {
-    const [activeTab, setActiveTab] = useState('dashboard')
+function Layout({ children, sidebarItems, bottomSidebarItems, defaultActiveTab = 'dashboard' }) {
+    const [activeTab, setActiveTab] = useState(defaultActiveTab)
     const [collapsed, setCollapsed] = useState(false)
 
     const mainContentVariants = {
@@ -33,6 +33,8 @@ function Layout({ children }) {
                 setActiveTab={setActiveTab}
                 collapsed={collapsed}
                 setCollapsed={setCollapsed}
+                menuItems={sidebarItems}
+                bottomMenuItems={bottomSidebarItems}
             />
             <motion.div
                 className="flex-1"

@@ -1,31 +1,13 @@
 import {
-    Home,
-    BarChart2,
-    Users,
-    ShoppingBag,
-    MessageSquare,
-    Settings,
-    HelpCircle,
-    LogOut,
     ChevronLeft,
     ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
-    const menuItems = [
-        { id: 'dashboard', icon: Home, label: 'Dashboard' },
-        { id: 'analytics', icon: BarChart2, label: 'Analytics' },
-        { id: 'customers', icon: Users, label: 'Customers' },
-        { id: 'orders', icon: ShoppingBag, label: 'Orders' },
-        { id: 'messages', icon: MessageSquare, label: 'Messages' },
-    ];
-
-    const bottomMenuItems = [
-        { id: 'settings', icon: Settings, label: 'Settings' },
-        { id: 'help', icon: HelpCircle, label: 'Help' },
-        { id: 'logout', icon: LogOut, label: 'Logout' },
-    ];
+function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed, menuItems, bottomMenuItems }) {
+    // Use the provided menu items or default to empty arrays
+    const sidebarMenuItems = menuItems || [];
+    const sidebarBottomMenuItems = bottomMenuItems || [];
 
     const toggleSidebar = () => {
         setCollapsed(!collapsed);
@@ -99,7 +81,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                             exit="hidden"
                             variants={textVariants}
                         >
-                            Admin
+                            CRM
                         </motion.h1>
                     )}
                 </AnimatePresence>
@@ -112,10 +94,9 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                 </motion.button>
             </div>
 
-            {/* Rest of the component remains the same */}
             <nav className="mt-6">
                 <ul className={`space-y-2 ${collapsed ? 'px-2' : 'px-4'}`}>
-                    {menuItems.map((item) => (
+                    {sidebarMenuItems.map((item) => (
                         <li key={item.id}>
                             <button
                                 onClick={() => setActiveTab(item.id)}
@@ -153,7 +134,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
 
             <div className={`absolute bottom-8 w-full ${collapsed ? 'px-2' : 'px-4'}`}>
                 <ul className="space-y-2">
-                    {bottomMenuItems.map((item) => (
+                    {sidebarBottomMenuItems.map((item) => (
                         <li key={item.id}>
                             <button
                                 onClick={() => setActiveTab(item.id)}
