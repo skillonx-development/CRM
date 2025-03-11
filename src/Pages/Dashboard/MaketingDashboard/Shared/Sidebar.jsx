@@ -15,10 +15,13 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const location = useLocation(); // Get current route
 
     const menuItems = [
-        { id: "dashboard", icon: Home, label: "Dashboard", path: "/" },
-        { id: "revenue", icon: BarChart2, label: "Revenue", path: "/revenue" },
-        { id: "orders", icon: ShoppingBag, label: "Orders", path: "/orders" },
-        { id: "calendar", icon: Calendar, label: "Calendar", path: "/calendar" },
+        { id: "dashboard", icon: Home, label: "Dashboard", path: "/Marketing" },
+        { id: "campaign", icon: BarChart2, label: "Campaign", path: "/marketingcampaign" },
+        { id: "socialmedia", icon: ShoppingBag, label: "socialmedia", path: "/marketingsocial" },
+        { id: "productlist", icon: Calendar, label: "Product List", path: "/productlist" },
+        { id: "calendar", icon: Calendar, label: "Calendar", path: "/marketingcalendar" },
+
+
     ];
 
     const bottomMenuItems = [
@@ -48,8 +51,8 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     };
 
     const toggleButtonVariants = {
-        expanded: { rotate: 0, transition: { duration: 0.3 } },
-        collapsed: { rotate: 180, transition: {duration: 0.3 }}
+        expanded: { rotate: 0 , transition: { duration: 0.3 }  },
+        collapsed: { rotate: 180 , transition: { duration: 0.3 }}
     };
 
     return (
