@@ -21,11 +21,6 @@ const App = () => {
         <Route path="/marketingcalendar" element={<MarketingCalendar/>} />
         <Route path="/marketingsocial" element={<MarketingSocial/>} />
         <Route path="/productlist" element={<ProductList/>} />
-
-
-
-
-
       </Routes>
     </Router>
     
