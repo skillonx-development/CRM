@@ -50,6 +50,11 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
         hidden: { opacity: 0, x: -10, transition: { duration: 0.2 } }
     };
 
+    const toggleButtonVariants = {
+        expanded: { rotate: 0 , transition: { duration: 0.3 }  },
+        collapsed: { rotate: 180 , transition: { duration: 0.3 }}
+    };
+
     return (
         <motion.aside
             className="fixed left-0 top-0 h-screen bg-background-sidebar border-r border-border-dark z-20 overflow-hidden"
@@ -68,6 +73,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                 <motion.button
                     onClick={toggleSidebar}
                     className="p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text"
+                    variants={toggleButtonVariants}
                 >
                     <ChevronLeft size={20} />
                 </motion.button>
