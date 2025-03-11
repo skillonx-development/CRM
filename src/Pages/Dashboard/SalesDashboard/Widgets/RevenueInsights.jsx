@@ -8,13 +8,11 @@ const insights = [
   { icon: <TrendingUp className="text-status-error" />, title: "Product B revenue surge", date: "21 DEC 11:21 PM" },
   { icon: <ShoppingCart className="text-status-info" />, title: "Q2 targets on track", date: "21 DEC 9:28 PM" },
   { icon: <Bell className="text-status-info" />, title: "Product E declining", date: "22 DEC 7:20 PM" },
-  { icon: <TrendingUp className="text-status-error" />, title: "New order #4219423", date: "21 DEC 11:21 PM" },
-  { icon: <ShoppingCart className="text-status-info" />, title: "Server Payments for April", date: "21 DEC 9:28 PM" },
 ];
 
 export default function RevenueInsights() {
   return (
-    <div className="bg-background-card p-4 rounded-2xl shadow-card w-[320px] text-text-default border border-border-dark">
+    <div className="bg-background-card p-4 rounded-2xl shadow-card w-[320px] text-text-default border border-border-dark ">
       <h2 className="text-lg font-semibold mb-4">Revenue Insights</h2>
       <div className="space-y-3">
         {insights.map((item, index) => (

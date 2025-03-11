@@ -1,16 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Calendar } from "lucide-react";
 
 const data = [
-  { name: "SEP", value1: 30, value2: 50 },
-  { name: "OCT", value1: 40, value2: 45 },
-  { name: "NOV", value1: 50, value2: 60 },
-  { name: "DEC", value1: 45, value2: 55 },
-  { name: "JAN", value1: 55, value2: 65 },
-  { name: "FEB", value1: 60, value2: 70 },
+  { name: "SEP", lastMonth: 30, thisMonth: 50 },
+  { name: "OCT", lastMonth: 40, thisMonth: 45 },
+  { name: "NOV", lastMonth: 50, thisMonth: 60 },
+  { name: "DEC", lastMonth: 45, thisMonth: 55 },
+  { name: "JAN", lastMonth: 55, thisMonth: 65 },
+  { name: "FEB", lastMonth: 60, thisMonth: 70 },
 ];
 
 export default function RevenueOverviewChart() {
@@ -22,7 +22,7 @@ export default function RevenueOverviewChart() {
           <p className="text-text-default">$37.5K <span className="text-status-success">▲ +2.45%</span></p>
         </div>
         <button className="bg-background-hover text-text-default hover:bg-background-sidebar flex items-center border border-border-dark px-4 py-2 rounded-lg">
-          <Calendar className="w-5 h-5 mr-2" /> This month
+          <Calendar className="w-5 h-5 mr-2" />  month
         </button>
       </div>
       <div className="w-full h-64">
@@ -30,9 +30,16 @@ export default function RevenueOverviewChart() {
           <LineChart data={data}>
             <XAxis dataKey="name" stroke="#ffffff" />
             <YAxis hide />
-            <Tooltip contentStyle={{ backgroundColor: "#233A5F", borderRadius: "8px", color: "#ffffff" }} />
-            <Line type="monotone" dataKey="value1" stroke="#3B82F6" strokeWidth={3} dot={{ fill: "#3B82F6" }} />
-            <Line type="monotone" dataKey="value2" stroke="#8B5CF6" strokeWidth={3} dot={{ fill: "#8B5CF6" }} />
+            <Tooltip 
+              contentStyle={{ backgroundColor: "#233A5F", borderRadius: "8px", color: "#ffffff" }}
+              labelFormatter={(label) => `Month: ${label}`}
+            />
+            <Legend 
+              wrapperStyle={{ color: "#ffffff", textAlign: "center" }} 
+              formatter={(value) => (value === "lastMonth" ? "Last Month" : "This Month")}
+            />
+            <Line type="monotone" dataKey="lastMonth" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: "#8B5CF6" }} strokeDasharray="5 5" />
+            <Line type="monotone" dataKey="thisMonth" stroke="#3B82F6" strokeWidth={3} dot={{ fill: "#3B82F6" }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

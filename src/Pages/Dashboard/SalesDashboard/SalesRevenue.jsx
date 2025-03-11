@@ -9,26 +9,27 @@ import RevenueOverviewChart from "./Widgets/RevenueOverviewChart";
 const SalesRevenue = () => {
   return (
     <Layout>
-    {/* Widgets Section */}
-    <div className="p-4">
-          <AnalyticsOverview />
-          <div className="p-6">
-    {/* Flexbox layout with spacing */}
-  <div className="flex gap-4"> 
-    <Todaysales className="flex-1" /> 
-    <RevenueInsights /> 
+      <div className="p-6 space-y-6"> {/* Balanced spacing */}
+        {/* Top Section - Analytics Overview */}
+        <AnalyticsOverview />
 
-  </div>
-    {/* Revenue Pie Chart Below */}
-    <div className="mt-6 p-6 ">
-            <RevenuePieChart />
+        {/* Middle Section - Today's Sales & Revenue Insights (Side by Side) */}
+        <div className="grid grid-cols-3 gap-6"> {/* Evenly spaced widgets */}
+          {/* Left Side: Today's Sales (2/3 width) */}
+          <div className="col-span-2">
+            <Todaysales />
           </div>
-      {/* Revenue Pie Chart Below */}
-    <div className="mt-6 p-6 ">
-            <RevenueOverviewChart />
+          {/* Right Side: Revenue Insights */}
+          <div className="col-span-1">
+            <RevenueInsights className="h-[600px]" /> {/* Adjusted height for better alignment */}
           </div>
-      </div>
+        </div>
 
+        {/* Bottom Section - Revenue Pie Chart & Revenue Overview (Stacked) */}
+        <div className="grid grid-cols-1 gap-6"> {/* Consistent spacing */}
+          <RevenuePieChart />
+          <RevenueOverviewChart />
+        </div>
       </div>
     </Layout>
   );

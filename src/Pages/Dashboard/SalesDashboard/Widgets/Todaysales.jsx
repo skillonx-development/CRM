@@ -13,14 +13,14 @@ const salesData = [
   {
     id: 2,
     value: "500",
-    label: "Total Orders",
+    label: "Total Proposals",
     change: "+8% from yesterday",
     color: "text-chart-green",
   },
   {
     id: 3,
     value: "9",
-    label: "Products Sold",
+    label: "Products Done",
     change: "+2% from yesterday",
     color: "text-chart-blue",
   },
@@ -39,13 +39,13 @@ const SalesSummary = () => {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-background-card text-text-muted p-6 rounded-2xl shadow-card w-full"
+      className="bg-background-card text-text-muted p-6 rounded-2xl shadow-card w-full h-80 "
     >
       {/* Title Section */}
       <h2 className="text-lg font-semibold text-center text-text-default">
         Today's Sales
       </h2>
-      <p className="text-sm text-text-muted text-center mb-6">Sales Summary</p>
+      <p className="text-sm text-text-muted text-center mb-7">Sales Summary</p>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
