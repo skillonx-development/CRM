@@ -25,7 +25,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
 
     const bottomMenuItems = [
         { id: "settings", icon: Settings, label: "Settings", path: "/settings" },
-        { id: 'help', icon: HelpCircle, label: 'Help' },
+        { id: 'help', icon: HelpCircle, label: 'Help', path: "/Help" },
         { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
 
@@ -63,22 +63,26 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
             animate={collapsed ? "collapsed" : "expanded"}
             variants={sidebarVariants}
         >
-            <div className="p-6 flex items-center justify-between">
-                <AnimatePresence>
-                    {!collapsed && (
-                        <motion.h1 className="text-xl font-bold text-text" initial="hidden" animate="visible" exit="hidden" variants={textVariants}>
-                            John Carter
-                        </motion.h1>
-                    )}
-                </AnimatePresence>
-                <motion.button
-                    onClick={toggleSidebar}
-                    className="p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text"
-                    variants={toggleButtonVariants}
-                >
-                    <ChevronLeft size={20} />
-                </motion.button>
-            </div>
+            <div className="p-4 flex items-center justify-between">
+    <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
+        <img src="./src/Pages/Dashboard/SalesDashboard/Assets/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
+        <AnimatePresence>
+            {!collapsed && (
+                <motion.h1 className="text-xl font-bold text-text" initial="hidden" animate="visible" exit="hidden" variants={textVariants}>
+                    SkillonX
+                </motion.h1>
+            )}
+        </AnimatePresence>
+    </div>
+    <motion.button
+        onClick={toggleSidebar}
+        className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text ${collapsed ? "absolute top-4 right-4" : ""}`}
+        variants={toggleButtonVariants}
+    >
+        <ChevronLeft size={20} />
+    </motion.button>
+</div>
+
 
             <nav className="mt-6">
                 <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
