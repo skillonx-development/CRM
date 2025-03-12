@@ -9,6 +9,9 @@ import MarketingCampaign from './Pages/Dashboard/MaketingDashboard/MarketingCamp
 import MarketingCalendar from './Pages/Dashboard/MaketingDashboard/MarketingCalendar';
 import ProductList from './Pages/Dashboard/MaketingDashboard/ProductList';
 import MarketingSocial from './Pages/Dashboard/MaketingDashboard/MarketingSocial';
+import TechDashboard from './Pages/Dashboard/TechDashboard/TechDashboard';
+import TechProjects from './Pages/Dashboard/TechDashboard/TechProjects';
+import TechTeam from './Pages/Dashboard/TechDashboard/TechTeam';
 
 const App = () => {
   return (
@@ -24,6 +27,9 @@ const App = () => {
         <Route path="/marketingcalendar" element={<MarketingCalendar/>} />
         <Route path="/marketingsocial" element={<MarketingSocial/>} />
         <Route path="/productlist" element={<ProductList/>} />
+        <Route path="/tech" element={<TechDashboard/>} />
+        <Route path="/Projects" element={<TechProjects/>} />
+        <Route path="/teams" element={<TechTeam />} />
       </Routes>
     </Router>
     

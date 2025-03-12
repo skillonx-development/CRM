@@ -9,7 +9,7 @@ const SalesDashboard = () => {
   return (
     <Layout>
         {/* Widgets Section */}
-      <div className="p-6">
+      <div className="p-6 mt">
           <AnalyticsOverview />
           <AnalyticsChart />
         </div>
