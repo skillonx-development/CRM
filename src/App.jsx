@@ -10,12 +10,17 @@ import MarketingCampaign from './Pages/Dashboard/MaketingDashboard/MarketingCamp
 import MarketingCalendar from './Pages/Dashboard/MaketingDashboard/MarketingCalendar';
 import ProductList from './Pages/Dashboard/MaketingDashboard/ProductList';
 import MarketingSocial from './Pages/Dashboard/MaketingDashboard/MarketingSocial';
+
+import Register from './Pages/Auth/Register';
+import Login from './Pages/Auth/Login';
+
 import TechDashboard from './Pages/Dashboard/TechDashboard/TechDashboard';
 import TechProjects from './Pages/Dashboard/TechDashboard/TechProjects';
 import TechTeam from './Pages/Dashboard/TechDashboard/TechTeam';
 import TechReport from './Pages/Dashboard/TechDashboard/TechReport';
 import TechSettings from './Pages/Dashboard/TechDashboard/TechSettings';
 import TechHelp from './Pages/Dashboard/TechDashboard/TechHelp';
+
 
 const App = () => {
   return (
@@ -32,12 +37,19 @@ const App = () => {
         <Route path="/marketingcalendar" element={<MarketingCalendar/>} />
         <Route path="/marketingsocial" element={<MarketingSocial/>} />
         <Route path="/productlist" element={<ProductList/>} />
+
+        <Route path="/login" element={<Login/>} />
+        <Route path="/register" element={<Register/>} />
+
+
+
         <Route path="/Tech" element={<TechDashboard/>} />
         <Route path="/Projects" element={<TechProjects/>} />
         <Route path="/teams" element={<TechTeam />} />
         <Route path="/report" element={<TechReport />}  />
         <Route path="/settings1" element={<TechSettings />}/>
         <Route path="/help1" element={<TechHelp />} />
+
       </Routes>
     </Router>
     

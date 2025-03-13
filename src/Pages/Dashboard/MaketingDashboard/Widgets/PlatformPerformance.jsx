@@ -7,7 +7,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const PlatformPerformance = () => {
   const data = {
-    labels: ["Insta", "F.B", "Twitt", "LinkedIn", "YouTube", "Others"],
+    labels: ["Instagram", "Facebook", "Twitter", "LinkedIn", "YouTube", "Others"],
     datasets: [
       {
         label: "Performance",

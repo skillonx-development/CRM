@@ -33,7 +33,7 @@ const ProductTable = () => {
       <table className="w-full text-left text-white">
         <thead>
           <tr className="border-b border-border-dark text-gray-400">
-            <th className="p-3">Product Name</th>
+            <th className="p-3">Product Number</th>
             <th className="p-3">Category</th>
             <th className="p-3">Quality</th>
             <th className="p-3">College</th>
