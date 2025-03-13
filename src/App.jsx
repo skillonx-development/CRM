@@ -8,6 +8,8 @@ import MarketingCampaign from './Pages/Dashboard/MaketingDashboard/MarketingCamp
 import MarketingCalendar from './Pages/Dashboard/MaketingDashboard/MarketingCalendar';
 import ProductList from './Pages/Dashboard/MaketingDashboard/ProductList';
 import MarketingSocial from './Pages/Dashboard/MaketingDashboard/MarketingSocial';
+import Register from './Pages/Auth/Register';
+import Login from './Pages/Auth/Login';
 const App = () => {
   return (
     <Router>
@@ -21,8 +23,8 @@ const App = () => {
         <Route path="/marketingcalendar" element={<MarketingCalendar/>} />
         <Route path="/marketingsocial" element={<MarketingSocial/>} />
         <Route path="/productlist" element={<ProductList/>} />
-
-
+        <Route path="/login" element={<Login/>} />
+        <Route path="/register" element={<Register/>} />
 
 
 
