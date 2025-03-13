@@ -17,11 +17,9 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const menuItems = [
         { id: "dashboard", icon: Home, label: "Dashboard", path: "/Marketing" },
         { id: "campaign", icon: BarChart2, label: "Campaign", path: "/marketingcampaign" },
-        { id: "socialmedia", icon: ShoppingBag, label: "socialmedia", path: "/marketingsocial" },
+        { id: "socialmedia", icon: ShoppingBag, label: "Social Media", path: "/marketingsocial" },
         { id: "productlist", icon: Calendar, label: "Product List", path: "/productlist" },
         { id: "calendar", icon: Calendar, label: "Calendar", path: "/marketingcalendar" },
-
-
     ];
 
     const bottomMenuItems = [
@@ -40,27 +38,19 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
         setCollapsed(!collapsed);
     };
 
-    const sidebarVariants = {
-        expanded: { width: 256, transition: { duration: 0.3, type: "spring", stiffness: 100 } },
-        collapsed: { width: 80, transition: { duration: 0.3, type: "spring", stiffness: 100 } }
-    };
-
-    const textVariants = {
-        visible: { opacity: 1, x: 0, transition: { delay: 0.1, duration: 0.2 } },
-        hidden: { opacity: 0, x: -10, transition: { duration: 0.2 } }
-    };
-
     return (
         <motion.aside
             className="fixed left-0 top-0 h-screen bg-background-sidebar border-r border-border-dark z-20 overflow-hidden"
-            initial="expanded"
-            animate={collapsed ? "collapsed" : "expanded"}
-            variants={sidebarVariants}
+            animate={{ width: collapsed ? 80 : 256 }}
+            transition={{ duration: 0.3, type: "spring", stiffness: 100 }}
         >
             <div className="p-6 flex items-center justify-between">
                 <AnimatePresence>
                     {!collapsed && (
-                        <motion.h1 className="text-xl font-bold text-text" initial="hidden" animate="visible" exit="hidden" variants={textVariants}>
+                        <motion.h1 className="text-xl font-bold text-text"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}>
                             John Carter
                         </motion.h1>
                     )}
@@ -87,7 +77,12 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                                 <item.icon className="h-5 w-5" />
                                 <AnimatePresence>
                                     {!collapsed && (
-                                        <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                                        <motion.span
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -10 }}
+                                            className="ml-3"
+                                        >
                                             {item.label}
                                         </motion.span>
                                     )}
@@ -112,7 +107,12 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                                 <item.icon className="h-5 w-5" />
                                 <AnimatePresence>
                                     {!collapsed && (
-                                        <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                                        <motion.span
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -10 }}
+                                            className="ml-3"
+                                        >
                                             {item.label}
                                         </motion.span>
                                     )}

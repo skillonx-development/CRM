@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-    Home,
-    BarChart2,
-    Calendar,
-    ShoppingBag,
-    Settings,
+    LayoutDashboard,
+    Star,
+    Users,
+    FileText,
     ChevronLeft,
+    Settings,
     HelpCircle,
     LogOut
 } from "lucide-react";
@@ -14,19 +14,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
-    const location = useLocation(); // Get current route
+    const location = useLocation();
 
     const menuItems = [
-        { id: "dashboard", icon: Home, label: "Dashboard", path: "/" },
-        { id: "revenue", icon: BarChart2, label: "Revenue", path: "/revenue" },
-        { id: "orders", icon: ShoppingBag, label: "Orders", path: "/orders" },
-        { id: "calendar", icon: Calendar, label: "Calendar", path: "/calendar" },
+        { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/tech" },
+        { id: "projects", icon: Star, label: "Projects", path: "/projects" },
+        { id: "teams", icon: Users, label: "Teams", path: "/teams" },
+        { id: "report", icon: FileText, label: "Report", path: "/report" },
     ];
-
     const bottomMenuItems = [
-        { id: "settings", icon: Settings, label: "Settings", path: "/settings" },
-        { id: 'help', icon: HelpCircle, label: 'Help', path: "/Help" },
-        { id: 'logout', icon: LogOut, label: 'Logout' },
+        { id: "settings", icon: Settings, label: "Settings", path: "/settings1" },
+        { id: 'help', icon: HelpCircle, label: 'Help', path: "/help1" },
+        { id: 'logout', icon: LogOut, label: 'Logout', path: "/logout" },
     ];
 
     // Update activeTab based on current route
