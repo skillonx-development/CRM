@@ -1,39 +1,51 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MoreHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
+import CountUp from "react-countup";
+import { CreditCard, Users, FileText, Package } from "lucide-react";
 
 const widgets = [
   {
     title: "Total Revenue",
-    value: "50.8K",
-    change: "28.4%",
+    value: 125600,
+    prefix: "$",
+    change: "12.5% from last month",
     positive: true,
+    icon: CreditCard,
   },
   {
-    title: "Sales Target",
-    value: "92%",
-    change: "3.1%",
+    title: "Active Leads",
+    value: 48,
+    change: "7.2% from last month",
     positive: true,
-    negativeChange: "12.6%",
+    icon: Users,
   },
   {
-    title: "Total Orders",
-    value: "756",
-    change: "3.1%",
+    title: "Proposals Sent",
+    value: 32,
+    change: "4.1% from last month",
     positive: true,
+    icon: FileText,
   },
   {
-    title: "Active Deals",
-    value: "2.3K",
-    change: "11.3%",
-    positive: true,
+    title: "Completed Orders",
+    value: 18,
+    change: "2.3% from last month",
+    positive: false,
+    icon: Package,
   },
 ];
 
 const AnalyticsOverview = () => {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    setAnimate(true);
+  }, []);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6 mt-[-10px]">
       {widgets.map((widget, index) => (
         <motion.div
           key={index}
@@ -44,25 +56,14 @@ const AnalyticsOverview = () => {
           <div className="bg-background-card text-text shadow-card border border-border rounded-xl p-4">
             <div className="flex justify-between items-center">
               <h3 className="text-sm text-text-muted">{widget.title}</h3>
-              <MoreHorizontal className="text-text-disabled" size={16} />
+              <widget.icon className="text-primary" size={18} />
             </div>
             <div className="mt-2">
-              <div className="text-2xl font-semibold">{widget.value}</div>
-              <div className="flex items-center gap-2 mt-2">
-                <span
-                  className={`text-xs font-medium px-2 py-1 rounded-md ${
-                    widget.positive
-                      ? "bg-status-success/20 text-status-success"
-                      : "bg-status-error/20 text-status-error"
-                  }`}
-                >
-                  {widget.change} {widget.positive ? "↑" : "↓"}
-                </span>
-                {widget.negativeChange && (
-                  <span className="text-xs font-medium px-2 py-1 rounded-md bg-status-error/20 text-status-error">
-                    {widget.negativeChange} ↓
-                  </span>
-                )}
+              <div className="text-2xl font-semibold">
+                <CountUp start={0} end={widget.value} duration={2} prefix={widget.prefix || ""} />
+              </div>
+              <div className={`text-xs mt-2 font-medium ${widget.positive ? "text-green-600" : "text-red-600"}`}>
+                {widget.positive ? "\u2191" : "\u2193"} {widget.change}
               </div>
             </div>
           </div>

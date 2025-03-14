@@ -1,9 +1,9 @@
 import React from "react";
 import Layout from "./Shared/Layout";
 import AnalyticsOverview from "./Widgets/AnalyticsOverview";
-import AnalyticsChart from "./Widgets/AnalyticsChart";
-import ProjectTable from "./Widgets/projecttable";
-import RecentActivity from "./Widgets/RecentActivity";
+import ActiveOrders from "./Widgets/ActiveOrders";
+import Notifications from "./Widgets/Notifications";
+import RecentProposals from "./Widgets/RecentProposals";
 
 const SalesDashboard = () => {
   return (
@@ -11,14 +11,18 @@ const SalesDashboard = () => {
         {/* Widgets Section */}
       <div className="p-6 mt">
           <AnalyticsOverview />
-          <AnalyticsChart />
         </div>
       {/* Add the ProjectTable component */}
-      <div className="p-6  min-h-screen text-white">
-      <ProjectTable />
-      <div className="py-6   text-white">
+      <div className="p-6 flex gap-6">
+        <div className="w-3/5">
+          <ActiveOrders />
+        </div>
+        <div className="w-2/5">
+          <Notifications />
+        </div>
       </div>
-      <RecentActivity />
+      <div className="w-3/5">
+        <RecentProposals />
       </div>
 
     </Layout>
