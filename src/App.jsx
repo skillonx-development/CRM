@@ -1,58 +1,44 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Public Pages
+// import Login from './Pages/Auth/Login';
+// import Register from './Pages/Auth/Register';
+
+
+// Sales Dashboard
 import SalesDashboard from './Pages/Dashboard/SalesDashboard/SalesDashboard';
-import SalesRevenue from './Pages/Dashboard/SalesDashboard/SalesRevenue';
-import SalesOrder from './Pages/Dashboard/SalesDashboard/SalesOrders';
-import SalesCalendar from './Pages/Dashboard/SalesDashboard/SalesCalendar';
-import SAlessettings from './Pages/Dashboard/SalesDashboard/SalesSettings';
-import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
-import MarketingDashboard from './Pages/Dashboard/MaketingDashboard/MarketingDashboard';
-import MarketingCampaign from './Pages/Dashboard/MaketingDashboard/MarketingCampaign';
-import MarketingCalendar from './Pages/Dashboard/MaketingDashboard/MarketingCalendar';
-import ProductList from './Pages/Dashboard/MaketingDashboard/ProductList';
-import MarketingSocial from './Pages/Dashboard/MaketingDashboard/MarketingSocial';
-
-import Register from './Pages/Auth/Register';
-import Login from './Pages/Auth/Login';
-
-import TechDashboard from './Pages/Dashboard/TechDashboard/TechDashboard';
-import TechProjects from './Pages/Dashboard/TechDashboard/TechProjects';
-import TechTeam from './Pages/Dashboard/TechDashboard/TechTeam';
-import TechReport from './Pages/Dashboard/TechDashboard/TechReport';
-import TechSettings from './Pages/Dashboard/TechDashboard/TechSettings';
-import TechHelp from './Pages/Dashboard/TechDashboard/TechHelp';
-
+import SalesLead from './Pages/Dashboard/SalesDashboard/SalesLead';
+import SalesProposals from './Pages/Dashboard/SalesDashboard/SalesProposals';
+import SalesOrders from './Pages/Dashboard/SalesDashboard/SalesOrders';
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<SalesDashboard/>} />
-        <Route path="/revenue" element={<SalesRevenue/>} />
-        <Route path="/orders" element={<SalesOrder/>} />
-        <Route path="/calendar" element={<SalesCalendar/>} />
-        <Route path="/Settings" element={<SAlessettings/>} />
-        <Route path="/help" element={<SalesHelp/>} />
-        <Route path="/marketing" element={<MarketingDashboard/>} />
-        <Route path="/marketingcampaign" element={<MarketingCampaign/>} />
-        <Route path="/marketingcalendar" element={<MarketingCalendar/>} />
-        <Route path="/marketingsocial" element={<MarketingSocial/>} />
-        <Route path="/productlist" element={<ProductList/>} />
+          <Router>
+            <Routes>
+              <Route>
+                {/* Sales Dashboard */}
+                <Route path="/sales" element={<SalesDashboard />} />
+                <Route path="/sales/lead" element={<SalesLead />} />
+                <Route path="/sales/proposals" element={<SalesProposals/>} />
+                <Route path="/sales/orders" element={<SalesOrders />} />
+                <Route path="/salaes/orders" element={<SalesOrders />} />
+              </Route>
 
-        <Route path="/login" element={<Login/>} />
-        <Route path="/register" element={<Register/>} />
-
-
-
-        <Route path="/Tech" element={<TechDashboard/>} />
-        <Route path="/Projects" element={<TechProjects/>} />
-        <Route path="/teams" element={<TechTeam />} />
-        <Route path="/report" element={<TechReport />}  />
-        <Route path="/settings1" element={<TechSettings />}/>
-        <Route path="/help1" element={<TechHelp />} />
-
-      </Routes>
-    </Router>
-    
+              {/* 404 Route */}
+              <Route path="*" element={
+                <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                  <div className="text-center">
+                    <h1 className="text-6xl font-bold text-primary">404</h1>
+                    <p className="text-xl text-gray-600 mt-4">Page not found</p>
+                    <a href="/" className="mt-6 inline-block text-primary hover:underline">
+                      Go back home
+                    </a>
+                  </div>
+                </div>
+              } />
+            </Routes>
+          </Router>
   );
 };
 

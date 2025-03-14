@@ -1,37 +1,42 @@
+"use client";
+
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-    Home,
-    BarChart2,
-    Calendar,
-    ShoppingBag,
-    Settings,
+    LayoutGrid,
+    Users,
+    FileText,
+    Package,
+    CreditCard,
     ChevronLeft,
+    Settings,
     HelpCircle,
     LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "../Assets/logo.png"; // Ensure the path is correct
 
-function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
+function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
-    const location = useLocation(); // Get current route
+    const location = useLocation();
 
     const menuItems = [
-        { id: "dashboard", icon: Home, label: "Dashboard", path: "/" },
-        { id: "revenue", icon: BarChart2, label: "Revenue", path: "/revenue" },
-        { id: "orders", icon: ShoppingBag, label: "Orders", path: "/orders" },
-        { id: "calendar", icon: Calendar, label: "Calendar", path: "/calendar" },
+        { id: "overview", icon: LayoutGrid, label: "Overview", path: "/sales" },
+        { id: "leads", icon: Users, label: "Leads", path: "/sales/lead" },
+        { id: "proposals", icon: FileText, label: "Proposals", path: "/sales/proposals" },
+        { id: "orders", icon: Package, label: "Orders", path: "/sales/orders" },
+        { id: "billing", icon: CreditCard, label: "Billing", path: "/sales/billing" },
     ];
 
     const bottomMenuItems = [
-        { id: "settings", icon: Settings, label: "Settings", path: "/settings" },
-        { id: 'help', icon: HelpCircle, label: 'Help', path: "/Help" },
+        { id: "settings", icon: Settings, label: "Settings", path: "/sales/settings" },
+        { id: 'help', icon: HelpCircle, label: 'Help', path: "/sales/help" },
         { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
 
     // Update activeTab based on current route
     useEffect(() => {
-        const currentTab = menuItems.concat(bottomMenuItems).find((item) => item.path === location.pathname);
+        const currentTab = [...menuItems, ...bottomMenuItems].find(item => item.path === location.pathname);
         if (currentTab) {
             setActiveTab(currentTab.id);
         }
@@ -53,7 +58,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
 
     const toggleButtonVariants = {
         expanded: { rotate: 0, transition: { duration: 0.3 } },
-        collapsed: { rotate: 180, transition: {duration: 0.3 }}
+        collapsed: { rotate: 180, transition: { duration: 0.3 } }
     };
 
     return (
@@ -64,25 +69,30 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
             variants={sidebarVariants}
         >
             <div className="p-4 flex items-center justify-between">
-    <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
-        <img src="./src/Pages/Dashboard/SalesDashboard/Assets/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
-        <AnimatePresence>
-            {!collapsed && (
-                <motion.h1 className="text-xl font-bold text-text" initial="hidden" animate="visible" exit="hidden" variants={textVariants}>
-                    SkillonX
-                </motion.h1>
-            )}
-        </AnimatePresence>
-    </div>
-    <motion.button
-        onClick={toggleSidebar}
-        className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text ${collapsed ? "absolute top-4 right-4" : ""}`}
-        variants={toggleButtonVariants}
-    >
-        <ChevronLeft size={20} />
-    </motion.button>
-</div>
-
+                <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
+                    <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
+                    <AnimatePresence>
+                        {!collapsed && (
+                            <motion.h1
+                                className="text-xl font-bold text-text"
+                                initial="hidden"
+                                animate="visible"
+                                exit="hidden"
+                                variants={textVariants}
+                            >
+                                SkillonX
+                            </motion.h1>
+                        )}
+                    </AnimatePresence>
+                </div>
+                <motion.button
+                    onClick={toggleSidebar}
+                    className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text ${collapsed ? "absolute top-4 right-4" : ""}`}
+                    variants={toggleButtonVariants}
+                >
+                    <ChevronLeft size={20} />
+                </motion.button>
+            </div>
 
             <nav className="mt-6">
                 <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
