@@ -69,3 +69,9 @@ body {
 .react-calendar__tile--weekend {
     color: #E53E3E !important;
 }
+.recharts-tooltip-wrapper {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  

@@ -1,5 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
+import Proposal from './Pages/Dashboard/Tech/Proposals';
+import Instructor from './Pages/Dashboard/Tech/Instructor';
+import Feedback from './Pages/Dashboard/Tech/Feedback';
 
 // Public Pages
 // import Login from './Pages/Auth/Login';
@@ -11,7 +15,8 @@ import SalesDashboard from './Pages/Dashboard/SalesDashboard/SalesDashboard';
 import SalesLead from './Pages/Dashboard/SalesDashboard/SalesLead';
 import SalesProposals from './Pages/Dashboard/SalesDashboard/SalesProposals';
 import SalesOrders from './Pages/Dashboard/SalesDashboard/SalesOrders';
-
+import Workshop from './Pages/Dashboard/Tech/Workshop';
+import Curriculum from './Pages/Dashboard/Tech/Curriculum';
 const App = () => {
   return (
           <Router>
@@ -23,6 +28,13 @@ const App = () => {
                 <Route path="/sales/proposals" element={<SalesProposals/>} />
                 <Route path="/sales/orders" element={<SalesOrders />} />
                 <Route path="/salaes/orders" element={<SalesOrders />} />
+                <Route path="/tech" element={<TechDashboard />} />
+                <Route path="/tech/proposal" element={<Proposal />} />
+                <Route path="/tech/instructor" element={<Instructor />} />
+                <Route path="/tech/workshop" element={<Workshop />} />
+                <Route path="/tech/curriculum" element={<Curriculum />} />
+                <Route path="/tech/feedback" element={<Feedback />} />
+
               </Route>
 
               {/* 404 Route */}
