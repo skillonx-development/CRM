@@ -19,6 +19,10 @@ import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
 // Marketing Dashboard
 import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
 
+// Admin Dashboard
+import AdminDashboard from './Pages/Dashboard/AdminDashboard/AdminDashboard';
+
+
 const App = () => {
   return (
           <Router>
@@ -37,7 +41,9 @@ const App = () => {
                 {/* Marketing Dahshboard */}
                 <Route path="/marketing" element={<MarketingDashboard />} />
 
+                {/* Admin Dashboard */}
 
+                <Route path="/admin" element={<AdminDashboard/>}/>
               </Route>
 
               {/* 404 Route */}
