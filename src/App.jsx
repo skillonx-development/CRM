@@ -11,6 +11,13 @@ import SalesDashboard from './Pages/Dashboard/SalesDashboard/SalesDashboard';
 import SalesLead from './Pages/Dashboard/SalesDashboard/SalesLead';
 import SalesProposals from './Pages/Dashboard/SalesDashboard/SalesProposals';
 import SalesOrders from './Pages/Dashboard/SalesDashboard/SalesOrders';
+import SalesBilling from './Pages/Dashboard/SalesDashboard/SalesBilling';
+import SalesSettings from './Pages/Dashboard/SalesDashboard/SalesSettings';
+import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
+
+
+// Marketing Dashboard
+import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
 
 const App = () => {
   return (
@@ -23,6 +30,14 @@ const App = () => {
                 <Route path="/sales/proposals" element={<SalesProposals/>} />
                 <Route path="/sales/orders" element={<SalesOrders />} />
                 <Route path="/salaes/orders" element={<SalesOrders />} />
+                <Route path="/sales/billing" element={<SalesBilling />} />
+                <Route path="/sales/settings" element={<SalesSettings />} />
+                <Route path="/sales/help" element={<SalesHelp />} />
+
+                {/* Marketing Dahshboard */}
+                <Route path="/marketing" element={<MarketingDashboard />} />
+
+
               </Route>
 
               {/* 404 Route */}
