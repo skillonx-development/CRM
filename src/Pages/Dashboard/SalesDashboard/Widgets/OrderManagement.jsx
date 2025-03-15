@@ -11,15 +11,18 @@ const ordersData = [
 ];
 
 const statusColors = {
-  Accepted: "bg-green-500",
-  Pending: "bg-yellow-500",
-  Completed: "bg-blue-500",
-  Rejected: "bg-red-500"
+  Accepted: "bg-status-success",
+  Pending: "bg-status-warning",
+  Completed: "bg-status-info",
+  Rejected: "bg-status-error"
 };
+
+const filters = ["All", "Pending", "Accepted", "Completed", "Rejected"];
 
 export default function OrderManagement() {
   const [orders, setOrders] = useState(ordersData);
   const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState("All");
   const [newOrder, setNewOrder] = useState({
     title: "", school: "", schedule: "", participants: "", price: "", status: "Pending"
   });
@@ -30,42 +33,56 @@ export default function OrderManagement() {
     setNewOrder({ title: "", school: "", schedule: "", participants: "", price: "", status: "Pending" });
   };
 
+  const handleManageOrder = (order) => {
+    console.log("Managing order:", order);
+  };
+
+  const filteredOrders = filter === "All" ? orders : orders.filter(order => order.status === filter);
+
   return (
-    <div className="p-6 bg-gray-900 min-h-screen text-white">
+    <div className="p-6 bg-background min-h-screen text-text">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Order Management</h1>
-        <button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded" onClick={() => setShowForm(true)}>Create New Order</button>
+        <button className="bg-primary hover:bg-primary-dark px-4 py-2 rounded text-white" onClick={() => setShowForm(true)}>Create New Order</button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {orders.map(order => (
+      <div className="mb-4 flex space-x-2">
+        {filters.map((status) => (
+          <button key={status} className={`px-4 py-2 rounded ${filter === status ? "bg-primary text-white" : "bg-background-hover"}`} onClick={() => setFilter(status)}>
+            {status}
+          </button>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        {filteredOrders.map(order => (
           <motion.div key={order.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="bg-gray-800 shadow-lg p-4 rounded-2xl">
+            <div className="bg-background-card shadow-card p-4 rounded-lg border border-border">
               <div className="flex justify-between items-center mb-3">
-                <h2 className="text-lg font-semibold">{order.title}</h2>
+                <h2 className="text-lg font-semibold text-text">{order.title}</h2>
                 <span className={`text-xs text-white px-3 py-1 rounded-full ${statusColors[order.status]}`}>{order.status}</span>
               </div>
-              <p className="text-sm text-gray-400">{order.school}</p>
-              <p className="text-sm text-gray-400">Schedule: {order.schedule}</p>
-              <p className="text-sm text-gray-400">Participants: {order.participants}</p>
-              <p className="text-lg font-bold mt-2">${order.price}</p>
-              <button className="w-full bg-purple-600 hover:bg-purple-700 mt-4 px-4 py-2 rounded">Manage Order</button>
+              <p className="text-sm text-text-muted">{order.school}</p>
+              <div className="flex justify-between bg-background-hover p-2 rounded-lg mt-2">
+                <p className="text-sm text-text">📅 {order.schedule}</p>
+                <p className="text-sm text-text">👥 {order.participants} students</p>
+              </div>
+              <p className="text-lg font-bold mt-3 text-text">${order.price}</p>
+              <button className="w-full bg-primary hover:bg-primary-dark mt-4 px-4 py-2 rounded text-white" onClick={() => handleManageOrder(order)}>Manage Order</button>
             </div>
           </motion.div>
         ))}
       </div>
-
       {showForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-gray-800 p-6 rounded-lg w-96 shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Create New Order</h2>
-            <input placeholder="Title" className="w-full p-2 mb-2 bg-gray-700 rounded" value={newOrder.title} onChange={e => setNewOrder({ ...newOrder, title: e.target.value })} />
-            <input placeholder="School" className="w-full p-2 mb-2 bg-gray-700 rounded" value={newOrder.school} onChange={e => setNewOrder({ ...newOrder, school: e.target.value })} />
-            <input placeholder="Schedule" className="w-full p-2 mb-2 bg-gray-700 rounded" value={newOrder.schedule} onChange={e => setNewOrder({ ...newOrder, schedule: e.target.value })} />
-            <input placeholder="Participants" type="number" className="w-full p-2 mb-2 bg-gray-700 rounded" value={newOrder.participants} onChange={e => setNewOrder({ ...newOrder, participants: e.target.value })} />
-            <input placeholder="Price" type="number" className="w-full p-2 mb-2 bg-gray-700 rounded" value={newOrder.price} onChange={e => setNewOrder({ ...newOrder, price: e.target.value })} />
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-background-card p-6 rounded-lg w-96 shadow-lg">
+            <h2 className="text-xl font-bold mb-4 text-text">Create New Order</h2>
+            <input placeholder="Title" className="w-full p-2 mb-2 bg-background-hover rounded text-text" value={newOrder.title} onChange={e => setNewOrder({ ...newOrder, title: e.target.value })} />
+            <input placeholder="School" className="w-full p-2 mb-2 bg-background-hover rounded text-text" value={newOrder.school} onChange={e => setNewOrder({ ...newOrder, school: e.target.value })} />
+            <input placeholder="Schedule" className="w-full p-2 mb-2 bg-background-hover rounded text-text" value={newOrder.schedule} onChange={e => setNewOrder({ ...newOrder, schedule: e.target.value })} />
+            <input placeholder="Participants" type="number" className="w-full p-2 mb-2 bg-background-hover rounded text-text" value={newOrder.participants} onChange={e => setNewOrder({ ...newOrder, participants: e.target.value })} />
+            <input placeholder="Price" type="number" className="w-full p-2 mb-2 bg-background-hover rounded text-text" value={newOrder.price} onChange={e => setNewOrder({ ...newOrder, price: e.target.value })} />
             <div className="flex justify-between mt-4">
-              <button className="bg-gray-600 px-4 py-2 rounded" onClick={() => setShowForm(false)}>Cancel</button>
-              <button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded" onClick={handleCreateOrder}>Create</button>
+              <button className="bg-border px-4 py-2 rounded text-white" onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="bg-primary hover:bg-primary-dark px-4 py-2 rounded text-white" onClick={handleCreateOrder}>Create</button>
             </div>
           </motion.div>
         </div>

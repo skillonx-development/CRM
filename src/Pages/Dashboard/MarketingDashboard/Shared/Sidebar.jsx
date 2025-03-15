@@ -4,35 +4,36 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
     LayoutGrid,
-    Users,
     FileText,
-    Package,
-    CreditCard,
-    ChevronLeft,
+    Users,
+    BarChart2,
+    Megaphone,
     Settings,
+    ChevronLeft,
     HelpCircle,
     LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../Assets/logo.png"; // Ensure the path is correct
+import logo from "../Assets/logo.png";
 
 function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
     const location = useLocation();
 
     const menuItems = [
-        { id: "overview", icon: LayoutGrid, label: "Overview", path: "/sales" },
-        { id: "leads", icon: Users, label: "Leads", path: "/sales/lead" },
-        { id: "proposals", icon: FileText, label: "Proposals", path: "/sales/proposals" },
-        { id: "orders", icon: Package, label: "Orders", path: "/sales/orders" },
-        { id: "billing", icon: CreditCard, label: "Billing", path: "/sales/billing" },
+        { id: "dashboard", icon: LayoutGrid, label: "Overview", path: "/marketing" },
+        { id: "proposals", icon: FileText, label: "Proposals", path: "/marketing/proposals" },
+        { id: "teachers", icon: Users, label: "Teachers", path: "/marketing/teachers" },
+        { id: "feedback", icon: BarChart2, label: "Feedback", path: "/marketing/feedback" },
+        { id: "promotion", icon: Megaphone, label: "Promotion", path: "/marketing/promotion" },
     ];
 
     const bottomMenuItems = [
-        { id: "settings", icon: Settings, label: "Settings", path: "/sales/settings" },
-        { id: 'help', icon: HelpCircle, label: 'Help', path: "/sales/help" },
+        { id: "settings", icon: Settings, label: "Settings", path: "/marketing/settings" },
+        { id: 'help', icon: HelpCircle, label: 'Help', path: "/marketing/help" },
         { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
+
 
     // Update activeTab based on current route
     useEffect(() => {
@@ -96,51 +97,53 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
 
             <nav className="mt-6">
                 <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
-                    {menuItems.map((item) => (
-                        <li key={item.id}>
-                            <button
-                                onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                    location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                }`}
-                                title={collapsed ? item.label : ""}
-                            >
-                                <item.icon className="h-5 w-5" />
-                                <AnimatePresence>
-                                    {!collapsed && (
-                                        <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
-                                            {item.label}
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
-                            </button>
-                        </li>
-                    ))}
+                {menuItems.map((item) => (
+    <li key={item.id}>
+        <button
+            onClick={() => navigate(item.path)}
+            className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
+                location.pathname.startsWith(item.path) ? "bg-primary text-text font-semibold" : "text-text-muted hover:bg-background-hover"
+            }`}
+            title={collapsed ? item.label : ""}
+        >
+            <item.icon className="h-5 w-5" />
+            <AnimatePresence>
+                {!collapsed && (
+                    <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                        {item.label}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+        </button>
+    </li>
+))}
+
                 </ul>
             </nav>
 
             <div className={`absolute bottom-8 w-full ${collapsed ? "px-2" : "px-4"}`}>
                 <ul className="space-y-2">
-                    {bottomMenuItems.map((item) => (
-                        <li key={item.id}>
-                            <button
-                                onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                    location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                }`}
-                                title={collapsed ? item.label : ""}
-                            >
-                                <item.icon className="h-5 w-5" />
-                                <AnimatePresence>
-                                    {!collapsed && (
-                                        <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
-                                            {item.label}
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
-                            </button>
-                        </li>
-                    ))}
+                {bottomMenuItems.map((item) => (
+    <li key={item.id}>
+        <button
+            onClick={() => navigate(item.path)}
+            className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
+                location.pathname.startsWith(item.path) ? "bg-primary text-text font-semibold" : "text-text-muted hover:bg-background-hover"
+            }`}
+            title={collapsed ? item.label : ""}
+        >
+            <item.icon className="h-5 w-5" />
+            <AnimatePresence>
+                {!collapsed && (
+                    <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                        {item.label}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+        </button>
+    </li>
+))}
+
                 </ul>
             </div>
         </motion.aside>
