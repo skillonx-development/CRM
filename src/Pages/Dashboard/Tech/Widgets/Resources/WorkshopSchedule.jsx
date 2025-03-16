@@ -7,7 +7,6 @@ import {
   FaTimes,
   FaCheck,
   FaMapMarkerAlt,
-  FaBook,
   FaDesktop,
 } from "react-icons/fa";
 
@@ -130,17 +129,20 @@ const WorkshopSchedule = () => {
                   {workshop.mode === "Online" ? <FaDesktop /> : <FaMapMarkerAlt />}
                   {workshop.location}
                 </p>
-                <span
-                  className={`px-3 py-1 rounded text-white ${
-                    workshop.status === "Scheduled"
-                      ? "bg-status-warning"
-                      : workshop.status === "Ongoing"
-                      ? "bg-status-info"
-                      : "bg-status-success"
-                  }`}
-                >
-                  {workshop.status}
-                </span>
+                
+                {/* Updated Status Display */}
+                <div className="flex items-center gap-2 mt-2">
+                  <span
+                    className={`w-3 h-3 rounded-full ${
+                      workshop.status === "Scheduled"
+                        ? "bg-yellow-400"
+                        : workshop.status === "Ongoing"
+                        ? "bg-blue-400"
+                        : "bg-green-400"
+                    }`}
+                  ></span>
+                  <span className="text-text-muted">{workshop.status}</span>
+                </div>
               </div>
 
               {/* Actions */}

@@ -1,103 +1,98 @@
-import React, { useState } from 'react';
-import { Info } from 'lucide-react';
+import React from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+// Register required Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const WorkshopChart = () => {
-  const [tooltipInfo, setTooltipInfo] = useState(null);
-  
-  // Chart data
-  const categories = [
-    { topic: 'React', count: 12 },
-    { topic: 'NodeJs', count: 8 },
-    { topic: 'AI/ML', count: 6 },
-    { topic: 'UI/UX', count: 9 },
-    { topic: 'DevOps', count: 5 }
-  ];
-  
-  // Maximum value for scaling
-  const maxValue = Math.max(...categories.map(cat => cat.count));
-  
-  // Handle mouse events for tooltip
-  const showTooltip = (category) => {
-    setTooltipInfo({
-      topic: category.topic,
-      value: category.count
-    });
+  const data = {
+    labels: ["React", "NodeJs", "AI/ML", "UI/UX", "DevOps"],
+    datasets: [
+      {
+        label: "Workshop Categories Distribution",
+        data: [12, 9, 6, 3, 0], // Workshop counts
+        backgroundColor: [
+          "#8b5cf6", // Purple
+          "#10b981", // Green
+          "#eab308", // Yellow
+          "#ef4444", // Red
+          "#3b82f6", // Blue
+        ],
+        borderRadius: 5, // Smooth bar edges
+        barThickness: 30, // Reduce bar width
+        hoverBackgroundColor: "#ffffff", // Hover effect
+      },
+    ],
   };
-  
-  const hideTooltip = () => {
-    setTooltipInfo(null);
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false, // Hide legend for cleaner UI
+      },
+      title: {
+        display: true,
+        text: "Workshop Categories Distribution",
+        color: "#ffffff",
+        font: {
+          size: 18,
+          weight: "bold",
+        },
+        padding: {
+          bottom: 10,
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: "#ffffff",
+          font: {
+            size: 14,
+          },
+        },
+        grid: {
+          display: false, // Hide grid lines for a clean look
+        },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 3,
+          color: "#ffffff",
+          font: {
+            size: 14,
+          },
+        },
+        grid: {
+          color: "#1f2937", // Dark grid lines
+        },
+      },
+    },
+    animation: {
+      duration: 1200, // Smooth animation
+      easing: "easeInOutQuart",
+    },
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6 shadow-lg w-full max-w-2xl">
-      <div className="mb-4">
-        <h2 className="text-white text-xl font-bold">Workshop Categories</h2>
-        <p className="text-gray-400 text-sm">Distribution by topic</p>
-      </div>
-      
-      <div className="relative h-72">
-        {/* Y-axis labels */}
-        <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-gray-400 text-xs">
-          <span>12</span>
-          <span>9</span>
-          <span>6</span>
-          <span>3</span>
-          <span>0</span>
-        </div>
-        
-        {/* Chart container */}
-        <div className="ml-8 h-full flex items-end space-x-6">
-          {categories.map((category, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center"
-              onMouseEnter={() => showTooltip(category)}
-              onMouseLeave={hideTooltip}
-            >
-              <div
-                className={`w-12 rounded-t-sm ${
-                  category.topic === 'AI/ML' && tooltipInfo?.topic === 'AI/ML' 
-                    ? 'bg-gray-300' 
-                    : 'bg-purple-500'
-                }`}
-                style={{
-                  height: `${(category.count / maxValue) * 100}%`,
-                  minHeight: '4px'
-                }}
-              ></div>
-              <span className="mt-2 text-gray-300 text-sm">{category.topic}</span>
-            </div>
-          ))}
-        </div>
-        
-        {/* Tooltip */}
-        {tooltipInfo && (
-          <div 
-            className="absolute bg-gray-800 border border-gray-700 p-3 rounded shadow-md text-white"
-            style={{
-              top: '30%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 10
-            }}
-          >
-            <div className="flex items-center space-x-2">
-              <span className="font-medium">{tooltipInfo.topic}</span>
-              <Info size={12} className="text-gray-400" />
-            </div>
-            <div className="mt-1">
-              <span className="text-sm">value: {tooltipInfo.value}</span>
-            </div>
-          </div>
-        )}
-        
-        {/* Horizontal grid lines */}
-        <div className="absolute left-8 right-0 top-0 h-full pointer-events-none">
-          <div className="border-t border-gray-700 opacity-20 h-1/4"></div>
-          <div className="border-t border-gray-700 opacity-20 h-1/4"></div>
-          <div className="border-t border-gray-700 opacity-20 h-1/4"></div>
-          <div className="border-t border-gray-700 opacity-20 h-1/4"></div>
-        </div>
+    <div className="w-full max-w-lg mx-auto bg-background-card p-6 rounded-lg shadow-card">
+      <h2 className="text-text-muted text-lg font-semibold mb-4 text-center">
+        Workshop Distribution
+      </h2>
+      <div className="h-[300px]">
+        <Bar data={data} options={options} />
       </div>
     </div>
   );

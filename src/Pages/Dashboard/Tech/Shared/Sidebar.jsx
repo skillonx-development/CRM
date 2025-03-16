@@ -17,7 +17,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const menuItems = [
         { id: "dashboard", icon: Home, label: "Dashboard", path: "/tech" },
         { id: "proposal", icon: BarChart2, label: "Proposals", path: "/tech/proposal" },
-        { id: "worshops", icon: ShoppingBag, label: "Workshops", path: "/tech/workshop" },
+        { id: "worshops", icon: ShoppingBag, label: "Resources", path: "/tech/workshop" },
         { id: "curriculum", icon: Calendar, label: "Curriculum", path: "/tech/curriculum" },
         // { id: "feedback", icon: Calendar, label: "Feedback", path: "/tech/feedback" },
 

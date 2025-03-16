@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
-import Proposal from './Pages/Dashboard/Tech/Proposals';
+import Proposals from './Pages/Dashboard/Tech/Proposals';
 import Instructor from './Pages/Dashboard/Tech/Instructor';
 import Feedback from './Pages/Dashboard/Tech/Feedback';
-
+import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
 // Public Pages
 // import Login from './Pages/Auth/Login';
 // import Register from './Pages/Auth/Register';
@@ -30,6 +30,8 @@ import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingPro
 import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
 import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
 import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
+import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
+
 
 // Admin Dashboard
 import AdminDashboard from './Pages/Dashboard/AdminDashboard/AdminDashboard';
@@ -49,7 +51,7 @@ const App = () => {
                 <Route path="/salaes/orders" element={<SalesOrders />} />
 
                 <Route path="/tech" element={<TechDashboard />} />
-                <Route path="/tech/proposal" element={<Proposal />} />
+                <Route path="/tech/proposal" element={<Proposals />} />
                 <Route path="/tech/instructor" element={<Instructor />} />
                 <Route path="/tech/workshop" element={<Workshop />} />
                 <Route path="/tech/curriculum" element={<Curriculum />} />
@@ -66,6 +68,8 @@ const App = () => {
                 <Route path="/marketing/teachers" element={<MarketingTeacher />} />
                 <Route path="/marketing/settings" element={<MarketingSettings />} />
                 <Route path="/marketing/help" element={<MarketingHelp />} />
+                <Route path="/marketing/feedback" element={<MarketingFeedback />} />
+                <Route path="/marketing/promotion" element={<MarketingPromotion />} />
 
                 {/* Admin Dashboard */}
 

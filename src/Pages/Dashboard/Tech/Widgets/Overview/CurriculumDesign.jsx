@@ -63,10 +63,7 @@ const CurriculumDesign = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-text">Curriculum Design</h1>
-          <p className="text-text-muted">Design and organize workshop curriculum.</p>
-        </div>
+       
 
         <div className="bg-background-card rounded-lg shadow-card p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
