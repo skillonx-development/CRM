@@ -1,9 +1,9 @@
 import React from "react";
 import Layout from "./Shared/Layout";
-import Settings from "./Widgets/Settings";
+import Settings from "../SalesDashboard/Widgets/Settings";
 
 
-const SalesSettings = () => {
+const MarketingSettings = () => {
   return (
     <Layout>
     {/* Widgets Section */}
@@ -15,4 +15,4 @@ const SalesSettings = () => {
   );
 };
 
-export default SalesSettings;
+export default MarketingSettings;

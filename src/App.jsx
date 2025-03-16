@@ -18,6 +18,10 @@ import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
 
 // Marketing Dashboard
 import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
+import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingProposal';
+import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
+import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
+import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
 
 const App = () => {
   return (
@@ -36,6 +40,10 @@ const App = () => {
 
                 {/* Marketing Dahshboard */}
                 <Route path="/marketing" element={<MarketingDashboard />} />
+                <Route path="/marketing/proposals" element={<MarketingProposal />} />
+                <Route path="/marketing/teachers" element={<MarketingTeacher />} />
+                <Route path="/marketing/settings" element={<MarketingSettings />} />
+                <Route path="/marketing/help" element={<MarketingHelp />} />
 
 
               </Route>
