@@ -39,10 +39,9 @@ const CurriculumDesign = () => {
   ];
 
   const quickActions = [
-    { id: 1, title: "Templates", icon: "📄" },
-    { id: 2, title: "Resources", icon: "📚" },
-    { id: 3, title: "Analytics", icon: "📊" },
-    { id: 4, title: "Collaboration", icon: "👥" },
+
+    { id: 1, title: "Resources", icon: "📚" },
+    { id: 2, title: "Analytics", icon: "📊" },
   ];
 
   const getCategoryColor = (category) => {
