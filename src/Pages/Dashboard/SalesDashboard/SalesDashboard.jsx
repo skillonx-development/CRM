@@ -8,25 +8,26 @@ import RecentProposals from "./Widgets/RecentProposals";
 const SalesDashboard = () => {
   return (
     <Layout>
-        {/* Widgets Section */}
-      <div className="p-6 mt">
-          <AnalyticsOverview />
-        </div>
-      {/* Add the ProjectTable component */}
-      <div className="p-6 flex gap-6">
-        <div className="w-3/5">
-          <ActiveOrders />
-        </div>
-        <div className="w-2/5">
-          <Notifications />
-        </div>
-      </div>
-      <div className="w-3/5">
-        <RecentProposals />
-      </div>
+      <div className="p-6 space-y-6">
+        {/* Analytics Overview */}
+        <AnalyticsOverview />
 
+        {/* Active Orders & Notifications */}
+        <div className="flex gap-6 ml-5">
+          <div className="w-2/3">
+            <ActiveOrders />
+          </div>
+          <div className="w-1/3">
+            <Notifications />
+          </div>
+        </div>
+
+        {/* Recent Proposals */}
+        <div>
+          <RecentProposals />
+        </div>
+      </div>
     </Layout>
-
   );
 };
 

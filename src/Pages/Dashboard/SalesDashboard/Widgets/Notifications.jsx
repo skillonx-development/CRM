@@ -23,7 +23,7 @@ const notifications = [
 
 const Notifications = () => {
   return (
-    <div className="bg-background-card p-6 rounded-xl shadow-card border border-border">
+    <div className="bg-background-card p-4 rounded-xl shadow-card border border-border">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <Bell className="text-primary" size={18} />

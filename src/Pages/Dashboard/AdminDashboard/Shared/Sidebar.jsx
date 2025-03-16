@@ -3,36 +3,42 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-    LayoutGrid,
-    Users,
-    FileText,
-    Package,
+    LayoutDashboard,
+    ClipboardCheck,
     CreditCard,
+    LineChart,
+    BarChart3,
+    CalendarClock,
+    Bell,
+    Lock,
+    UserCog,
     ChevronLeft,
-    Settings,
-    HelpCircle,
-    LogOut
+    ChevronRight,
+    Menu,
+    X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../Assets/logo.png"; // Ensure the path is correct
+import logo from "../Assets/logo.png";
 
 function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
     const location = useLocation();
 
     const menuItems = [
-        { id: "overview", icon: LayoutGrid, label: "Overview", path: "/sales" },
-        { id: "leads", icon: Users, label: "Leads", path: "/sales/lead" },
-        { id: "proposals", icon: FileText, label: "Proposals", path: "/sales/proposals" },
-        { id: "orders", icon: Package, label: "Orders", path: "/sales/orders" },
-        { id: "billing", icon: CreditCard, label: "Billing", path: "/sales/billing" },
+        { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+        { label: 'Approvals', href: '/approvals', icon: ClipboardCheck, badge: 5 },
+        { label: 'Financials', href: '/financials', icon: CreditCard },
+        { label: 'Analytics', href: '/analytics', icon: LineChart },
+        { label: 'Invoices', href: '/invoices', icon: BarChart3, badge: 2 },
+        { label: 'Scheduling', href: '/scheduling', icon: CalendarClock },
     ];
 
     const bottomMenuItems = [
-        { id: "settings", icon: Settings, label: "Settings", path: "/sales/settings" },
-        { id: 'help', icon: HelpCircle, label: 'Help', path: "/sales/help" },
-        { id: 'logout', icon: LogOut, label: 'Logout' },
+        { label: 'Notifications', href: '/notifications', icon: Bell, badge: 3 },
+        { label: 'Access Control', href: '/access-control', icon: Lock },
+        { label: 'User Management', href: '/users', icon: UserCog },
     ];
+
 
     // Update activeTab based on current route
     useEffect(() => {
@@ -100,9 +106,8 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <li key={item.id}>
                             <button
                                 onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                    location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                }`}
+                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname.startsWith(item.path) ? "bg-primary text-text font-semibold" : "text-text-muted hover:bg-background-hover"
+                                    }`}
                                 title={collapsed ? item.label : ""}
                             >
                                 <item.icon className="h-5 w-5" />
@@ -116,6 +121,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                             </button>
                         </li>
                     ))}
+
                 </ul>
             </nav>
 
@@ -125,9 +131,8 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <li key={item.id}>
                             <button
                                 onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                    location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                }`}
+                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname.startsWith(item.path) ? "bg-primary text-text font-semibold" : "text-text-muted hover:bg-background-hover"
+                                    }`}
                                 title={collapsed ? item.label : ""}
                             >
                                 <item.icon className="h-5 w-5" />
@@ -141,6 +146,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                             </button>
                         </li>
                     ))}
+
                 </ul>
             </div>
         </motion.aside>

@@ -15,8 +15,23 @@ import SalesDashboard from './Pages/Dashboard/SalesDashboard/SalesDashboard';
 import SalesLead from './Pages/Dashboard/SalesDashboard/SalesLead';
 import SalesProposals from './Pages/Dashboard/SalesDashboard/SalesProposals';
 import SalesOrders from './Pages/Dashboard/SalesDashboard/SalesOrders';
+
 import Workshop from './Pages/Dashboard/Tech/Workshop';
 import Curriculum from './Pages/Dashboard/Tech/Curriculum';
+
+import SalesBilling from './Pages/Dashboard/SalesDashboard/SalesBilling';
+import SalesSettings from './Pages/Dashboard/SalesDashboard/SalesSettings';
+import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
+
+
+// Marketing Dashboard
+import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
+
+// Admin Dashboard
+import AdminDashboard from './Pages/Dashboard/AdminDashboard/AdminDashboard';
+
+
+
 const App = () => {
   return (
           <Router>
@@ -28,12 +43,25 @@ const App = () => {
                 <Route path="/sales/proposals" element={<SalesProposals/>} />
                 <Route path="/sales/orders" element={<SalesOrders />} />
                 <Route path="/salaes/orders" element={<SalesOrders />} />
+
                 <Route path="/tech" element={<TechDashboard />} />
                 <Route path="/tech/proposal" element={<Proposal />} />
                 <Route path="/tech/instructor" element={<Instructor />} />
                 <Route path="/tech/workshop" element={<Workshop />} />
                 <Route path="/tech/curriculum" element={<Curriculum />} />
                 <Route path="/tech/feedback" element={<Feedback />} />
+
+
+                <Route path="/sales/billing" element={<SalesBilling />} />
+                <Route path="/sales/settings" element={<SalesSettings />} />
+                <Route path="/sales/help" element={<SalesHelp />} />
+
+                {/* Marketing Dahshboard */}
+                <Route path="/marketing" element={<MarketingDashboard />} />
+
+                {/* Admin Dashboard */}
+
+                <Route path="/admin" element={<AdminDashboard/>}/>
 
               </Route>
 
