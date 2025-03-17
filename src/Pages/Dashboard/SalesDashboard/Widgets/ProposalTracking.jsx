@@ -112,7 +112,7 @@ const ProposalTracking = () => {
       </div>
       
       {/* Main content */}
-      <div className="bg-background-card p-4 rounded-lg shadow-card border border-border">
+      <div className="bg-background p-4 rounded-lg shadow-card border border-border">
         <h2 className="text-xl font-semibold text-text flex items-center gap-2 mb-4">
           <FileText size={20} /> Proposals
         </h2>
