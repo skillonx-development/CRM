@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -13,24 +11,19 @@ import {
     Lock,
     UserCog,
     ChevronLeft,
-    ChevronRight,
-    Menu,
-    X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../Assets/logo.png";
+import logo from "../Assets/logo.png"; // Ensure the path is correct
 
 function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
     const location = useLocation();
 
     const menuItems = [
-        { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-        { label: 'Approvals', href: '/approvals', icon: ClipboardCheck, badge: 5 },
-        { label: 'Financials', href: '/financials', icon: CreditCard },
-        { label: 'Analytics', href: '/analytics', icon: LineChart },
-        { label: 'Invoices', href: '/invoices', icon: BarChart3, badge: 2 },
-        { label: 'Scheduling', href: '/scheduling', icon: CalendarClock },
+        { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+        { id: "approvals", icon: ClipboardCheck, label: "Approvals", path: "/admin/approvals" },
+        { id: "invoices", icon: BarChart3, label: "Invoices", path: "/admin/invoices" },
+        { id: "notifications", icon: Bell, label: "Notifications", path: "/admin/notifications" },
     ];
 
     const bottomMenuItems = [
@@ -38,7 +31,6 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { label: 'Access Control', href: '/access-control', icon: Lock },
         { label: 'User Management', href: '/users', icon: UserCog },
     ];
-
 
     // Update activeTab based on current route
     useEffect(() => {
@@ -106,7 +98,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <li key={item.id}>
                             <button
                                 onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname.startsWith(item.path) ? "bg-primary text-text font-semibold" : "text-text-muted hover:bg-background-hover"
+                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
                                     }`}
                                 title={collapsed ? item.label : ""}
                             >
@@ -121,7 +113,6 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                             </button>
                         </li>
                     ))}
-
                 </ul>
             </nav>
 
@@ -131,7 +122,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <li key={item.id}>
                             <button
                                 onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname.startsWith(item.path) ? "bg-primary text-text font-semibold" : "text-text-muted hover:bg-background-hover"
+                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
                                     }`}
                                 title={collapsed ? item.label : ""}
                             >
@@ -146,7 +137,6 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                             </button>
                         </li>
                     ))}
-
                 </ul>
             </div>
         </motion.aside>

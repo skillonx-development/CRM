@@ -3,8 +3,12 @@ import { motion } from "framer-motion";
 import StatCard from "./Widgets/StatCrad";
 import RevenueChart from "./Widgets/RevenueChart";
 import WorkshopDistribution from "./Widgets/WorkshopDistribution";
+import Notifications from "./Widgets/Notifications";
+import RecentInvoices from "./Widgets/RecentInvoices";
+import MonthlyPerformance from "./Widgets/MonthlyPerformance";
+import FeedbackAnalysis from "./Widgets/FeedbackAnalysis";
 import { DollarSign, BookOpen, FileText, Users } from "lucide-react";
-import Layout from "../../../components/layout/Layout";
+import Layout from "./Shared/Layout";
 
 const AdminDashboard = () => {
   // Container animation variants
@@ -35,13 +39,13 @@ const AdminDashboard = () => {
   return (
     <Layout>
       <motion.div
-        className="p-6"
+        className="p-6 bg-background"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
         <motion.h1
-          className="text-2xl font-bold mb-6 text-white"
+          className="text-2xl font-bold mb-6 text-text"
           variants={itemVariants}
         >
           Dashboard Overview
@@ -55,7 +59,7 @@ const AdminDashboard = () => {
             <StatCard
               title="Total Revenue"
               value="$143,500"
-              icon={<DollarSign className="text-purple-500" />}
+              icon={<DollarSign className="text-primary" />}
               percentChange={12}
               isPositive={true}
             />
@@ -65,7 +69,7 @@ const AdminDashboard = () => {
             <StatCard
               title="Workshops Completed"
               value="57"
-              icon={<BookOpen className="text-purple-500" />}
+              icon={<BookOpen className="text-primary" />}
               percentChange={8}
               isPositive={true}
             />
@@ -75,7 +79,7 @@ const AdminDashboard = () => {
             <StatCard
               title="Pending Proposals"
               value="14"
-              icon={<FileText className="text-purple-500" />}
+              icon={<FileText className="text-primary" />}
               percentChange={3}
               isPositive={false}
             />
@@ -85,7 +89,7 @@ const AdminDashboard = () => {
             <StatCard
               title="Workshop Participants"
               value="1,248"
-              icon={<Users className="text-purple-500" />}
+              icon={<Users className="text-primary" />}
               percentChange={15}
               isPositive={true}
             />
@@ -112,6 +116,24 @@ const AdminDashboard = () => {
           >
             <WorkshopDistribution />
           </motion.div>
+        </motion.div>
+
+          <motion.div
+          className="mt-6"
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <MonthlyPerformance />
+          </motion.div>
+
+        <motion.div
+          className="mt-6"
+          variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <FeedbackAnalysis />
         </motion.div>
       </motion.div>
     </Layout>
