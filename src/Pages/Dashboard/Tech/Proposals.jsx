@@ -2,7 +2,7 @@ import React from "react";
 import Layout from "./Shared/Layout";
 import ProposalAnalytics from "./Widgets/ProposalAnalytics";
 import ProposalWidget from "./Widgets/ProposalWidget";
-const Proposal = () => {
+const Proposals = () => {
     return (
       <Layout>
           {/* Widgets Section */}
@@ -25,5 +25,5 @@ const Proposal = () => {
     );
   };
   
-  export default Proposal;
+  export default Proposals;
   

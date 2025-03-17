@@ -38,12 +38,6 @@ const CurriculumDesign = () => {
     },
   ];
 
-  const quickActions = [
-    { id: 1, title: "Templates", icon: "📄" },
-    { id: 2, title: "Resources", icon: "📚" },
-    { id: 3, title: "Analytics", icon: "📊" },
-    { id: 4, title: "Collaboration", icon: "👥" },
-  ];
 
   const getCategoryColor = (category) => {
     switch (category) {
@@ -69,10 +63,7 @@ const CurriculumDesign = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-text">Curriculum Design</h1>
-          <p className="text-text-muted">Design and organize workshop curriculum.</p>
-        </div>
+       
 
         <div className="bg-background-card rounded-lg shadow-card p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -127,20 +118,6 @@ const CurriculumDesign = () => {
             ))}
           </div>
 
-          <div className="mt-8">
-            <h3 className="text-lg font-medium text-text mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {quickActions.map((action) => (
-                <div
-                  key={action.id}
-                  className="border border-border rounded-lg p-4 flex flex-col items-center justify-center py-6 hover:bg-background-hover cursor-pointer"
-                >
-                  <div className="text-2xl mb-2">{action.icon}</div>
-                  <span className="text-text">{action.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
