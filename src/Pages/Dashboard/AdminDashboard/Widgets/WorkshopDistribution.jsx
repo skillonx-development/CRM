@@ -3,17 +3,17 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { motion } from 'framer-motion';
 
 const data = [
-    { name: 'Web Development', value: 35, color: '#8884d8' },
-    { name: 'Data Science', value: 25, color: '#82ca9d' },
-    { name: 'UI/UX Design', value: 20, color: '#ffc658' },
-    { name: 'Mobile Development', value: 15, color: '#ff8042' },
-    { name: 'DevOps', value: 5, color: '#0088FE' },
+    { name: 'Web Development', value: 35, color: '#8b5cf6' },
+    { name: 'Data Science', value: 25, color: '#10b981' },
+    { name: 'UI/UX Design', value: 20, color: '#eab308' },
+    { name: 'Mobile Development', value: 15, color: '#3b82f6' },
+    { name: 'DevOps', value: 5, color: '#6366f1' },
 ];
 
 const WorkshopDistribution = () => {
     return (
         <motion.div
-            className="bg-[#0f1123] rounded-lg p-6"
+            className="bg-background-card rounded-lg p-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
@@ -63,8 +63,29 @@ const WorkshopDistribution = () => {
                             ))}
                         </Pie>
                         <Tooltip
-                            contentStyle={{ backgroundColor: '#1a1c31', border: 'none' }}
-                            formatter={(value) => [`${value}%`, 'Percentage']}
+                            content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                    const currentItem = payload[0];
+                                    const dataItem = data.find(item => item.name === currentItem.name);
+
+                                    return (
+                                        <div
+                                            style={{
+                                                backgroundColor: dataItem?.color || '#8b5cf6',
+                                                padding: '8px 12px',
+                                                borderRadius: '4px',
+                                                border: 'none',
+                                                color: '#111',
+                                                fontWeight: 500
+                                            }}
+                                        >
+                                            <p className="font-medium">{currentItem.name}</p>
+                                            <p>{`${currentItem.value}%`}</p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            }}
                         />
                     </PieChart>
                 </ResponsiveContainer>

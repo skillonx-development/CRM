@@ -35,11 +35,63 @@ import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFee
 
 // Admin Dashboard
 import AdminDashboard from './Pages/Dashboard/AdminDashboard/AdminDashboard';
+import AdminApproval from './Pages/Dashboard/AdminDashboard/AdminApproval';
+import AdminInvoices from './Pages/Dashboard/AdminDashboard/AdminInvoices';
+import AdminNotifications from './Pages/Dashboard/AdminDashboard/AdminNotifications';
 
 
 
 const App = () => {
   return (
+
+    <Router>
+      <Routes>
+        <Route>
+          {/* Sales Dashboard */}
+          <Route path="/sales" element={<SalesDashboard />} />
+          <Route path="/sales/lead" element={<SalesLead />} />
+          <Route path="/sales/proposals" element={<SalesProposals />} />
+          <Route path="/sales/orders" element={<SalesOrders />} />
+          <Route path="/salaes/orders" element={<SalesOrders />} />
+
+          <Route path="/tech" element={<TechDashboard />} />
+          <Route path="/tech/proposal" element={<Proposal />} />
+          <Route path="/tech/instructor" element={<Instructor />} />
+          <Route path="/tech/workshop" element={<Workshop />} />
+          <Route path="/tech/curriculum" element={<Curriculum />} />
+          <Route path="/tech/feedback" element={<Feedback />} />
+
+
+          <Route path="/sales/billing" element={<SalesBilling />} />
+          <Route path="/sales/settings" element={<SalesSettings />} />
+          <Route path="/sales/help" element={<SalesHelp />} />
+
+          {/* Marketing Dahshboard */}
+          <Route path="/marketing" element={<MarketingDashboard />} />
+
+          {/* Admin Dashboard */}
+
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/approvals" element={<AdminApproval/>} />
+          <Route path="/admin/invoices" element={<AdminInvoices/>} />
+          <Route path="/admin/notifications" element={<AdminNotifications/>} />
+        </Route>
+
+        {/* 404 Route */}
+        <Route path="*" element={
+          <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="text-center">
+              <h1 className="text-6xl font-bold text-primary">404</h1>
+              <p className="text-xl text-gray-600 mt-4">Page not found</p>
+              <a href="/" className="mt-6 inline-block text-primary hover:underline">
+                Go back home
+              </a>
+            </div>
+          </div>
+        } />
+      </Routes>
+    </Router>
+
           <Router>
             <Routes>
               <Route>
@@ -91,6 +143,7 @@ const App = () => {
               } />
             </Routes>
           </Router>
+
   );
 };
 
