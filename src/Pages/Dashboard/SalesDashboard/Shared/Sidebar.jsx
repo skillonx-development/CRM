@@ -26,6 +26,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "proposals", icon: FileText, label: "Proposals", path: "/sales/proposals" },
         { id: "orders", icon: Package, label: "Orders", path: "/sales/orders" },
         { id: "billing", icon: CreditCard, label: "Billing", path: "/sales/billing" },
+        { id: "Team Management", icon: Users, label: "Team Management", path: "/sales/team" },
     ];
 
     const bottomMenuItems = [
