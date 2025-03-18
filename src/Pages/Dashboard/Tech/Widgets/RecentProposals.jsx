@@ -14,7 +14,7 @@ export default function RecentProposals() {
   return (
     <div 
       className="bg-background-card p-6 rounded-xl shadow-card cursor-pointer hover:bg-background-hover transition"
-      onClick={() => navigate("/proposals")} // ✅ Corrected navigation
+      onClick={() => navigate("/tech/proposal")} // ✅ Corrected navigation
     >
       <h2 className="text-lg font-semibold text-white mb-4">Recent Proposals</h2>
       <table className="w-full text-left">
