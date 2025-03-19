@@ -26,6 +26,8 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "teachers", icon: Users, label: "Teachers", path: "/marketing/teachers" },
         { id: "feedback", icon: BarChart2, label: "Feedback", path: "/marketing/feedback" },
         { id: "promotion", icon: Megaphone, label: "Promotion", path: "/marketing/promotion" },
+        { id: "Team Management", icon: Users, label: "Team Management", path: "/marketing/team" },
+
     ];
 
     const bottomMenuItems = [
@@ -54,9 +56,10 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
                     <AnimatePresence>
                         {!collapsed && (
-                            <motion.h1 className="text-xl font-bold text-text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                CRM
-                            </motion.h1>
+                           <motion.h1 className="text-xl font-bold text-text" style={{ fontFamily: 'Morebi Rounded, sans-serif' }} 
+                           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                           Flariex
+                       </motion.h1>
                         )}
                     </AnimatePresence>
                 </div>

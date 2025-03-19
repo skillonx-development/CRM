@@ -6,10 +6,12 @@ import {
     Calendar,
     ShoppingBag,
     Settings,
-    ChevronLeft
+    ChevronLeft,
+    HelpCircle,
+    LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import logo from "../Assets/logo.png";
 function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
     const location = useLocation(); // Get current route
@@ -17,15 +19,17 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const menuItems = [
         { id: "dashboard", icon: Home, label: "Dashboard", path: "/tech" },
         { id: "proposal", icon: BarChart2, label: "Proposals", path: "/tech/proposal" },
-        { id: "worshops", icon: ShoppingBag, label: "Resources", path: "/tech/workshop" },
+        { id: "resources", icon: ShoppingBag, label: "Resources", path: "/tech/Resources" },
         { id: "curriculum", icon: Calendar, label: "Curriculum", path: "/tech/curriculum" },
-        // { id: "feedback", icon: Calendar, label: "Feedback", path: "/tech/feedback" },
+        { id: "team", icon: Calendar, label: "Team Management", path: "/tech/manageteam" },
 
 
     ];
 
     const bottomMenuItems = [
-        { id: "settings", icon: Settings, label: "Settings", path: "/settings" },
+        { id: "settings", icon: Settings, label: "Settings", path: "/tech/settings" },
+        { id: 'help', icon: HelpCircle, label: 'Help', path: "/tech/help" },
+        { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
 
     // Update activeTab based on current route
@@ -59,10 +63,11 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
         >
             <div className="p-6 flex items-center justify-between">
                 <AnimatePresence>
+                      <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
                     {!collapsed && (
-                        <motion.h1 className="text-xl font-bold text-text" initial="hidden" animate="visible" exit="hidden" variants={textVariants}>
-                            John Carter
-                        </motion.h1>
+                         <motion.h1 className="text-xl font-bold text-text"  style={{ fontFamily: "'MotoyaLMaru'" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                         Flariex
+                     </motion.h1>
                     )}
                 </AnimatePresence>
                 <motion.button
