@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Mail, Phone, MoreVertical, X, Pencil, Trash } from "lucide-react";
+import { Star, Mail, Phone, MoreVertical, X, Pencil, Trash, Settings, ArrowLeft, Database, PieChart, FileText, ShoppingCart, CreditCard } from "lucide-react";
 
-const MemberOptions = ({ onEdit, onDelete }) => {
+const MemberOptions = ({ onEdit, onDelete, onManage }) => {
     const [isOpen, setIsOpen] = useState(false);
   
     return (
@@ -20,7 +20,16 @@ const MemberOptions = ({ onEdit, onDelete }) => {
                 setIsOpen(false);
               }}
             >
-              <Pencil className="w-4 h-4 mr-2" /> Edit Member
+              <Pencil className="w-4 h-4 mr-2" /> Edit 
+            </button>
+            <button
+              className="flex items-center px-4 py-2 text-text-default hover:bg-background-hover w-full text-sm"
+              onClick={() => {
+                onManage();
+                setIsOpen(false);
+              }}
+            >
+              <Settings className="w-4 h-4 mr-2" /> Manage 
             </button>
             <button
               className="flex items-center px-4 py-2 text-red-500 hover:bg-background-hover w-full text-sm"
@@ -29,7 +38,7 @@ const MemberOptions = ({ onEdit, onDelete }) => {
                 setIsOpen(false);
               }}
             >
-              <Trash className="w-4 h-4 mr-2" /> Delete Member
+              <Trash className="w-4 h-4 mr-2" /> Delete 
             </button>
           </div>
         )}
@@ -87,6 +96,188 @@ const teamMembers = [
     isFavorite: true,
   },
 ];
+
+// Member Management Modal Component
+const ManageMemberModal = ({ isOpen, onClose, member }) => {
+  const [permissions, setPermissions] = useState({
+    overview: true,
+    leads: true,
+    proposals: true,
+    orders: false,
+    billing: false
+  });
+
+  const handleTogglePermission = (key) => {
+    setPermissions({
+      ...permissions,
+      [key]: !permissions[key]
+    });
+  };
+
+  if (!isOpen || !member) return null;
+
+  return (
+    <div className="fixed inset-0 bg-background bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-background-card rounded-xl shadow-card w-full max-w-2xl h-full md:h-auto max-h-screen overflow-auto">
+        <div className="p-4">
+          <button 
+            onClick={onClose}
+            className="flex items-center text-text-muted hover:text-text-default mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to all members
+          </button>
+
+          <div className="flex items-center mb-6">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-light text-text-default font-bold mr-3">
+              {member.initials}
+            </div>
+            <div>
+              <h2 className="text-text-default font-bold text-lg flex items-center">
+                {member.name} {member.isFavorite && <Star className="w-4 h-4 text-status-warning ml-1" />}
+              </h2>
+              <p className="text-text-muted">{member.role}</p>
+            </div>
+          </div>
+
+          <h3 className="text-text-default font-semibold mb-2">Manage Dashboard Access</h3>
+          <p className="text-text-muted text-sm mb-6">Select which dashboard modules this team member can access.</p>
+
+          <div className="space-y-4">
+            {/* Overview */}
+            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
+                  <PieChart className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-text-default">Overview</h4>
+                  <p className="text-xs text-text-muted">Dashboard overview with key metrics and KPIs</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className={`text-xs mr-2 ${permissions.overview ? 'text-status-success' : 'text-status-error'}`}>
+                  {permissions.overview ? '✓ Granted' : '✕ No access'}
+                </span>
+                <div 
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.overview ? 'bg-primary' : 'bg-background-hover'}`}
+                  onClick={() => handleTogglePermission('overview')}
+                >
+                  <div 
+                    className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions.overview ? 'translate-x-6' : 'translate-x-0'}`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Leads */}
+            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
+                  <Database className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-text-default">Leads</h4>
+                  <p className="text-xs text-text-muted">Manage and track sales leads</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className={`text-xs mr-2 ${permissions.leads ? 'text-status-success' : 'text-status-error'}`}>
+                  {permissions.leads ? '✓ Granted' : '✕ No access'}
+                </span>
+                <div 
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.leads ? 'bg-primary' : 'bg-background-hover'}`}
+                  onClick={() => handleTogglePermission('leads')}
+                >
+                  <div 
+                    className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions.leads ? 'translate-x-6' : 'translate-x-0'}`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Proposals */}
+            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
+                  <FileText className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-text-default">Proposals</h4>
+                  <p className="text-xs text-text-muted">Create and manage sales proposals</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className={`text-xs mr-2 ${permissions.proposals ? 'text-status-success' : 'text-status-error'}`}>
+                  {permissions.proposals ? '✓ Granted' : '✕ No access'}
+                </span>
+                <div 
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.proposals ? 'bg-primary' : 'bg-background-hover'}`}
+                  onClick={() => handleTogglePermission('proposals')}
+                >
+                  <div 
+                    className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions.proposals ? 'translate-x-6' : 'translate-x-0'}`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Orders */}
+            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
+                  <ShoppingCart className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-text-default">Orders</h4>
+                  <p className="text-xs text-text-muted">Track and manage customer orders</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className={`text-xs mr-2 ${permissions.orders ? 'text-status-success' : 'text-status-error'}`}>
+                  {permissions.orders ? '✓ Granted' : '✕ No access'}
+                </span>
+                <div 
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.orders ? 'bg-primary' : 'bg-background-hover'}`}
+                  onClick={() => handleTogglePermission('orders')}
+                >
+                  <div 
+                    className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions.orders ? 'translate-x-6' : 'translate-x-0'}`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Billing */}
+            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
+                  <CreditCard className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-text-default">Billing</h4>
+                  <p className="text-xs text-text-muted">Manage invoices and payment tracking</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className={`text-xs mr-2 ${permissions.billing ? 'text-status-success' : 'text-status-error'}`}>
+                  {permissions.billing ? '✓ Granted' : '✕ No access'}
+                </span>
+                <div 
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.billing ? 'bg-primary' : 'bg-background-hover'}`}
+                  onClick={() => handleTogglePermission('billing')}
+                >
+                  <div 
+                    className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions.billing ? 'translate-x-6' : 'translate-x-0'}`}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Add Team Member Modal Component
 const AddTeamMemberModal = ({ isOpen, onClose, onAddMember }) => {
@@ -283,9 +474,11 @@ const AddTeamMemberModal = ({ isOpen, onClose, onAddMember }) => {
 const TeamWidget = () => {
   const [animate, setAnimate] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [members, setMembers] = useState(teamMembers);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Statuses");
+  const [selectedMember, setSelectedMember] = useState(null);
 
   useEffect(() => {
     setTimeout(() => setAnimate(true), 300);
@@ -293,6 +486,22 @@ const TeamWidget = () => {
 
   const handleAddMember = (newMember) => {
     setMembers([...members, newMember]);
+  };
+
+  const handleEditMember = (member) => {
+    console.log("Edit Member", member);
+    // Implement edit logic here
+  };
+
+  const handleDeleteMember = (memberIndex) => {
+    const updatedMembers = [...members];
+    updatedMembers.splice(memberIndex, 1);
+    setMembers(updatedMembers);
+  };
+
+  const handleManageMember = (member) => {
+    setSelectedMember(member);
+    setIsManageModalOpen(true);
   };
 
   const handleSearch = (e) => {
@@ -375,8 +584,9 @@ const TeamWidget = () => {
                 </div>
               </div>
               <MemberOptions
-                onEdit={() => console.log("Edit Member")}
-                onDelete={() => console.log("Delete Member")}
+                onEdit={() => handleEditMember(member)}
+                onDelete={() => handleDeleteMember(index)}
+                onManage={() => handleManageMember(member)}
               />
             </div>
             
@@ -420,6 +630,13 @@ const TeamWidget = () => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onAddMember={handleAddMember}
+      />
+
+      {/* Manage Member Modal */}
+      <ManageMemberModal
+        isOpen={isManageModalOpen}
+        onClose={() => setIsManageModalOpen(false)}
+        member={selectedMember}
       />
     </div>
   );

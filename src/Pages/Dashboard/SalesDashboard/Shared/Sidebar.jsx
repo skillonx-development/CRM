@@ -74,15 +74,9 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
                     <AnimatePresence>
                         {!collapsed && (
-                            <motion.h1
-                                className="text-xl font-bold text-text"
-                                initial="hidden"
-                                animate="visible"
-                                exit="hidden"
-                                variants={textVariants}
-                            >
-                                CRM
-                            </motion.h1>
+                             <motion.h1 className="text-xl font-bold text-text"  style={{ fontFamily: "'MotoyaLMaru'" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                             Flariex
+                         </motion.h1>
                         )}
                     </AnimatePresence>
                 </div>
