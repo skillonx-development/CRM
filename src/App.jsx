@@ -4,11 +4,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // Tech Dashboaard
 import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
 import Proposals from './Pages/Dashboard/Tech/Proposals';
-import Instructor from './Pages/Dashboard/Tech/Instructor';
-import Feedback from './Pages/Dashboard/Tech/Feedback';
-import Workshop from './Pages/Dashboard/Tech/Workshop';
-import Curriculum from './Pages/Dashboard/Tech/Curriculum';
 
+import Curriculum from './Pages/Dashboard/Tech/Curriculum';
+import Resources from './Pages/Dashboard/Tech/Resources';
+import ManageTeam from './Pages/Dashboard/Tech/ManageTeam';
 // Sales Dashboard
 import SalesDashboard from './Pages/Dashboard/SalesDashboard/SalesDashboard';
 import SalesLead from './Pages/Dashboard/SalesDashboard/SalesLead';
@@ -59,10 +58,11 @@ const App = () => {
           {/* Tech Dashboard */}
           <Route path="/tech" element={<TechDashboard />} />
           <Route path="/tech/proposal" element={<Proposals />} />
-          <Route path="/tech/instructor" element={<Instructor />} />
-          <Route path="/tech/workshop" element={<Workshop />} />
+         
           <Route path="/tech/curriculum" element={<Curriculum />} />
-          <Route path="/tech/feedback" element={<Feedback />} />
+     
+          <Route path="/tech/manageteam" element={<ManageTeam />} />
+          <Route path="/tech/resources" element={<Resources />} />
 
           {/* Marketing Dahshboard */}
           <Route path="/marketing" element={<MarketingDashboard />} />

@@ -5,7 +5,7 @@ import WorkshopPerformance from "./Widgets/Overview/WorkshopPerformance";
 import RecentProposals from "./Widgets/RecentProposals";
 import QuickActions from "./Widgets/QuickaActions";
 import RecentActivity from "./Widgets/Overview/RecentActivity";
-import Workshop from "./Workshop";
+import Resources from "./Resources";
 import WorkshopChart from "./Widgets/Overview/WorkshopChart";
 const TechDashboard = () => {
     return (
