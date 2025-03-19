@@ -1,10 +1,8 @@
 import React from "react";
 import Layout from "./Shared/Layout";
-import DashboardAnalytics from "./Widgets/DashboardAnalytics";
-import FeedbackAnalysis from "./Widgets/Feedback/FeedbackAnalysis";
-import Ratings from "./Widgets/Feedback/Rating";
-import TopWorkshops from "./Widgets/Feedback/TopWorkshops";
-import RecentFeedback from "./Widgets/Feedback/RecentFeedback";
+import FeedbackAnalysis from "../AdminDashboard/Widgets/FeedbackAnalysis";
+// import TopWorkshops from "./Widgets/Feedback/TopWorkshops";
+// import RecentFeedback from "./Widgets/Feedback/RecentFeedback";
 const Feedback = () => {
     return (
       <Layout>
@@ -16,13 +14,13 @@ const Feedback = () => {
           </div>
           <div className="p-6">
         
-           <Ratings/>
+           <Rating/>
            
           </div>
       
           <div className="p-6">
         
-           <RecentFeedback/>
+           {/* <RecentFeedback/> */}
           </div>
   
       </Layout>

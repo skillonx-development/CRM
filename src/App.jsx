@@ -46,7 +46,7 @@ import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeac
 import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
 import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
 import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
-import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
+// import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
 
 
 
@@ -80,7 +80,7 @@ const App = () => {
 
           <Route path="/tech" element={<TechDashboard />} />
           <Route path="/tech/instructor" element={<Instructor />} />
-          <Route path="/tech/workshop" element={<Workshop />} />
+          {/* <Route path="/tech/workshop" element={<Worksho/>} /> */}
           <Route path="/tech/curriculum" element={<Curriculum />} />
           <Route path="/tech/feedback" element={<Feedback />} />
 
