@@ -20,7 +20,6 @@ const AdminApproval = () => {
     <Layout>
           <motion.div
               variants={itemVariants}
-              whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
           >
               <PendingApprovals />

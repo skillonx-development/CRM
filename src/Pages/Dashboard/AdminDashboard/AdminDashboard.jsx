@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import StatCard from "./Widgets/StatCrad";
 import RevenueChart from "./Widgets/RevenueChart";
 import WorkshopDistribution from "./Widgets/WorkshopDistribution";
-import Notifications from "./Widgets/Notifications";
-import RecentInvoices from "./Widgets/RecentInvoices";
 import MonthlyPerformance from "./Widgets/MonthlyPerformance";
 import FeedbackAnalysis from "./Widgets/FeedbackAnalysis";
 import { DollarSign, BookOpen, FileText, Users } from "lucide-react";
