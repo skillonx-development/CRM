@@ -12,15 +12,7 @@ const RecentActivity = () => {
       time: "30 minutes ago",
       avatar: "/api/placeholder/32/32"
     },
-    {
-      id: 2,
-      icon: <BookOpen className="w-5 h-5 text-status-warning" />,
-      title: "Curriculum updated",
-      description: "Full-Stack Development Bootcamp content revised",
-      user: "Maya Wilson",
-      time: "2 hours ago",
-      initials: "M"
-    },
+   
     {
       id: 3,
       icon: <Users className="w-5 h-5 text-status-success" />,

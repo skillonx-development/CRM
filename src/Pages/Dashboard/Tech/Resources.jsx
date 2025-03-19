@@ -4,7 +4,7 @@ import DashboardAnalytics from "./Widgets/DashboardAnalytics";
 import ResourceManager from "./Widgets/Resources/ResourceManager";
 import WorkshopSchedule from "./Widgets/Resources/WorkshopSchedule";
 import TodaysTasks from "./Widgets/Overview/Todaystask";
-const Workshop = () => {
+const Resources = () => {
     return (
       <Layout>
           {/* Widgets Section */}
@@ -14,7 +14,7 @@ const Workshop = () => {
             <TodaysTasks/>
             
           </div>
-       
+          
         
     
   
@@ -23,5 +23,5 @@ const Workshop = () => {
     );
   };
   
-  export default Workshop;
+  export default Resources;
   
