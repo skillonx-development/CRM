@@ -69,9 +69,14 @@ body {
 .react-calendar__tile--weekend {
     color: #E53E3E !important;
 }
+
 .recharts-tooltip-wrapper {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-  }
-  
+}
+
+@font-face {
+    font-family: 'Morebi Rounded';
+    src: url('/fonts/MorebiRounded.ttf') format('truetype');
+}
