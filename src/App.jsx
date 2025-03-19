@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Landing from './Pages/Landing';
+import LoginPage from './Pages/LoginPage';
 
 // Tech Dashboaard
 import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
@@ -49,6 +50,7 @@ const App = () => {
         <Route>
 
         <Route path="/" element={<Landing/>} />
+        <Route path="/login" element={<LoginPage/>} />
 
           {/* Sales Dashboard */}
           <Route path="/sales" element={<SalesDashboard />} />
