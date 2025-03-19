@@ -1,5 +1,3 @@
-"use client"; 
-
 import { motion } from "framer-motion";
 import { MoreHorizontal } from "lucide-react";
 
@@ -34,7 +32,7 @@ const widgets = [
   },
 ];
 
-const WorkshopOverview = () => {
+const DashboardAnalytics = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
       {widgets.map((widget, index) => (
@@ -73,4 +71,4 @@ const WorkshopOverview = () => {
   );
 };
 
-export default WorkshopOverview;
+export default DashboardAnalytics;
