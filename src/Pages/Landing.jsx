@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; 
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
@@ -10,8 +10,21 @@ const Landing = () => {
 
   return (
     <div className="bg-background text-text min-h-screen">
+      {/* Header with Login Button */}
+      <header className="relative bg-background-card shadow-card py-6 px-8 flex justify-between items-center">
+        <h2 className="text-3xl font-bold text-text">flariex</h2>
+        
+        {/* Login Button - Positioned in Top Right */}
+        <button 
+          onClick={() => navigate('/login')}
+          className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+        >
+          Login
+        </button>
+      </header>
+
       {/* Hero Section */}
-      <header className="text-center py-20 bg-background-card shadow-card">
+      <section className="text-center py-20">
         <h2 className="text-4xl font-bold text-text">
           Streamline Your Workshop Management
         </h2>
@@ -47,7 +60,7 @@ const Landing = () => {
             Admin
           </button>
         </div>
-      </header>
+      </section>
 
       {/* Features Section */}
       <section id="features" className="py-16 px-8 bg-background">
@@ -73,21 +86,6 @@ const Landing = () => {
           />
         </div>
       </section>
-
-      {/* Workflow Section */}
-      <section id="workflow" className="py-16 px-8 bg-background-card">
-        <h3 className="text-3xl font-semibold text-center text-text">
-          How It Works
-        </h3>
-        <div className="mt-8 space-y-6">
-          <WorkflowStep step="1" title="Sales Team Logs Order" />
-          <WorkflowStep step="2" title="Tech Team Drafts Proposal" />
-          <WorkflowStep step="3" title="Marketing Enhances Proposal" />
-          <WorkflowStep step="4" title="Sales Finalizes & Sends Proposal" />
-          <WorkflowStep step="5" title="College Accepts/Rejects Proposal" />
-          <WorkflowStep step="6" title="Execution, Payments & Review" />
-        </div>
-      </section>
     </div>
   );
 };
@@ -97,16 +95,6 @@ const FeatureCard = ({ title, description }) => (
   <div className="bg-background-card shadow-card p-6 rounded-lg text-center">
     <h4 className="text-xl font-semibold text-text">{title}</h4>
     <p className="text-text-muted mt-2">{description}</p>
-  </div>
-);
-
-// Workflow Step Component
-const WorkflowStep = ({ step, title }) => (
-  <div className="bg-background-hover shadow-card p-6 rounded-lg flex items-center space-x-4">
-    <span className="bg-primary text-white px-4 py-2 rounded-full text-xl font-bold">
-      {step}
-    </span>
-    <h5 className="text-lg font-medium text-text">{title}</h5>
   </div>
 );
 
