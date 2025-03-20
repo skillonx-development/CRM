@@ -57,6 +57,9 @@ import AdminInvoices from './Pages/Dashboard/AdminDashboard/AdminInvoices';
 import AdminNotifications from './Pages/Dashboard/AdminDashboard/AdminNotifications';
 import SalesTeam from './Pages/Dashboard/SalesDashboard/SalesTeam';
 import MarketingTeam from './Pages/Dashboard/MarketingDashboard/MarketingTeam';
+import AdminTeamManage from './Pages/Dashboard/AdminDashboard/AdminTeamManage';
+import AdminSettings from './Pages/Dashboard/AdminDashboard/AdminSettings';
+import AdminControl from './Pages/Dashboard/AdminDashboard/AdminControl';
 
 
 
@@ -113,7 +116,10 @@ const App = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/approvals" element={<AdminApproval/>} />
           <Route path="/admin/invoices" element={<AdminInvoices/>} />
+          <Route path="/admin/teams" element={<AdminTeamManage/>} />
           <Route path="/admin/notifications" element={<AdminNotifications/>} />
+          <Route path="/admin/settings" element={<AdminSettings/>} />
+          <Route path="/admin/control" element={<AdminControl/>} />
         </Route>
 
         {/* 404 Route */}
