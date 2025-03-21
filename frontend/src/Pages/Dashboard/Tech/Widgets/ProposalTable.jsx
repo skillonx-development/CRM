@@ -1,12 +1,43 @@
-import React from "react";
-
-const proposals = [
-  { id: 1, client: "Acme Corp", type: "Web Dev", budget: "$5,000", status: "New", received: "2023-03-10", requirements: "Advanced React workshop" },
-  { id: 2, client: "TechGiant", type: "Data Science", budget: "$8,000", status: "Draft", received: "2023-03-08", requirements: "Data pipeline optimization" },
-  { id: 3, client: "Startup Hub", type: "UI/UX", budget: "$4,000", status: "Ready", received: "2023-03-05", requirements: "Redesign mobile UI" },
-];
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const ProposalsTable = ({ onSelect }) => {
+  const [proposals, setProposals] = useState([]);
+
+  // ✅ Fetch data from the backend
+  useEffect(() => {
+    const fetchProposals = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/proposals"); // Update the endpoint 
+        setProposals(response.data.proposals);
+      } catch (error) {
+        console.error("Error fetching proposals:", error);
+      }
+    };
+
+    fetchProposals();
+  }, []);
+
+  // ✅ Function to format price with currency symbol
+  const formatBudget = (price) => `$${Number(price).toLocaleString()}`;
+
+  // ✅ Function to format date
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US");
+
+  // ✅ Function to get status color dynamically
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "New":
+        return "bg-blue-500 text-white"; // Info color
+      case "Draft":
+        return "bg-gray-300 text-gray-800"; // Draft color
+      case "Ready":
+        return "bg-green-500 text-white"; // Success color
+      default:
+        return "bg-gray-200 text-gray-800"; // Default color
+    }
+  };
+
   return (
     <div className="bg-background-card p-6 shadow-card rounded-lg text-text-default">
       <h2 className="text-2xl font-semibold mb-4 text-primary">Proposals</h2>
@@ -24,22 +55,19 @@ const ProposalsTable = ({ onSelect }) => {
         <tbody>
           {proposals.map((proposal) => (
             <tr
-              key={proposal.id}
+              key={proposal._id}
               className="hover:bg-background-hover cursor-pointer transition"
               onClick={() => onSelect(proposal)}
             >
-              <td className="p-3 font-semibold">{proposal.client}</td>
-              <td className="p-3">{proposal.type}</td>
-              <td className="p-3">{proposal.budget}</td>
+              <td className="p-3 font-semibold">{proposal.institution}</td>
+              <td className="p-3">{proposal.title}</td>
+              <td className="p-3">{formatBudget(proposal.price)}</td>
               <td className="p-3">
-                <span className={`px-3 py-1 text-xs font-medium rounded-full 
-                  ${proposal.status === "New" ? "bg-status-info text-white" : 
-                  proposal.status === "Draft" ? "bg-border-dark text-text-default" : 
-                  "bg-status-success text-white"}`}>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(proposal.status)}`}>
                   {proposal.status}
                 </span>
               </td>
-              <td className="p-3">{proposal.received}</td>
+              <td className="p-3">{formatDate(proposal.scheduleDate)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,36 +1,70 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar, FileText, PlusCircle, Search, X } from "lucide-react";
+import axios from 'axios';
+
+const api = {
+  // Fetch all proposals from the database
+  fetchProposals: async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/proposals'); 
+      return response.data.proposals;
+    } catch (error) {
+      console.error("Error fetching proposals:", error);
+      return [];
+    }
+  },
+  // Create a new proposal in the database
+  createProposal: async (proposal) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/proposals', proposal);
+      return response.data.proposal;
+    } catch (error) {
+      console.error("Error creating proposal:", error);
+      throw error;
+    }
+  }
+};
 
 const ProposalTracking = () => {
-  // Initial data
-  const initialProposals = [
-    { title: "React Workshop", price: "$4,500", status: "Proposal Sent", statusColor: "bg-status-info", institution: "ABC University", schedule: "Mar 15, 2023", description: "3-day intensive React workshop covering fundamentals to advanced concepts with hands-on projects.", daysLeft: "2 days left" },
-    { title: "UI/UX Design Workshop", price: "$7,200", status: "Lead Acquired", statusColor: "bg-primary", institution: "XYZ College", schedule: "Mar 20, 2023", description: "5-day workshop on UI/UX design principles, tools, and methodologies.", daysLeft: "7 days left" },
-    { title: "Machine Learning Workshop", price: "$9,800", status: "Accepted", statusColor: "bg-status-success", institution: "Tech Institute", schedule: "Apr 5, 2023", description: "7-day in-depth machine learning workshop with practical applications and projects.", daysLeft: "10 days left" },
-    { title: "Web Development Workshop", price: "$5,600", status: "Proposal Sent", statusColor: "bg-status-info", institution: "Digital Academy", schedule: "Apr 12, 2023", description: "4-day web development workshop covering HTML, CSS, JavaScript, and responsive design.", daysLeft: "5 days left" },
-    { title: "Cloud Computing Workshop", price: "$4,200", status: "Rejected", statusColor: "bg-status-error", institution: "Future University", schedule: "Apr 18, 2023", description: "3-day workshop on cloud platforms, deployment, and management.", daysLeft: "1 day left" },
-    { title: "Blockchain Workshop", price: "$3,500", status: "Accepted", statusColor: "bg-status-success", institution: "Innovation College", schedule: "Apr 25, 2023", description: "2-day introduction to blockchain technology and smart contracts.", daysLeft: "12 days left" }
-  ];
-
-  // State variables
-  const [proposals, setProposals] = useState(initialProposals);
-  const [filteredProposals, setFilteredProposals] = useState(initialProposals);
+  const [proposals, setProposals] = useState([]);
+  const [filteredProposals, setFilteredProposals] = useState([]);
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewProposalForm, setShowNewProposalForm] = useState(false);
-  const [newProposal, setNewProposal] = useState({
-    title: "",
-    price: "",
-    status: "Lead Acquired",
-    statusColor: "bg-primary",
-    institution: "",
-    schedule: "",
-    description: "",
-    daysLeft: "14 days left"
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Simple filter function that runs whenever search or filter changes
+const [newProposal, setNewProposal] = useState({
+  title: "",
+  price: "",
+  status: "Lead Acquired",
+  statusColor: "bg-primary",
+  institution: "",
+  scheduleDate: "", 
+  description: "",
+});
+
+  // Fetch proposals from the database on component mount
+  // ✅ Fetch proposals from the database on component mount
+  useEffect(() => {
+    const loadProposals = async () => {
+      setIsLoading(true);
+      try {
+        const data = await api.fetchProposals();
+        setProposals(data);
+        setFilteredProposals(data);
+      } catch (err) {
+        setError("Failed to load proposals");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProposals();
+  }, []);
+
+  // Filter function that runs whenever search or filter changes
   useEffect(() => {
     let results = [...proposals];
     
@@ -81,21 +115,33 @@ const ProposalTracking = () => {
     }
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  // Handle form submission - save to database
+  // ✅ Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setProposals([...proposals, newProposal]);
-    setShowNewProposalForm(false);
-    setNewProposal({
-      title: "",
-      price: "",
-      status: "Lead Acquired",
-      statusColor: "bg-primary",
-      institution: "",
-      schedule: "",
-      description: "",
-      daysLeft: "14 days left"
-    });
+
+    try {
+      const proposalToSave = {
+        ...newProposal,
+        scheduleDate: new Date(newProposal.scheduleDate).toISOString(),
+      };
+
+      const savedProposal = await api.createProposal(proposalToSave);
+      setProposals((prev) => [...prev, savedProposal]);
+
+      setShowNewProposalForm(false);
+      setNewProposal({
+        title: "",
+        price: "",
+        status: "Lead Acquired",
+        statusColor: "bg-primary",
+        institution: "",
+        scheduleDate: "",
+        description: "",
+      });
+    } catch (err) {
+      alert("Failed to create proposal. Please try again.");
+    }
   };
 
   return (
@@ -156,16 +202,35 @@ const ProposalTracking = () => {
           </div>
         </div>
         
-        {/* Proposals grid */}
-        {filteredProposals.length === 0 ? (
+        {/* Loading state */}
+        {isLoading && (
           <div className="p-8 text-center text-text-muted">
-            No matching proposals found.
+            Loading proposals...
           </div>
-        ) : (
+        )}
+        
+        {/* Error state */}
+        {error && (
+          <div className="p-8 text-center text-status-error">
+            {error}. Please try again later.
+          </div>
+        )}
+        
+        {/* Empty state */}
+        {!isLoading && !error && filteredProposals.length === 0 && (
+          <div className="p-8 text-center text-text-muted">
+            {searchQuery || activeFilter !== "All" 
+              ? "No matching proposals found." 
+              : "No proposals yet. Create your first proposal!"}
+          </div>
+        )}
+        
+        {/* Proposals grid */}
+        {!isLoading && !error && filteredProposals.length > 0 && (
           <div className="grid md:grid-cols-2 gap-4">
             {filteredProposals.map((proposal, index) => (
               <motion.div
-                key={index}
+                key={proposal.id || index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -178,15 +243,19 @@ const ProposalTracking = () => {
                       {proposal.status}
                     </span>
                   </h3>
-                  <span className="text-lg font-semibold text-text">{proposal.price}</span>
+                  <span className="text-lg font-semibold text-text">₹{proposal.price}</span>
                 </div>
                 <p className="text-text-muted text-sm">{proposal.institution}</p>
                 <p className="text-text-muted text-xs mt-1">{proposal.description}</p>
                 <div className="flex justify-between items-center text-text-muted text-sm mt-2">
                   <div className="flex items-center">
-                    <Calendar size={16} className="mr-1" /> {proposal.schedule}
+                    <Calendar size={16} className="mr-1" /> 
+                     {new Date(proposal.scheduleDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                      })}
                   </div>
-                  <span className="text-status-error text-sm font-semibold">{proposal.daysLeft}</span>
                 </div>
                 <div className="flex justify-between items-center text-text mt-3">
                   <button className="text-sm flex items-center gap-2 text-text-muted hover:text-text">
@@ -236,7 +305,6 @@ const ProposalTracking = () => {
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                   placeholder="e.g. React Workshop"
                   required
-                  
                 />
               </div>
               
@@ -296,8 +364,8 @@ const ProposalTracking = () => {
                 </label>
                 <input
                   type="text"
-                  name="schedule"
-                  value={newProposal.schedule}
+                  name="scheduleDate"
+                  value={newProposal.scheduleDate}
                   onChange={handleInputChange}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                   placeholder="e.g. Mar 15, 2023"
