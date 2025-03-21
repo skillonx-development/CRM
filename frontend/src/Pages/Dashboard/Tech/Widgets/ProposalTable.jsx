@@ -4,7 +4,7 @@ import axios from "axios";
 const ProposalsTable = ({ onSelect }) => {
   const [proposals, setProposals] = useState([]);
 
-  // ✅ Fetch data from the backend
+  //  Fetch data from the backend
   useEffect(() => {
     const fetchProposals = async () => {
       try {
@@ -18,13 +18,13 @@ const ProposalsTable = ({ onSelect }) => {
     fetchProposals();
   }, []);
 
-  // ✅ Function to format price with currency symbol
+  //  Function to format price with currency symbol
   const formatBudget = (price) => `$${Number(price).toLocaleString()}`;
 
-  // ✅ Function to format date
+  //  Function to format date
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US");
 
-  // ✅ Function to get status color dynamically
+  //  Function to get status color dynamically
   const getStatusColor = (status) => {
     switch (status) {
       case "New":
