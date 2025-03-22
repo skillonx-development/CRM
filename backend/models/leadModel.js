@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import ROLES from '../config/roles.js';
 
-const userSchema = new mongoose.Schema(
+const leadSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -26,4 +26,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const User = mongoose.model('User', userSchema);
+export const Lead = mongoose.model('Lead', leadSchema);
