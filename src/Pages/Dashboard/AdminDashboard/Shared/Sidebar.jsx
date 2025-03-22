@@ -11,6 +11,9 @@ import {
     Lock,
     UserCog,
     ChevronLeft,
+    Users,
+    Settings,
+    LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../Assets/logo.png"; // Ensure the path is correct
@@ -23,13 +26,14 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
         { id: "approvals", icon: ClipboardCheck, label: "Approvals", path: "/admin/approvals" },
         { id: "invoices", icon: BarChart3, label: "Invoices", path: "/admin/invoices" },
+        { id: "teams", icon: Users, label: "Manage Team", path: "/admin/teams" },
         { id: "notifications", icon: Bell, label: "Notifications", path: "/admin/notifications" },
     ];
 
     const bottomMenuItems = [
-        { label: 'Notifications', href: '/notifications', icon: Bell, badge: 3 },
-        { label: 'Access Control', href: '/access-control', icon: Lock },
-        { label: 'User Management', href: '/users', icon: UserCog },
+        { id: "settings", icon: Settings, label: "Settings", path: "/admin/settings" },
+        { id: "control", icon: Lock, label: "Access Control", path: "/admin/control" },
+        { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
 
     // Update activeTab based on current route

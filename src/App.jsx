@@ -6,7 +6,17 @@ import RegistrationPage from './Pages/RegistrationPage';
 
 // Tech Dashboaard
 import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
+
+import Instructor from './Pages/Dashboard/Tech/Instructor';
+import Feedback from './Pages/Dashboard/Tech/Feedback';
+import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
+// Public Pages
+// import Login from './Pages/Auth/Login';
+// import Register from './Pages/Auth/Register';
+
+
 import Proposals from './Pages/Dashboard/Tech/Proposals';
+
 
 import Curriculum from './Pages/Dashboard/Tech/Curriculum';
 import Resources from './Pages/Dashboard/Tech/Resources';
@@ -25,12 +35,20 @@ import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
 
 // Marketing Dashboard
 import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
+
+// import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingProposal';
+// import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
+// import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
+// import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
+// import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
+
 import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingProposal';
 import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
 import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
 import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
 import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
-import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
+// import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
+
 
 
 // Admin Dashboard
@@ -40,6 +58,9 @@ import AdminInvoices from './Pages/Dashboard/AdminDashboard/AdminInvoices';
 import AdminNotifications from './Pages/Dashboard/AdminDashboard/AdminNotifications';
 import SalesTeam from './Pages/Dashboard/SalesDashboard/SalesTeam';
 import MarketingTeam from './Pages/Dashboard/MarketingDashboard/MarketingTeam';
+import AdminTeamManage from './Pages/Dashboard/AdminDashboard/AdminTeamManage';
+import AdminSettings from './Pages/Dashboard/AdminDashboard/AdminSettings';
+import AdminControl from './Pages/Dashboard/AdminDashboard/AdminControl';
 
 
 
@@ -60,6 +81,14 @@ const App = () => {
           <Route path="/sales/proposals" element={<SalesProposals />} />
           <Route path="/sales/orders" element={<SalesOrders />} />
           <Route path="/salaes/orders" element={<SalesOrders />} />
+
+
+          <Route path="/tech" element={<TechDashboard />} />
+          <Route path="/tech/instructor" element={<Instructor />} />
+          {/* <Route path="/tech/workshop" element={<Worksho/>} /> */}
+          <Route path="/tech/curriculum" element={<Curriculum />} />
+          <Route path="/tech/feedback" element={<Feedback />} />
+
           <Route path="/sales/billing" element={<SalesBilling />} />
           <Route path="/sales/team" element={<SalesTeam />} />
           <Route path="/sales/settings" element={<SalesSettings />} />
@@ -89,7 +118,10 @@ const App = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/approvals" element={<AdminApproval/>} />
           <Route path="/admin/invoices" element={<AdminInvoices/>} />
+          <Route path="/admin/teams" element={<AdminTeamManage/>} />
           <Route path="/admin/notifications" element={<AdminNotifications/>} />
+          <Route path="/admin/settings" element={<AdminSettings/>} />
+          <Route path="/admin/control" element={<AdminControl/>} />
         </Route>
 
         {/* 404 Route */}
@@ -107,7 +139,6 @@ const App = () => {
       </Routes>
     </Router>
 
-        
   );
 };
 
