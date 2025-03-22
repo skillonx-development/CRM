@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Landing from './Pages/Landing';
 import LoginPage from './Pages/LoginPage';
+import RegistrationPage from './Pages/RegistrationPage';
 
 // Tech Dashboaard
 import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
@@ -51,6 +52,7 @@ const App = () => {
 
         <Route path="/" element={<Landing/>} />
         <Route path="/login" element={<LoginPage/>} />
+        <Route path="/register" element={<RegistrationPage/>} />
 
           {/* Sales Dashboard */}
           <Route path="/sales" element={<SalesDashboard />} />

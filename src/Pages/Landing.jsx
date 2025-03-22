@@ -12,16 +12,25 @@ const Landing = () => {
     <div className="bg-background text-text min-h-screen">
       {/* Header with Login Button */}
       <header className="relative bg-background-card shadow-card py-6 px-8 flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-text">flariex</h2>
-        
-        {/* Login Button - Positioned in Top Right */}
-        <button 
-          onClick={() => navigate('/login')}
-          className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
-        >
-          Login
-        </button>
-      </header>
+  <h2 className="text-3xl font-bold text-text">flariex</h2>
+
+  {/* Login and Register Buttons - Positioned Together on the Right */}
+  <div className="flex gap-4">
+    <button 
+      onClick={() => navigate('/login')}
+      className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+    >
+      Login
+    </button>
+    <button 
+      onClick={() => navigate('/register')}
+      className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+    >
+      Register
+    </button>
+  </div>
+</header>
+
 
       {/* Hero Section */}
       <section className="text-center py-20">
