@@ -11,8 +11,6 @@ import Instructor from './Pages/Dashboard/Tech/Instructor';
 import Feedback from './Pages/Dashboard/Tech/Feedback';
 import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
 // Public Pages
-// import Login from './Pages/Auth/Login';
-// import Register from './Pages/Auth/Register';
 
 
 import Proposals from './Pages/Dashboard/Tech/Proposals';
@@ -35,19 +33,11 @@ import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
 
 // Marketing Dashboard
 import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
-
-// import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingProposal';
-// import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
-// import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
-// import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
-// import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
-
 import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingProposal';
 import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
 import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
 import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
 import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
-// import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
 
 
 
