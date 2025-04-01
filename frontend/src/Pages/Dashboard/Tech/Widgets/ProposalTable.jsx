@@ -8,7 +8,7 @@ const ProposalsTable = ({ onSelect }) => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/proposals"); // Update the endpoint 
+        const response = await axios.get("http://localhost:5001/api/proposals"); // Update the endpoint 
         setProposals(response.data.proposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);

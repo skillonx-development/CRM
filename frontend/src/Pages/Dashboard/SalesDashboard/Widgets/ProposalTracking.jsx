@@ -7,7 +7,7 @@ const api = {
   // Fetch all proposals from the database
   fetchProposals: async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/proposals'); 
+      const response = await axios.get('http://localhost:5001/api/proposals'); 
       return response.data.proposals;
     } catch (error) {
       console.error("Error fetching proposals:", error);
@@ -17,7 +17,7 @@ const api = {
   // Create a new proposal in the database
   createProposal: async (proposal) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/proposals', proposal);
+      const response = await axios.post('http://localhost:5001/api/proposals', proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error creating proposal:", error);
@@ -45,8 +45,6 @@ const [newProposal, setNewProposal] = useState({
   description: "",
 });
 
-  // Fetch proposals from the database on component mount
-  // ✅ Fetch proposals from the database on component mount
   useEffect(() => {
     const loadProposals = async () => {
       setIsLoading(true);

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const leadSchema = new mongoose.Schema({
+const memberSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required'],
@@ -35,7 +35,7 @@ const leadSchema = new mongoose.Schema({
 });
 
 // Create a virtual for confirmPassword
-leadSchema.virtual('confirmPassword')
+memberSchema.virtual('confirmPassword')
   .get(function () {
     return this._confirmPassword;
   })
@@ -43,6 +43,6 @@ leadSchema.virtual('confirmPassword')
     this._confirmPassword = value;
   });
 
-const Lead = mongoose.model('Lead', leadSchema);
+const Member = mongoose.model('Member', memberSchema);
 
-export default Lead;
+export default Member;
