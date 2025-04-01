@@ -9,7 +9,6 @@ import {
 
 const router = express.Router();
 
-// ✅ Use the imported controller directly
 router.post("/", createProposal);
 router.get("/", getProposals);
 router.get("/:id", getProposalById);

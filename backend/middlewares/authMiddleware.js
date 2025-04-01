@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/userModel.js';
+import Lead from '../models/leadModel.js';
+import Member from '../models/memberModel.js';
 
 export const protect = async (req, res, next) => {
   try {
@@ -11,7 +12,17 @@ export const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findById(decoded.id).select('-password');
+    if (decoded.type === 'lead') {
+      req.user = await Lead.findById(decoded.id).select('-password');
+    } else if (decoded.type === 'member') {
+      req.user = await Member.findById(decoded.id).select('-password');
+    } else {
+      return res.status(401).json({ success: false, message: 'Invalid user type' });
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'User not found' });
+    }
 
     next();
   } catch (error) {
@@ -20,7 +31,7 @@ export const protect = async (req, res, next) => {
 };
 
 export const authorize = (...roles) => (req, res, next) => {
-  if (!roles.includes(req.user.role)) {
+  if (!roles.includes(req.user.team)) {
     return res.status(403).json({ success: false, message: 'Access Denied' });
   }
   next();
