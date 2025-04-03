@@ -29,6 +29,10 @@ const memberSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [6, 'Password should be at least 6 characters long']
+  },
+  approve: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
