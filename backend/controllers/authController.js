@@ -96,9 +96,15 @@ export async function register(req, res) {
 // Login
 export async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, type } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!type || (type !== 'lead' && type !== 'member')) {
+      return res.status(400).json({ success: false, message: 'Invalid user type' });
+    }
+
+    const user = type === 'lead'
+      ? await Lead.findOne({ email })
+      : await Member.findOne({ email });
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -112,7 +118,32 @@ export async function login(req, res) {
 
     generateTokenAndSetCookie(user._id, res);
 
-    res.status(200).json({ success: true, user });
+    if (type === 'lead') {
+      switch (user.team.toLowerCase()) {
+        case 'tech':
+          return res.status(200).json({ success: true, redirect: '/tech', user });
+        case 'sales':
+          return res.status(200).json({ success: true, redirect: '/sales', user });
+        case 'marketing':
+          return res.status(200).json({ success: true, redirect: '/marketing', user });
+        default:
+          return res.status(400).json({ success: false, message: 'Invalid team for lead' });
+      }
+    }
+
+    if (type === 'member') {
+      switch (user.team.toLowerCase()) {
+        case 'tech':
+          return res.status(200).json({ success: true, redirect: '/tech', user });
+        case 'sales':
+          return res.status(200).json({ success: true, redirect: '/sales', user });
+        case 'marketing':
+          return res.status(200).json({ success: true, redirect: '/marketing', user });
+        default:
+          return res.status(400).json({ success: false, message: 'Invalid team for member' });
+      }
+    }
+    
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }

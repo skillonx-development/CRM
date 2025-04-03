@@ -45,7 +45,7 @@ const RegistrationPage = () => {
       }
 
       alert("Registration successful!");
-      navigate("/dashboard"); // Redirect after successful registration
+      navigate("/"); // Redirect after successful registration
     } catch (err) {
       setError(err.message);
     }
@@ -77,7 +77,7 @@ const RegistrationPage = () => {
 
       <div className="bg-background-card p-6 rounded-lg shadow-card w-96">
         <h3 className="text-xl font-semibold mb-4">{role} Registration</h3>
-        
+
         {error && <p className="text-red-500 mb-4">{error}</p>} {/* Display error message */}
 
         <form onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ const RegistrationPage = () => {
             placeholder="Enter Name"
             className="w-full p-2 rounded bg-background-default border border-border-default text-text-default mb-4"
           />
-          
+
           <label className="block mb-2">Contact number:</label>
           <input
             type="text"
@@ -100,7 +100,7 @@ const RegistrationPage = () => {
             placeholder="Enter Contact Number"
             className="w-full p-2 rounded bg-background-default border border-border-default text-text-default mb-4"
           />
-          
+
           <label className="block mb-2">Email:</label>
           <input
             type="email"
@@ -110,7 +110,7 @@ const RegistrationPage = () => {
             placeholder="Enter Email"
             className="w-full p-2 rounded bg-background-default border border-border-default text-text-default mb-4"
           />
-          
+
           <label className="block mb-2">Team:</label>
           <select
             name="team"
@@ -132,7 +132,7 @@ const RegistrationPage = () => {
             placeholder="Enter Password"
             className="w-full p-2 rounded bg-background-default border border-border-default text-text-default mb-4"
           />
-          
+
           <label className="block mb-2">Confirm Password:</label>
           <input
             type="password"
@@ -142,7 +142,7 @@ const RegistrationPage = () => {
             placeholder="Confirm Password"
             className="w-full p-2 rounded bg-background-default border border-border-default text-text-default mb-4"
           />
-          
+
           <button type="submit" className="w-full p-2 rounded bg-status-success text-white">Register</button>
         </form>
       </div>

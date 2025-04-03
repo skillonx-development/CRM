@@ -30,7 +30,7 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email, password, type: role }), // Send role as 'type'
       });
 
       const data = await response.json();
@@ -44,14 +44,8 @@ const LoginPage = () => {
       // Store token if applicable
       localStorage.setItem("token", data.token);
 
-      // Navigate to the respective dashboard based on the selected role
-      if (role === "lead") {
-        navigate("/lead-dashboard");
-      } else if (role === "member") {
-        navigate("/member-dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      // Navigate to the respective dashboard based on the redirect field
+      navigate(data.redirect);
     } catch (error) {
       setError(error.message);
     }
@@ -159,7 +153,7 @@ const LoginPage = () => {
           </a>
           <p className="text-text-muted text-sm">
             Don't have an account?{" "}
-            <a href="/signup" className="text-primary hover:underline">
+            <a href="/register/lead" className="text-primary hover:underline">
               Sign up here
             </a>
           </p>
