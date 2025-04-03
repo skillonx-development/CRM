@@ -21,7 +21,7 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
         { id: "proposal", icon: BarChart2, label: "Proposals", path: "/tech/proposal" },
         { id: "resources", icon: ShoppingBag, label: "Resources", path: "/tech/Resources" },
         { id: "curriculum", icon: Calendar, label: "Curriculum", path: "/tech/curriculum" },
-        { id: "team", icon: Calendar, label: "Team Management", path: "/tech/manageteam" },
+        { id: "team", icon: Calendar, label: "Team Management", path: "/tech/team" },
 
 
     ];
