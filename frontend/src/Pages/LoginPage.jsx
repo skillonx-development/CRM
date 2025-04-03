@@ -4,13 +4,16 @@ import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("lead"); // Default role selection
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
 
+    // Basic validation
     if (!email.includes("@")) {
       setError("Please enter a valid email address.");
       return;
@@ -21,11 +24,37 @@ const LoginPage = () => {
       return;
     }
 
-    console.log("Logging in with:", { email, password });
+    try {
+      const response = await fetch("http://localhost:5001/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, role }),
+      });
 
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed. Please try again.");
+      }
+
+      console.log("Login successful:", data);
+
+      // Store token if applicable
+      localStorage.setItem("token", data.token);
+
+      // Navigate to the respective dashboard based on the selected role
+      if (role === "lead") {
+        navigate("/lead-dashboard");
+      } else if (role === "member") {
+        navigate("/member-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -84,6 +113,35 @@ const LoginPage = () => {
               </button>
             </div>
           </div>
+
+          {/* Role Selection Radio Buttons */}
+          <fieldset>
+            <legend className="block text-text-muted font-medium mb-2">Select Role</legend>
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="lead"
+                  checked={role === "lead"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="form-radio h-5 w-5 accent-purple-500"
+                />
+                <span className="ml-2 text-text">Lead</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="member"
+                  checked={role === "member"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="form-radio h-5 w-5 accent-purple-500"
+                />
+                <span className="ml-2 text-text">Member</span>
+              </label>
+            </div>
+          </fieldset>
 
           {/* Login Button */}
           <button
