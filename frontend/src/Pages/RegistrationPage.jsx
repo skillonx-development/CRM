@@ -1,21 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const RegistrationPage = () => {
   const [role, setRole] = useState("Member");
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background-default text-text-default">
       <h2 className="text-2xl font-bold mb-4">Register as</h2>
       <div className="flex space-x-4 mb-6">
         <button
-          className={`px-6 py-2 rounded-lg ${role === "Lead" ? "bg-primary-default text-white" : "bg-background-card text-text-muted"}`}
-          onClick={() => setRole("Lead")}
+          className={`px-6 py-2 rounded-lg ${role === "Lead" ? "bg-background-card text-text-muted border border-purple-500" : "bg-primary-default text-white"}`}
+          onClick={() => {
+            setRole("Lead");
+            navigate("/register/lead");
+          }}
+  
         >
           Lead
         </button>
         <button
-          className={`px-6 py-2 rounded-lg ${role === "Member" ? "bg-primary-default text-white" : "bg-background-card text-text-muted"}`}
-          onClick={() => setRole("Member")}
+          className={`px-6 py-2 rounded-lg ${role === "Member" ?"bg-background-card text-text-muted  border border-purple-500" : "bg-primary-default text-white"}`}
+          onClick={() => {
+            setRole("Member");
+            navigate("/register/member");
+          }}
+  
         >
           Member
         </button>

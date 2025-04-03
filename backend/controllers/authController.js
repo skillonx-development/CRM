@@ -9,10 +9,10 @@ const isValidEmail = (email) => {
   return regex.test(email);
 }
 
-const isValidPassword = (password) => {
-  const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-  return regex.test(password);
-}
+// const isValidPassword = (password) => {
+//   const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+//   return regex.test(password);
+// }
 // Register
 export async function register(req, res) {
   try {
@@ -27,9 +27,9 @@ export async function register(req, res) {
       return res.status(400).json({ success: false, message: 'Please enter a valid email address' });
     }
 
-    if (!isValidPassword(password)) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, and one number' });
-    }
+    // if (!isValidPassword(password)) {
+    //   return res.status(400).json({ success: false, message: 'Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, and one number' });
+    // }
 
     if (password !== confirmPassword) {
       return res.status(400).json({ success: false, message: 'Passwords do not match' });

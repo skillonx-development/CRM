@@ -23,7 +23,7 @@ const Landing = () => {
       Login
     </button>
     <button 
-      onClick={() => navigate('/register')}
+      onClick={() => navigate('/register/lead')}
       className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
     >
       Register
