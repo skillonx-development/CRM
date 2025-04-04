@@ -1,58 +1,74 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Mail, Phone, Trash, Settings, ArrowLeft, Database, PieChart, FileText, ShoppingCart, CreditCard } from "lucide-react";
+import { Star, Mail, Phone, ArrowLeft, Database, PieChart, FileText, ShoppingCart, CreditCard } from "lucide-react";
 
-// Sample data with status (no separation between pending/approved)
-const teamMembers = [
-  {
-    initials: "DM",
-    name: "David Miller",
-    role: "Account Executive",
-    status: "Active",
-    isFavorite: true,
-    isApproved: false
-  },
-  {
-    initials: "ET",
-    name: "Emma Thompson",
-    role: "Account Manager",
-    status: "Active",
-    isFavorite: false,
-    isApproved: true
-  },
-  {
-    initials: "JA",
-    name: "James Anderson",
-    role: "Sales Executive",
-    status: "Active",
-    isFavorite: false,
-    isApproved: true
-  },
-  {
-    initials: "JD",
-    name: "Jessica Davis",
-    role: "Sales Coordinator",
-    status: "Active",
-    isFavorite: false,
-    isApproved: true
-  },
-  {
-    initials: "MB",
-    name: "Michael Brown",
-    role: "Sales Executive",
-    status: "On Leave",
-    isFavorite: false,
-    isApproved: false
-  },
-  {
-    initials: "SW",
-    name: "Sarah Wilson",
-    role: "Sales Manager",
-    status: "Active",
-    isFavorite: true,
-    isApproved: false
-  },
-];
+const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
+  <motion.div
+    key={member._id}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: index * 0.1 }}
+    className="p-5 bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-700"
+  >
+    <div className="flex items-center justify-between">
+      {/* Avatar & Details */}
+      <div className="flex items-center space-x-3">
+        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-lg">
+          {member.name
+            .split(" ")
+            .map((word) => word[0])
+            .join("")
+            .toUpperCase()}
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-white flex items-center">
+            {member.name}{" "}
+            {member.isFavorite && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
+          </h3>
+          <p className="text-gray-400 text-sm">{member.team}</p>
+        </div>
+      </div>
+
+      {/* Contact Icons */}
+      <div className="flex space-x-3 text-gray-400">
+        <Mail className="w-5 h-5 cursor-pointer hover:text-blue-400 transition-colors" />
+        <Phone className="w-5 h-5 cursor-pointer hover:text-green-400 transition-colors" />
+      </div>
+    </div>
+
+    {/* Toggle & Manage Access Button */}
+    <div className="mt-4 flex justify-between items-center">
+      {/* Toggle Approval Switch */}
+      <label className="flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          checked={member.approve}
+          onChange={() => onToggleApprove(member._id)}
+          className="sr-only"
+        />
+        <div className={`relative w-12 h-6 bg-gray-600 rounded-full transition-all ${member.approve ? "bg-green-500" : "bg-yellow-500"}`}>
+          <div
+            className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-all ${member.approve ? "translate-x-6" : "translate-x-1"}`}
+          />
+        </div>
+        <span className="ml-2 text-sm text-gray-300">{member.approve ? "Approved" : "Pending"}</span>
+      </label>
+
+      {/* Manage Access Button */}
+      <button
+        onClick={() => onManage(member)}
+        className={`px-4 py-1 rounded-lg text-sm font-medium ${
+          member.approve
+            ? "bg-blue-600 text-white hover:bg-blue-700 transition-all"
+            : "bg-gray-600 text-gray-400 cursor-not-allowed"
+        }`}
+        disabled={!member.approve}
+      >
+        Manage Access
+      </button>
+    </div>
+  </motion.div>
+);
 
 // Member Management Modal Component
 const ManageMemberModal = ({ isOpen, onClose, member }) => {
@@ -74,49 +90,53 @@ const ManageMemberModal = ({ isOpen, onClose, member }) => {
   if (!isOpen || !member) return null;
 
   return (
-    <div className="fixed inset-0 bg-background bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-background-card rounded-xl shadow-card w-full max-w-2xl h-full md:h-auto max-h-screen overflow-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-gray-900 rounded-xl shadow-lg w-full max-w-2xl h-full md:h-auto max-h-screen overflow-auto">
         <div className="p-4">
           <button 
             onClick={onClose}
-            className="flex items-center text-text-muted hover:text-text-default mb-4"
+            className="flex items-center text-gray-400 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to all members
           </button>
 
           <div className="flex items-center mb-6">
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-light text-text-default font-bold mr-3">
-              {member.initials}
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold mr-3">
+              {member.name
+                .split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase()}
             </div>
             <div>
-              <h2 className="text-text-default font-bold text-lg flex items-center">
-                {member.name} {member.isFavorite && <Star className="w-4 h-4 text-status-warning ml-1" />}
+              <h2 className="text-white font-bold text-lg flex items-center">
+                {member.name} {member.isFavorite && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
               </h2>
-              <p className="text-text-muted">{member.role}</p>
+              <p className="text-gray-400">{member.team}</p>
             </div>
           </div>
 
-          <h3 className="text-text-default font-semibold mb-2">Manage Dashboard Access</h3>
-          <p className="text-text-muted text-sm mb-6">Select which dashboard modules this team member can access.</p>
+          <h3 className="text-white font-semibold mb-2">Manage Dashboard Access</h3>
+          <p className="text-gray-400 text-sm mb-6">Select which dashboard modules this team member can access.</p>
 
           <div className="space-y-4">
             {/* Overview */}
-            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
-                  <PieChart className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
+                  <PieChart className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-text-default">Overview</h4>
-                  <p className="text-xs text-text-muted">Dashboard overview with key metrics and KPIs</p>
+                  <h4 className="font-medium text-white">Overview</h4>
+                  <p className="text-xs text-gray-400">Dashboard overview with key metrics and KPIs</p>
                 </div>
               </div>
               <div className="flex items-center">
-                <span className={`text-xs mr-2 ${permissions.overview ? 'text-status-success' : 'text-status-error'}`}>
+                <span className={`text-xs mr-2 ${permissions.overview ? 'text-green-400' : 'text-red-400'}`}>
                   {permissions.overview ? '✓ Granted' : '✕ No access'}
                 </span>
                 <div 
-                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.overview ? 'bg-primary' : 'bg-background-hover'}`}
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.overview ? 'bg-blue-600' : 'bg-gray-700'}`}
                   onClick={() => handleTogglePermission('overview')}
                 >
                   <div 
@@ -127,22 +147,22 @@ const ManageMemberModal = ({ isOpen, onClose, member }) => {
             </div>
 
             {/* Leads */}
-            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
-                  <Database className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
+                  <Database className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-text-default">Leads</h4>
-                  <p className="text-xs text-text-muted">Manage and track sales leads</p>
+                  <h4 className="font-medium text-white">Leads</h4>
+                  <p className="text-xs text-gray-400">Manage and track sales leads</p>
                 </div>
               </div>
               <div className="flex items-center">
-                <span className={`text-xs mr-2 ${permissions.leads ? 'text-status-success' : 'text-status-error'}`}>
+                <span className={`text-xs mr-2 ${permissions.leads ? 'text-green-400' : 'text-red-400'}`}>
                   {permissions.leads ? '✓ Granted' : '✕ No access'}
                 </span>
                 <div 
-                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.leads ? 'bg-primary' : 'bg-background-hover'}`}
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.leads ? 'bg-blue-600' : 'bg-gray-700'}`}
                   onClick={() => handleTogglePermission('leads')}
                 >
                   <div 
@@ -153,22 +173,22 @@ const ManageMemberModal = ({ isOpen, onClose, member }) => {
             </div>
 
             {/* Proposals */}
-            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
-                  <FileText className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
+                  <FileText className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-text-default">Proposals</h4>
-                  <p className="text-xs text-text-muted">Create and manage sales proposals</p>
+                  <h4 className="font-medium text-white">Proposals</h4>
+                  <p className="text-xs text-gray-400">Create and manage sales proposals</p>
                 </div>
               </div>
               <div className="flex items-center">
-                <span className={`text-xs mr-2 ${permissions.proposals ? 'text-status-success' : 'text-status-error'}`}>
+                <span className={`text-xs mr-2 ${permissions.proposals ? 'text-green-400' : 'text-red-400'}`}>
                   {permissions.proposals ? '✓ Granted' : '✕ No access'}
                 </span>
                 <div 
-                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.proposals ? 'bg-primary' : 'bg-background-hover'}`}
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.proposals ? 'bg-blue-600' : 'bg-gray-700'}`}
                   onClick={() => handleTogglePermission('proposals')}
                 >
                   <div 
@@ -179,22 +199,22 @@ const ManageMemberModal = ({ isOpen, onClose, member }) => {
             </div>
 
             {/* Orders */}
-            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
-                  <ShoppingCart className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
+                  <ShoppingCart className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-text-default">Orders</h4>
-                  <p className="text-xs text-text-muted">Track and manage customer orders</p>
+                  <h4 className="font-medium text-white">Orders</h4>
+                  <p className="text-xs text-gray-400">Track and manage customer orders</p>
                 </div>
               </div>
               <div className="flex items-center">
-                <span className={`text-xs mr-2 ${permissions.orders ? 'text-status-success' : 'text-status-error'}`}>
+                <span className={`text-xs mr-2 ${permissions.orders ? 'text-green-400' : 'text-red-400'}`}>
                   {permissions.orders ? '✓ Granted' : '✕ No access'}
                 </span>
                 <div 
-                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.orders ? 'bg-primary' : 'bg-background-hover'}`}
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.orders ? 'bg-blue-600' : 'bg-gray-700'}`}
                   onClick={() => handleTogglePermission('orders')}
                 >
                   <div 
@@ -205,22 +225,22 @@ const ManageMemberModal = ({ isOpen, onClose, member }) => {
             </div>
 
             {/* Billing */}
-            <div className="flex items-center justify-between p-3 border border-border-default rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-3">
-                  <CreditCard className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
+                  <CreditCard className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-text-default">Billing</h4>
-                  <p className="text-xs text-text-muted">Manage invoices and payment tracking</p>
+                  <h4 className="font-medium text-white">Billing</h4>
+                  <p className="text-xs text-gray-400">Manage invoices and payment tracking</p>
                 </div>
               </div>
               <div className="flex items-center">
-                <span className={`text-xs mr-2 ${permissions.billing ? 'text-status-success' : 'text-status-error'}`}>
+                <span className={`text-xs mr-2 ${permissions.billing ? 'text-green-400' : 'text-red-400'}`}>
                   {permissions.billing ? '✓ Granted' : '✕ No access'}
                 </span>
                 <div 
-                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.billing ? 'bg-primary' : 'bg-background-hover'}`}
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions.billing ? 'bg-blue-600' : 'bg-gray-700'}`}
                   onClick={() => handleTogglePermission('billing')}
                 >
                   <div 
@@ -236,217 +256,73 @@ const ManageMemberModal = ({ isOpen, onClose, member }) => {
   );
 };
 
-// Modified Member Card Component
-const MemberCard = ({ member, index, animate, onEdit, onDelete, onManage, onToggleApproval }) => {
-  return (
-    <motion.div
-      key={index}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: animate ? 1 : 0, y: animate ? 0 : 20 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="p-4 rounded-2xl bg-background-card border border-border-default shadow-card border-none"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-light text-text-default font-bold">
-            {member.initials}
-          </div>
-          <div>
-            <h3 className="text-text-default font-semibold flex items-center">
-              {member.name} {member.isFavorite && <Star className="w-4 h-4 text-status-warning ml-1" />}
-            </h3>
-            <p className="text-text-muted text-sm">{member.role}</p>
-          </div>
-        </div>
-        
-        <div className="flex space-x-3 text-text-muted">
-          <Mail className="w-5 h-5 cursor-pointer" />
-          <Phone className="w-5 h-5 cursor-pointer" />
-        </div>
-      </div>
-      
-      {/* Middle Section - Approval Toggle for all members */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between">
-          <p className="text-text-muted text-sm">Approval Status</p>
-          <div 
-            className={`w-12 h-6 rounded-full p-1 cursor-pointer ${member.isApproved ? 'bg-primary' : 'bg-background-hover'}`}
-            onClick={() => onToggleApproval(index)}
-          >
-            <div 
-              className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${member.isApproved ? 'translate-x-6' : 'translate-x-0'}`}
-            />
-          </div>
-        </div>
-      </div>
-      
-      {/* Status & Actions - Modified to disable button when not approved */}
-      <div className="mt-4 flex justify-between items-center">
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${
-            member.status === "Active" ? "bg-status-success text-white" : 
-            member.status === "On Leave" ? "bg-status-warning text-white" : 
-            "bg-status-error text-white"
-          }`}
-        >
-          {member.status}
-        </span>
-        
-        <button
-          onClick={() => member.isApproved && onManage(member)}
-          className={`px-3 py-1 rounded-lg text-xs ${
-            member.isApproved 
-              ? "bg-primary-light text-text-default cursor-pointer" 
-              : "bg-background-hover text-text-muted cursor-not-allowed opacity-60"
-          }`}
-          disabled={!member.isApproved}
-        >
-          Manage Access
-        </button>
-      </div>
-    </motion.div>
-  );
-};
-
-// Main TeamWidget Component
 const TeamWidget = () => {
-  const [animate, setAnimate] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
-  const [members, setMembers] = useState(teamMembers);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Statuses");
-  const [approvalFilter, setApprovalFilter] = useState("All");
   const [selectedMember, setSelectedMember] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => setAnimate(true), 300);
+    const fetchMembers = async () => {
+      try {
+        const response = await fetch("http://localhost:5001/api/members/getMembers");
+        if (!response.ok) throw new Error("Failed to fetch members");
+        const data = await response.json();
+        setMembers(data.filter(member => member.team === "Sales")); // Only show Sales team members
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMembers();
   }, []);
 
-  const handleEditMember = (member) => {
-    console.log("Edit Member", member);
-    // Implement edit logic here
-  };
-
-  const handleDeleteMember = (memberIndex) => {
-    const updatedMembers = [...members];
-    updatedMembers.splice(memberIndex, 1);
-    setMembers(updatedMembers);
-  };
-
-  const handleToggleApproval = (memberIndex) => {
-    const updatedMembers = [...members];
-    updatedMembers[memberIndex].isApproved = !updatedMembers[memberIndex].isApproved;
-    setMembers(updatedMembers);
-  };
-
   const handleManageMember = (member) => {
-    // Only allow managing members that are approved
-    if (member.isApproved) {
+    if (member.approve) {
       setSelectedMember(member);
       setIsManageModalOpen(true);
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+  const toggleApproval = (id) => {
+    setMembers(prevMembers =>
+      prevMembers.map(member =>
+        member._id === id ? { ...member, approve: !member.approve } : member
+      )
+    );
   };
-
-  const handleStatusFilter = (e) => {
-    setStatusFilter(e.target.value);
-  };
-
-  const handleApprovalFilter = (e) => {
-    setApprovalFilter(e.target.value);
-  };
-
-  const handleApproveSelected = () => {
-    const updatedMembers = members.map(member => {
-      if (!member.isApproved) {
-        return { ...member, isApproved: true };
-      }
-      return member;
-    });
-    setMembers(updatedMembers);
-  };
-
-  // Filter members based on search term, status, and approval status
-  const filteredMembers = members.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          member.role.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "All Statuses" || member.status === statusFilter;
-    const matchesApproval = approvalFilter === "All" || 
-                            (approvalFilter === "Approved" && member.isApproved) || 
-                            (approvalFilter === "Pending" && !member.isApproved);
-    
-    return matchesSearch && matchesStatus && matchesApproval;
-  });
 
   return (
-    <div className="p-6">
-      {/* Header with title */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-text-default">Team Members</h2>
-        <button 
-          className="px-4 py-2 rounded-lg bg-status-success text-white"
-          onClick={handleApproveSelected}
-        >
-          Approve Selected
-        </button>
-      </div>
+    <div className="p-6 bg-gray-900 min-h-screen text-white">
+      <h2 className="text-2xl font-bold mb-6">Sales Team Members</h2>
 
-      {/* Search & Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search team members..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className="px-4 py-2 rounded-lg bg-background-hover text-text-muted flex-grow"
-        />
-        
-        <select 
-          className="px-4 py-2 rounded-lg bg-background-hover text-text-muted"
-          value={statusFilter}
-          onChange={handleStatusFilter}
-        >
-          <option>All Statuses</option>
-          <option>Active</option>
-          <option>On Leave</option>
-          <option>Inactive</option>
-        </select>
-        
-        <select 
-          className="px-4 py-2 rounded-lg bg-background-hover text-text-muted"
-          value={approvalFilter}
-          onChange={handleApprovalFilter}
-        >
-          <option value="All">All Members</option>
-          <option value="Approved">Approved Only</option>
-          <option value="Pending">Pending Only</option>
-        </select>
-      </div>
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-28 w-full bg-gray-700 animate-pulse rounded-2xl" />
+          ))}
+        </div>
+      )}
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredMembers.map((member, index) => (
-          <MemberCard 
-            key={index}
-            member={member}
-            index={index}
-            animate={animate}
-            onEdit={handleEditMember}
-            onDelete={handleDeleteMember}
-            onManage={handleManageMember}
-            onToggleApproval={handleToggleApproval}
-          />
-        ))}
-      </div>
+      {error && <p className="text-red-400">{error}</p>}
 
-      {/* Show message if no members found */}
-      {filteredMembers.length === 0 && (
-        <div className="text-center py-8 text-text-muted">
-          No team members found matching your criteria.
+      {!loading && !error && members.length === 0 && (
+        <p className="text-gray-400">No team members found in Sales.</p>
+      )}
+
+      {!loading && !error && members.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {members.map((member, index) => (
+            <MemberCard
+              key={member._id}
+              member={member}
+              index={index}
+              onManage={handleManageMember}
+              onToggleApprove={toggleApproval}
+            />
+          ))}
         </div>
       )}
 
