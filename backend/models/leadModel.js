@@ -30,11 +30,7 @@ const leadSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Password should be at least 6 characters long']
   },
-<<<<<<< HEAD
-  approved: {
-=======
   approve : {
->>>>>>> a9ba1743bda8c5f21ba1be7cafe3eccd5f76f1dc
     type: Boolean,
     default: false
   }
