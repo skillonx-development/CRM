@@ -16,7 +16,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../Assets/logo.png";
 
-function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
+function Sidebar({ setActiveTab, collapsed, setCollapsed, userRole }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -26,8 +26,13 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "teachers", icon: Users, label: "Teachers", path: "/marketing/teachers" },
         { id: "feedback", icon: BarChart2, label: "Feedback", path: "/marketing/feedback" },
         { id: "promotion", icon: Megaphone, label: "Promotion", path: "/marketing/promotion" },
-        { id: "Team Management", icon: Users, label: "Team Management", path: "/marketing/team" },
-
+        { 
+            id: "team-management", 
+            icon: Users, 
+            label: "Team Management", 
+            path: "/marketing/team", 
+            disabled: userRole === "member" // Disable if the user is a member
+        },
     ];
 
     const bottomMenuItems = [
@@ -56,10 +61,13 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
                     <AnimatePresence>
                         {!collapsed && (
-                           <motion.h1 className="text-xl font-bold text-text" style={{ fontFamily: 'Morebi Rounded, sans-serif' }} 
-                           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                           Flariex
-                       </motion.h1>
+                            <motion.h1 className="text-xl font-bold text-text" 
+                                style={{ fontFamily: 'Morebi Rounded, sans-serif' }} 
+                                initial={{ opacity: 0 }} 
+                                animate={{ opacity: 1 }} 
+                                exit={{ opacity: 0 }}>
+                                Flariex
+                            </motion.h1>
                         )}
                     </AnimatePresence>
                 </div>
@@ -77,15 +85,18 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     {menuItems.map((item) => (
                         <li key={item.id}>
                             <button
-                                onClick={() => navigate(item.path)}
+                                onClick={() => !item.disabled && navigate(item.path)}
                                 className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
                                     location.pathname === item.path || (item.path === "/marketing" && location.pathname === "/")
                                         ? "bg-primary text-white font-semibold shadow-md"
-                                        : "text-text-muted hover:bg-background-hover"
+                                        : item.disabled 
+                                            ? "text-gray-400 cursor-not-allowed" 
+                                            : "text-text-muted hover:bg-background-hover"
                                 } ${collapsed ? "justify-center" : ""}`}
                                 title={collapsed ? item.label : ""}
+                                disabled={item.disabled}
                             >
-                                <item.icon className={`h-5 w-5 ${location.pathname === item.path || (item.path === "/marketing" && location.pathname === "/") ? "text-white" : "text-text-muted"}`} />
+                                <item.icon className={`h-5 w-5 ${location.pathname === item.path || (item.path === "/marketing" && location.pathname === "/") ? "text-white" : item.disabled ? "text-gray-400" : "text-text-muted"}`} />
                                 <AnimatePresence>
                                     {!collapsed && (
                                         <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="ml-3">

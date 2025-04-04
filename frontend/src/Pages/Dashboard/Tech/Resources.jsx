@@ -9,7 +9,6 @@ const Resources = () => {
       <Layout>
           {/* Widgets Section */}
         <div className="p-6">
-            <DashboardAnalytics />
             <ResourceManager/>
             <TodaysTasks/>
             
