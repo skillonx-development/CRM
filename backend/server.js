@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import proposalRoutes from './routes/proposalRoutes.js';
 import memberRoutes from "./routes/memberRoutes.js";
+import resourceRoutes from './routes/resourceRoutes.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -27,6 +28,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use("/api/proposals", proposalRoutes);
 app.use("/api/members", memberRoutes)
+app.use('/api/resources', resourceRoutes);
+app.use('/tech/Resources', resourceRoutes); // For file uploads
+
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
