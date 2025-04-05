@@ -24,6 +24,8 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'User not found' });
     }
 
+    req.user.role = decoded.type; // Add user role to the request object
+
     next();
   } catch (error) {
     res.status(401).json({ success: false, message: 'Invalid token' });
