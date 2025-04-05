@@ -16,9 +16,10 @@ export const createResource = asyncHandler(async (req, res) => {
 
     if (req.file) {
         const uploaded = await cloudinary.uploader.upload(req.file.path, {
-            resource_type: "auto",
+            resource_type: type === "PDF" ? "raw" : "auto", // 👈 force raw for PDFs
             folder: "tech-resources",
         });
+
 
         fileData = {
             url: uploaded.secure_url,
