@@ -190,31 +190,32 @@ const ResourceManager = () => {
       {/* Display Resources */}
       <div className="mt-8 flex flex-col lg:flex-row gap-8">
         {/* Videos */}
-        <div className="w-full lg:w-1/2">
-          <h2 className="text-lg font-semibold mb-2">Videos</h2>
-          <div className="space-y-4">
-            {resources.videos.map((video) => (
-              <div key={video._id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                <h3 className="text-md font-medium">{video.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{video.description}</p>
-                <a
-                  href={video.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 underline"
-                >
-                  Watch Video
-                </a>
-                <button
-                  className="text-red-500 mt-2 hover:underline"
-                  onClick={() => deleteResource(video._id)}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+<div className="w-full lg:w-1/2">
+  <h2 className="text-lg font-semibold mb-2">Videos</h2>
+  <div className="space-y-4">
+    {resources.videos.map((video, index) => (
+      <div key={`${video._id}-${index}`} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h3 className="text-md font-medium">{video.title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300">{video.description}</p>
+        <a
+          href={video.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-400 transition mr-2 mt-2"
+        >
+          Watch Video
+        </a>
+        <button
+          className="inline-block bg-red-500 text-white px-3 py-1.5 rounded-md hover:bg-red-400 transition mt-2"
+          onClick={() => deleteResource(video._id)}
+        >
+          Delete
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
 
         {/* PDFs */}
         <div className="w-full lg:w-1/2">
