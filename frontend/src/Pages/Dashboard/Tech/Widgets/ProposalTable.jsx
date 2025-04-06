@@ -4,11 +4,10 @@ import axios from "axios";
 const ProposalsTable = ({ onSelect }) => {
   const [proposals, setProposals] = useState([]);
 
-  //  Fetch data from the backend
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/proposals"); // Update the endpoint 
+        const response = await axios.get("http://localhost:5001/api/proposals");
         setProposals(response.data.proposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);
@@ -18,30 +17,26 @@ const ProposalsTable = ({ onSelect }) => {
     fetchProposals();
   }, []);
 
-  //  Function to format price with currency symbol
   const formatBudget = (price) => `$${Number(price).toLocaleString()}`;
-
-  //  Function to format date
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US");
 
-  //  Function to get status color dynamically
   const getStatusColor = (status) => {
     switch (status) {
       case "New":
-        return "bg-blue-500 text-white"; // Info color
+        return "bg-blue-500 text-white";
       case "Draft":
-        return "bg-gray-300 text-gray-800"; // Draft color
+        return "bg-gray-300 text-gray-800";
       case "Ready":
-        return "bg-green-500 text-white"; // Success color
+        return "bg-green-500 text-white";
       default:
-        return "bg-gray-200 text-gray-800"; // Default color
+        return "bg-gray-200 text-gray-800";
     }
   };
 
   return (
     <div className="bg-background-card p-6 shadow-card rounded-lg text-text-default">
       <h2 className="text-2xl font-semibold mb-4 text-primary">Proposals</h2>
-      
+
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-background-hover text-text-default">
