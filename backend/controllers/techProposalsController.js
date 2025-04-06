@@ -82,3 +82,49 @@ export const markProposalAsSent = async (req, res) => {
     res.status(500).json({ message: "Failed to update proposal", error });
   }
 };
+
+//getSentProposals
+export const getSentProposals = async (req, res) => {
+  try {
+    const sentProposals = await TechProposal.find({ sent: true });
+    res.status(200).json(sentProposals);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch sent proposals" });
+  }
+};
+
+
+// Update a tech proposal by ID before ending email
+export const updateTechProposal = async (req, res) => {
+  const { id } = req.params;
+  const {
+    title,
+    status,
+    institution,
+    scheduledDate,
+    price,
+  } = req.body;
+
+  try {
+    const updated = await TechProposal.findByIdAndUpdate(
+      id,
+      {
+        title,
+        status,
+        institution,
+        scheduledDate,
+        price,
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Proposal not found" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error updating proposal:", error);
+    res.status(500).json({ message: "Server error while updating proposal" });
+  }
+};

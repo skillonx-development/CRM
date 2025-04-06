@@ -244,7 +244,6 @@ const [newProposal, setNewProposal] = useState({
                   <span className="text-lg font-semibold text-text">₹{proposal.price}</span>
                 </div>
                 <p className="text-text-muted text-sm">{proposal.institution}</p>
-                <p className="text-text-muted text-xs mt-1">{proposal.description}</p>
                 <div className="flex justify-between items-center text-text-muted text-sm mt-2">
                   <div className="flex items-center">
                     <Calendar size={16} className="mr-1" /> 
@@ -259,12 +258,6 @@ const [newProposal, setNewProposal] = useState({
                   <button className="text-sm flex items-center gap-2 text-text-muted hover:text-text">
                     <FileText size={16} /> View proposal details
                   </button>
-                  <motion.button 
-                    className="px-3 py-1 bg-background rounded-lg text-text border border-border hover:bg-background-hover" 
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    Open
-                  </motion.button>
                 </div>
               </motion.div>
             ))}

@@ -33,6 +33,13 @@ const memberSchema = new mongoose.Schema({
   approve: {
     type: Boolean,
     default: false
+  },
+  permissions: {
+    overview: { type: Boolean, default: true },
+    leads: { type: Boolean, default: true },
+    proposals: { type: Boolean, default: true },
+    orders: { type: Boolean, default: false },
+    billing: { type: Boolean, default: false },
   }
 }, {
   timestamps: true
