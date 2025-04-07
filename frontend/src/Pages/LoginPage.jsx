@@ -1,13 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { Link, useLocation } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("lead");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const { login } = useAuth();
+  const location = useLocation();
+
+  // Handle registration success message
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccess(location.state.message);
+      if (location.state.email) {
+        setEmail(location.state.email);
+      }
+      // Clear the message from location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,27 +39,12 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5001/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Send cookies
-        body: JSON.stringify({ email, password, type: role }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed. Please try again.");
+      const result = await login(email, password, role);
+      if (!result.success) {
+        setError(result.error);
       }
-
-      console.log("Login successful:", data);
-
-      // Redirect based on team
-      navigate(data.redirect);
-    } catch (error) {
-      setError(error.message);
+    } catch (err) {
+      setError(err.message || "An error occurred during login");
     }
   };
 
@@ -57,6 +57,7 @@ const LoginPage = () => {
         </p>
 
         {error && <p className="text-status-error text-sm text-center mb-4">{error}</p>}
+        {success && <p className="text-status-success text-sm text-center mb-4">{success}</p>}
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
@@ -135,14 +136,14 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-6 text-center space-y-2">
-          <a href="#" className="text-text-muted hover:text-primary text-sm transition">
+          <Link to="#" className="text-text-muted hover:text-primary text-sm transition">
             Forgot Password?
-          </a>
+          </Link>
           <p className="text-text-muted text-sm">
             Don&apos;t have an account?{" "}
-            <a href="/register/lead" className="text-primary hover:underline">
+            <Link to="/register/member" className="text-primary hover:underline">
               Sign up here
-            </a>
+            </Link>
           </p>
         </div>
       </div>

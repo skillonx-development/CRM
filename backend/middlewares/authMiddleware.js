@@ -6,13 +6,11 @@ export const protect = async (req, res, next) => {
   const token = req.cookies?.['jwt-crm'];
 
   if (!token) {
-    // Not logged in → redirect
     return res.status(401).json({ success: false, redirect: '/login', message: 'Not logged in' });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     const user = await Member.findById(decoded.id) || await Lead.findById(decoded.id);
     if (!user) {
       return res.status(401).json({ success: false, redirect: '/login', message: 'User not found' });
@@ -21,20 +19,28 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error('Auth error:', error);
     return res.status(401).json({ success: false, redirect: '/login', message: 'Invalid token' });
   }
 };
 
 export const authorize = (...roles) => {
   return (req, res, next) => {
-    const userTeam = req.user?.team?.toLowerCase();
+    const userRole = req.user?.role?.toLowerCase();
 
-    if (!req.user || !roles.includes(userTeam)) {
-      // Trying to access another team's dashboard → redirect to login
+    if (!req.user || !roles.includes(userRole)) {
       return res.status(403).json({ success: false, redirect: '/login', message: 'Access denied' });
     }
 
     next();
   };
+};
+
+export const restrictToUnauthenticated = (req, res, next) => {
+  const token = req.cookies?.['jwt-crm'];
+
+  if (token) {
+    return res.status(403).json({ success: false, redirect: '/dashboard', message: 'Already logged in' });
+  }
+
+  next();
 };

@@ -19,4 +19,9 @@ router.get('/marketing', protect, authorize('marketing'), (req, res) => {
   res.json({ message: 'Marketing Dashboard' });
 });
 
+// Redirect unauthorized users to login
+router.use((req, res) => {
+  res.status(403).json({ success: false, redirect: '/login', message: 'Access denied' });
+});
+
 export default router;
