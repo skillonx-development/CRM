@@ -18,10 +18,38 @@ export default function TeacherManagement() {
     setTeacherData({ ...teacherData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("New Teacher:", teacherData);
-    setShowForm(false);
+
+    try {
+      const response = await fetch("http://localhost:5001/api/teachers/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(teacherData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add teacher");
+      }
+
+      const data = await response.json();
+      console.log("Teacher added successfully:", data);
+
+      // Clear form
+      setTeacherData({
+        name: "",
+        specialty: "",
+        status: "Available",
+        workshops: "",
+        rating: "",
+      });
+
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error adding teacher:", error.message);
+    }
   };
 
   return (
@@ -58,7 +86,7 @@ export default function TeacherManagement() {
       </div>
 
       {/* Search & Filters */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mb-4">
         <div className="relative w-full">
           <Search className="absolute left-3 top-3 text-text-muted" size={16} />
           <input
@@ -85,7 +113,7 @@ export default function TeacherManagement() {
 
       {/* Add Teacher Modal */}
       {showForm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-background-card p-6 rounded-lg shadow-lg w-96">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Add New Teacher</h2>
@@ -147,7 +175,7 @@ export default function TeacherManagement() {
               />
               <button
                 type="submit"
-                className="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition"
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
               >
                 Save Teacher
               </button>
