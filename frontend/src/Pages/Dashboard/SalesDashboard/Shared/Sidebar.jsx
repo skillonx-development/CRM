@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../context/AuthContext";
 import {
     LayoutGrid,
     Users,
@@ -17,6 +18,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import logo from "../Assets/logo.png"; // Ensure the path is correct
 
 function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
+    const { logout } = useAuth();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -62,84 +65,111 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         collapsed: { rotate: 180, transition: { duration: 0.3 } }
     };
 
+    const handleLogout = () => {
+        logout();
+    };
+
     return (
-        <motion.aside
-            className="fixed left-0 top-0 h-screen bg-background-sidebar border-r border-border-dark z-20 overflow-hidden"
-            initial="expanded"
-            animate={collapsed ? "collapsed" : "expanded"}
-            variants={sidebarVariants}
-        >
-            <div className="p-4 flex items-center justify-between">
-                <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
-                    <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
-                    <AnimatePresence>
-                        {!collapsed && (
-                             <motion.h1 className="text-xl font-bold text-text" style={{ fontFamily: 'Morebi Rounded, sans-serif' }} 
-                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                             Flariex
-                         </motion.h1>
-                        )}
-                    </AnimatePresence>
+        <>
+            <motion.aside
+                className="fixed left-0 top-0 h-screen bg-background-sidebar border-r border-border-dark z-20 overflow-hidden"
+                initial="expanded"
+                animate={collapsed ? "collapsed" : "expanded"}
+                variants={sidebarVariants}
+            >
+                <div className="p-4 flex items-center justify-between">
+                    <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
+                        <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
+                        <AnimatePresence>
+                            {!collapsed && (
+                                <motion.h1 className="text-xl font-bold text-text" style={{ fontFamily: 'Morebi Rounded, sans-serif' }}
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                    Flariex
+                                </motion.h1>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                    <motion.button
+                        onClick={toggleSidebar}
+                        className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text ${collapsed ? "absolute top-4 right-4" : ""}`}
+                        variants={toggleButtonVariants}
+                    >
+                        <ChevronLeft size={20} />
+                    </motion.button>
                 </div>
-                <motion.button
-                    onClick={toggleSidebar}
-                    className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text ${collapsed ? "absolute top-4 right-4" : ""}`}
-                    variants={toggleButtonVariants}
-                >
-                    <ChevronLeft size={20} />
-                </motion.button>
-            </div>
 
-            <nav className="mt-6">
-                <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
-                    {menuItems.map((item) => (
-                        <li key={item.id}>
-                            <button
-                                onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                    location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                }`}
-                                title={collapsed ? item.label : ""}
-                            >
-                                <item.icon className="h-5 w-5" />
-                                <AnimatePresence>
-                                    {!collapsed && (
-                                        <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
-                                            {item.label}
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
+                <nav className="mt-6">
+                    <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
+                        {menuItems.map((item) => (
+                            <li key={item.id}>
+                                <button
+                                    onClick={() => navigate(item.path)}
+                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
+                                        }`}
+                                    title={collapsed ? item.label : ""}
+                                >
+                                    <item.icon className="h-5 w-5" />
+                                    <AnimatePresence>
+                                        {!collapsed && (
+                                            <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                                                {item.label}
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
 
-            <div className={`absolute bottom-8 w-full ${collapsed ? "px-2" : "px-4"}`}>
-                <ul className="space-y-2">
-                    {bottomMenuItems.map((item) => (
-                        <li key={item.id}>
+                <div className={`absolute bottom-8 w-full ${collapsed ? "px-2" : "px-4"}`}>
+                    <ul className="space-y-2">
+                        {bottomMenuItems.map((item) => (
+                            <li key={item.id}>
+                                <button
+                                    onClick={() => item.id === 'logout' ? setShowLogoutModal(true) : navigate(item.path)}
+                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
+                                        }`}
+                                    title={collapsed ? item.label : ""}
+                                >
+                                    <item.icon className="h-5 w-5" />
+                                    <AnimatePresence>
+                                        {!collapsed && (
+                                            <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                                                {item.label}
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </motion.aside>
+
+            {showLogoutModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-background-card p-6 rounded-lg shadow-lg w-full max-w-sm">
+                        <h2 className="text-xl font-bold text-text mb-4">Are you sure you want to logout?</h2>
+                        <p className="text-text-muted mb-6">You will be redirected to the landing page.</p>
+                        <div className="flex justify-end space-x-4">
                             <button
-                                onClick={() => navigate(item.path)}
-                                className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                    location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                }`}
-                                title={collapsed ? item.label : ""}
+                                onClick={() => setShowLogoutModal(false)}
+                                className="px-4 py-2 bg-gray-300 text-text-muted rounded-md hover:bg-gray-400 hover:text-black transition"
                             >
-                                <item.icon className="h-5 w-5" />
-                                <AnimatePresence>
-                                    {!collapsed && (
-                                        <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
-                                            {item.label}
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
+                                Cancel
                             </button>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </motion.aside>
+                            <button
+                                onClick={handleLogout}
+                                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition"
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
 

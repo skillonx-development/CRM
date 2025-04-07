@@ -33,38 +33,87 @@ const RegistrationPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      return setError("Passwords do not match.");
-    }
-    if (!formData.email.includes("@")) {
-      return setError("Invalid email address.");
-    }
-    if (formData.contactNumber.length < 10) {
-      return setError("Contact number should be at least 10 digits.");
-    }
-
+    setError('');
+    setSuccess('');
     setIsLoading(true);
+
+    // Add validation checks
     try {
+      // Validate form data
+      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+        throw new Error('All fields are required');
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      if (formData.password.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
+      }
+
+      if (!formData.email.includes('@')) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      const registrationData = {
+        name: formData.name.trim(),
+        contactNumber: formData.contactNumber.trim(),
+        email: formData.email.toLowerCase().trim(),
+        team: formData.team, // Send team value as is, without transformation
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
+      };
+
+      console.log('Attempting registration with data:', {
+        ...registrationData,
+        password: '***hidden***',
+        confirmPassword: '***hidden***'
+      });
+
       const response = await fetch(`http://localhost:5001/api/auth/register/${userType}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(registrationData)
       });
 
       const data = await response.json();
 
+      // Log full response for debugging
+      console.log('Server Response Status:', response.status);
+      console.log('Server Response:', data);
+
       if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+        throw new Error(data.message || `Registration failed with status ${response.status}`);
       }
 
-      setSuccess("Registration successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000); // Redirect after success
+      setSuccess('Registration successful! Redirecting to login...');
+
+      // Clear form data
+      setFormData({
+        name: "",
+        contactNumber: "",
+        email: "",
+        team: "Sales",
+        password: "",
+        confirmPassword: ""
+      });
+
+      // Redirect after successful registration
+      setTimeout(() => {
+        navigate('/login', {
+          state: {
+            message: 'Registration successful! Please login with your credentials.',
+            email: registrationData.email
+          }
+        });
+      }, 1500);
+
     } catch (err) {
-      setError(err.message);
+      console.error('Registration failed:', err);
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
