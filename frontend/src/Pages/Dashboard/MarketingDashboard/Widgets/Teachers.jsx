@@ -1,86 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Star, CheckCircle, UserCheck, X } from "lucide-react";
+import axios from "axios";
 
 const filters = ["All Teachers", "Available", "Busy", "Tentative"];
 
-const teachers = [
-  {
-    name: "Dr. Sarah Wilson",
-    specialty: "React & Frontend Development",
-    status: "Available",
-    statusColor: "bg-status-success/10 text-status-success",
-    workshops: 24,
-    rating: 4.9,
-  },
-  {
-    name: "Prof. Michael Chen",
-    specialty: "UI/UX Design",
-    status: "Busy",
-    statusColor: "bg-status-error/10 text-status-error",
-    workshops: 18,
-    rating: 4.7,
-  },
-  {
-    name: "Dr. James Anderson",
-    specialty: "Data Science & Machine Learning",
-    status: "Available",
-    statusColor: "bg-status-success/10 text-status-success",
-    workshops: 15,
-    rating: 4.8,
-  },
-  {
-    name: "Emily Rodriguez",
-    specialty: "Mobile App Development",
-    status: "Tentative",
-    statusColor: "bg-status-warning/10 text-status-warning",
-    workshops: 12,
-    rating: 4.6,
-  },
-  {
-    name: "Dr. Robert Johnson",
-    specialty: "Cloud Computing & DevOps",
-    status: "Available",
-    statusColor: "bg-status-success/10 text-status-success",
-    workshops: 10,
-    rating: 4.5,
-  },
-  {
-    name: "Lisa Thompson",
-    specialty: "Artificial Intelligence",
-    status: "Busy",
-    statusColor: "bg-status-error/10 text-status-error",
-    workshops: 14,
-    rating: 4.8,
-  },
-];
-
-const upcomingWorkshops = [
-  { title: "Advanced JavaScript", date: "June 5-7, 2023", location: "Tech University" },
-  { title: "UI/UX Masterclass", date: "June 15-16, 2023", location: "Design Academy" },
-  { title: "Data Science Fundamentals", date: "June 20-24, 2023", location: "Analytics College" },
-];
-
 export default function TeacherManagement() {
+  const [teachers, setTeachers] = useState([]);
   const [activeFilter, setActiveFilter] = useState("All Teachers");
   const [assignedWorkshops, setAssignedWorkshops] = useState({});
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [proposals, setProposals] = useState([]);
 
-  const filteredTeachers = teachers.filter(
-    (teacher) =>
-      activeFilter === "All Teachers" || teacher.status === activeFilter
-  );
+  // Fetch teachers
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5001/api/teachers");
+        const fetchedTeachers = Array.isArray(res.data) ? res.data : res.data.teachers || [];
+        setTeachers(fetchedTeachers);
+
+        // Load assigned workshops into state
+        const initialAssignments = {};
+        fetchedTeachers.forEach((t) => {
+          if (t.assignedWorkshop) {
+            initialAssignments[t.name] = t.assignedWorkshop;
+          }
+        });
+        setAssignedWorkshops(initialAssignments);
+      } catch (err) {
+        console.error("Failed to fetch teachers:", err);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
+  // Fetch proposals when a teacher is selected
+  useEffect(() => {
+    const fetchProposals = async () => {
+      if (!selectedTeacher) return;
+      try {
+        const res = await axios.get("http://localhost:5001/api/tech-proposals");
+        setProposals(Array.isArray(res.data) ? res.data : res.data.proposals || []);
+      } catch (err) {
+        console.error("Failed to fetch proposals:", err);
+        setProposals([]);
+      }
+    };
+
+    fetchProposals();
+  }, [selectedTeacher]);
+
+  const filteredTeachers = Array.isArray(teachers)
+    ? teachers.filter(
+        (teacher) => activeFilter === "All Teachers" || teacher.status === activeFilter
+      )
+    : [];
 
   const handleAssignClick = (teacherName) => {
     setSelectedTeacher(teacherName);
   };
 
-  const handleAssignToWorkshop = (workshop) => {
-    setAssignedWorkshops({
-      ...assignedWorkshops,
-      [selectedTeacher]: workshop.title,
-    });
-    setSelectedTeacher(null);
+  const handleAssignToWorkshop = async (proposal) => {
+    try {
+      await axios.post(`http://localhost:5001/api/teachers/assign/${selectedTeacher}`, {
+        workshopTitle: proposal.title,
+      });
+
+      setAssignedWorkshops((prev) => ({
+        ...prev,
+        [selectedTeacher]: proposal.title,
+      }));
+      setSelectedTeacher(null);
+    } catch (error) {
+      console.error("Failed to assign proposal:", error);
+    }
   };
 
   return (
@@ -102,7 +97,7 @@ export default function TeacherManagement() {
         ))}
       </div>
 
-      {/* Teacher Cards Grid */}
+      {/* Teacher Cards */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
         initial="hidden"
@@ -122,14 +117,11 @@ export default function TeacherManagement() {
             }}
             whileHover={{ scale: 1.02 }}
           >
-            {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <User size={36} className="text-text-muted" />
                 <div>
-                  <h3 className="text-lg font-semibold text-text">
-                    {teacher.name}
-                  </h3>
+                  <h3 className="text-lg font-semibold text-text">{teacher.name}</h3>
                   <p className="text-sm text-text-muted">{teacher.specialty}</p>
                 </div>
               </div>
@@ -140,7 +132,6 @@ export default function TeacherManagement() {
               </span>
             </div>
 
-            {/* Details */}
             <div className="flex items-center justify-between">
               <p className="text-sm text-text-muted flex items-center gap-1">
                 <CheckCircle size={14} className="text-status-success" />
@@ -152,14 +143,12 @@ export default function TeacherManagement() {
               </p>
             </div>
 
-            {/* Assigned Workshop */}
             {assignedWorkshops[teacher.name] && (
               <p className="text-sm font-medium text-text-success">
                 Assigned to: {assignedWorkshops[teacher.name]}
               </p>
             )}
 
-            {/* Actions */}
             <div className="flex justify-between mt-2">
               <button className="px-4 py-2 text-sm font-medium text-text-muted border border-border rounded-lg hover:bg-background-hover transition">
                 View Profile
@@ -181,39 +170,42 @@ export default function TeacherManagement() {
         ))}
       </motion.div>
 
-      {/* No Teachers Found */}
       {filteredTeachers.length === 0 && (
         <p className="text-center text-text-muted mt-4">
           No teachers found for this category.
         </p>
       )}
 
-      {/* Assign Workshop Modal */}
+      {/* Assign Modal */}
       {selectedTeacher && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-background-card p-6 rounded-lg shadow-lg w-96">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Assign Workshop</h2>
+              <h2 className="text-lg font-semibold">Assign Proposal</h2>
               <button onClick={() => setSelectedTeacher(null)}>
                 <X size={20} />
               </button>
             </div>
             <p className="text-sm text-text-muted mb-4">
-              Select a workshop to assign {selectedTeacher}:
+              Select a proposal to assign {selectedTeacher}:
             </p>
             <ul>
-              {upcomingWorkshops.map((workshop, index) => (
-                <li
-                  key={index}
-                  className="p-3 bg-background-hover rounded-lg mb-2 cursor-pointer hover:bg-background transition"
-                  onClick={() => handleAssignToWorkshop(workshop)}
-                >
-                  <p className="font-medium">{workshop.title}</p>
-                  <p className="text-xs text-text-muted">
-                    {workshop.date} - {workshop.location}
-                  </p>
-                </li>
-              ))}
+              {proposals.length > 0 ? (
+                proposals.map((proposal, index) => (
+                  <li
+                    key={index}
+                    className="p-3 bg-background-hover rounded-lg mb-2 cursor-pointer hover:bg-background transition"
+                    onClick={() => handleAssignToWorkshop(proposal)}
+                  >
+                    <p className="font-medium">{proposal.title}</p>
+                    <p className="text-xs text-text-muted">
+                      {proposal.schedule} – {proposal.institution}
+                    </p>
+                  </li>
+                ))
+              ) : (
+                <p className="text-sm text-text-muted">No proposals available</p>
+              )}
             </ul>
           </div>
         </div>
@@ -221,4 +213,3 @@ export default function TeacherManagement() {
     </div>
   );
 }
-

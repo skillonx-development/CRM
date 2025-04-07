@@ -1,40 +1,40 @@
 import jwt from 'jsonwebtoken';
-import Lead from '../models/leadModel.js';
 import Member from '../models/memberModel.js';
+import Lead from '../models/leadModel.js';
 
 export const protect = async (req, res, next) => {
+  const token = req.cookies?.['jwt-crm'];
+
+  if (!token) {
+    // Not logged in → redirect
+    return res.status(401).json({ success: false, redirect: '/login', message: 'Not logged in' });
+  }
+
   try {
-    const token = req.cookies['jwt-crm'];
-
-    if (!token) {
-      return res.status(401).json({ success: false, message: 'Not authorized' });
-    }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (decoded.type === 'lead') {
-      req.user = await Lead.findById(decoded.id).select('-password');
-    } else if (decoded.type === 'member') {
-      req.user = await Member.findById(decoded.id).select('-password');
-    } else {
-      return res.status(401).json({ success: false, message: 'Invalid user type' });
+    const user = await Member.findById(decoded.id) || await Lead.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ success: false, redirect: '/login', message: 'User not found' });
     }
 
-    if (!req.user) {
-      return res.status(401).json({ success: false, message: 'User not found' });
-    }
-
-    req.user.role = decoded.type; // Add user role to the request object
-
+    req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
+    console.error('Auth error:', error);
+    return res.status(401).json({ success: false, redirect: '/login', message: 'Invalid token' });
   }
 };
 
-export const authorize = (...roles) => (req, res, next) => {
-  if (!roles.includes(req.user.team)) {
-    return res.status(403).json({ success: false, message: 'Access Denied' });
-  }
-  next();
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    const userTeam = req.user?.team?.toLowerCase();
+
+    if (!req.user || !roles.includes(userTeam)) {
+      // Trying to access another team's dashboard → redirect to login
+      return res.status(403).json({ success: false, redirect: '/login', message: 'Access denied' });
+    }
+
+    next();
+  };
 };

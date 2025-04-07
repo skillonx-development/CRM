@@ -4,16 +4,15 @@ import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("lead"); // Default role selection
+  const [role, setRole] = useState("lead");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
-    // Basic validation
     if (!email.includes("@")) {
       setError("Please enter a valid email address.");
       return;
@@ -30,7 +29,8 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, type: role }), // Send role as 'type'
+        credentials: "include", // Send cookies
+        body: JSON.stringify({ email, password, type: role }),
       });
 
       const data = await response.json();
@@ -41,10 +41,7 @@ const LoginPage = () => {
 
       console.log("Login successful:", data);
 
-      // Store token if applicable
-      localStorage.setItem("token", data.token);
-
-      // Navigate to the respective dashboard based on the redirect field
+      // Redirect based on team
       navigate(data.redirect);
     } catch (error) {
       setError(error.message);
@@ -54,18 +51,14 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md bg-background-card p-8 rounded-lg shadow-card">
-        {/* Welcome Message */}
         <h2 className="text-3xl font-bold text-text text-center mb-2">Welcome Back</h2>
         <p className="text-text-muted text-center mb-6">
           Sign in to access your dashboard and manage your resources efficiently.
         </p>
 
-        {/* Error Message */}
         {error && <p className="text-status-error text-sm text-center mb-4">{error}</p>}
 
-        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-5">
-          {/* Email Input */}
           <div>
             <label className="block text-text-muted font-medium mb-2" htmlFor="email">
               Email Address
@@ -77,12 +70,10 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 bg-background-hover text-text rounded-md border border-border focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition"
-              aria-label="Email Address"
               placeholder="Enter your email"
             />
           </div>
 
-          {/* Password Input */}
           <div>
             <label className="block text-text-muted font-medium mb-2" htmlFor="password">
               Password
@@ -95,7 +86,6 @@ const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3 bg-background-hover text-text rounded-md border border-border focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition"
-                aria-label="Password"
                 placeholder="Enter your password"
               />
               <button
@@ -108,7 +98,6 @@ const LoginPage = () => {
             </div>
           </div>
 
-          {/* Role Selection Radio Buttons */}
           <fieldset>
             <legend className="block text-text-muted font-medium mb-2">Select Role</legend>
             <div className="flex space-x-4">
@@ -137,7 +126,6 @@ const LoginPage = () => {
             </div>
           </fieldset>
 
-          {/* Login Button */}
           <button
             type="submit"
             className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md font-semibold transition duration-300"
@@ -146,13 +134,12 @@ const LoginPage = () => {
           </button>
         </form>
 
-        {/* Additional Links */}
         <div className="mt-6 text-center space-y-2">
           <a href="#" className="text-text-muted hover:text-primary text-sm transition">
             Forgot Password?
           </a>
           <p className="text-text-muted text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a href="/register/lead" className="text-primary hover:underline">
               Sign up here
             </a>

@@ -58,7 +58,11 @@ const ProposalsTable = ({ onSelect }) => {
               <td className="p-3">{proposal.title}</td>
               <td className="p-3">{formatBudget(proposal.price)}</td>
               <td className="p-3">
-                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(proposal.status)}`}>
+                <span
+                  className={`px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(
+                    proposal.status
+                  )}`}
+                >
                   {proposal.status}
                 </span>
               </td>

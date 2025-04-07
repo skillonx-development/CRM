@@ -3,16 +3,11 @@ import Lead from '../models/leadModel.js';
 import Member from '../models/memberModel.js';
 import { generateTokenAndSetCookie } from '../utils/generateToken.js';
 
-
 const isValidEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
-}
+};
 
-// const isValidPassword = (password) => {
-//   const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-//   return regex.test(password);
-// }
 // Register
 export async function register(req, res) {
   try {
@@ -27,15 +22,10 @@ export async function register(req, res) {
       return res.status(400).json({ success: false, message: 'Please enter a valid email address' });
     }
 
-    // if (!isValidPassword(password)) {
-    //   return res.status(400).json({ success: false, message: 'Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, and one number' });
-    // }
-
     if (password !== confirmPassword) {
       return res.status(400).json({ success: false, message: 'Passwords do not match' });
     }
 
-    // Check if the user is already registered as a lead or member
     const existingLead = await Lead.findOne({ email });
     const existingMember = await Member.findOne({ email });
 
@@ -53,42 +43,42 @@ export async function register(req, res) {
       }
 
       const hashedPassword = await bcryptjs.hash(password, 10);
-
       const newLead = new Lead({
         name,
         contactNumber,
         email,
         team,
-        password: hashedPassword
-      })
+        password: hashedPassword,
+      });
 
-      generateTokenAndSetCookie(newLead._id, res);
+      generateTokenAndSetCookie(newLead._id, 'lead', res);
       await newLead.save();
-      return res.status(201).json({ success: true, user: newLead })
+      return res.status(201).json({ success: true, user: newLead });
     }
-    else if (type === 'member') {
+
+    if (type === 'member') {
       if (existingMember) {
         return res.status(400).json({ success: false, message: 'Email already registered as a member' });
       }
 
       const hashedPassword = await bcryptjs.hash(password, 10);
-
       const newMember = new Member({
         name,
         contactNumber,
         email,
-        team,
-        password: hashedPassword
-      })
+        team: team.toLowerCase(),
+        password: hashedPassword,
+      });
 
-      generateTokenAndSetCookie(newMember._id, res);
+      generateTokenAndSetCookie(newMember._id, 'member', res);
       await newMember.save();
-      return res.status(201).json({ success: true, user: newMember })
-    } else {
-      return res.status(400).json({ success: false, message: 'Invalid user type' });
+      return res.status(201).json({ success: true, user: newMember });
     }
+
+    return res.status(400).json({ success: false, message: 'Invalid user type' });
+
   } catch (error) {
-    console.error('Error in register:', error); // Log the error for debugging
+    console.error('Error in register:', error);
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 }
@@ -116,36 +106,23 @@ export async function login(req, res) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    generateTokenAndSetCookie(user._id, res);
+    generateTokenAndSetCookie(user._id, type, res);
 
-    if (type === 'lead') {
-      switch (user.team.toLowerCase()) {
-        case 'tech':
-          return res.status(200).json({ success: true, redirect: '/tech', user });
-        case 'sales':
-          return res.status(200).json({ success: true, redirect: '/sales', user });
-        case 'marketing':
-          return res.status(200).json({ success: true, redirect: '/marketing', user });
-        default:
-          return res.status(400).json({ success: false, message: 'Invalid team for lead' });
-      }
+    const team = user.team?.toLowerCase();
+    switch (team) {
+      case 'tech':
+        return res.status(200).json({ success: true, redirect: '/tech', user });
+      case 'sales':
+        return res.status(200).json({ success: true, redirect: '/sales', user });
+      case 'marketing':
+        return res.status(200).json({ success: true, redirect: '/marketing', user });
+      default:
+        return res.status(400).json({ success: false, message: 'Invalid or missing team' });
     }
 
-    if (type === 'member') {
-      switch (user.team.toLowerCase()) {
-        case 'tech':
-          return res.status(200).json({ success: true, redirect: '/tech', user });
-        case 'sales':
-          return res.status(200).json({ success: true, redirect: '/sales', user });
-        case 'marketing':
-          return res.status(200).json({ success: true, redirect: '/marketing', user });
-        default:
-          return res.status(400).json({ success: false, message: 'Invalid team for member' });
-      }
-    }
-    
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('Login Error:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 }
 

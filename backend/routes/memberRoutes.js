@@ -1,13 +1,26 @@
 import express from "express";
 import Member from "../models/memberModel.js"; 
+import LeadMember from '../models/leadModel.js';
+import { updateMemberPermissions } from '../controllers/memberController.js';
+
 
 const router = express.Router();
 
-// ✅ Get all members
+//  Get all members
 router.get("/getMembers", async (req, res) => {
   try {
     const members = await Member.find();
     res.status(200).json(members);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
+//Get  all team leads
+router.get("/getLeads", async (req, res) => {
+  try {
+    const leadMembers = await LeadMember.find();
+    res.status(200).json(leadMembers);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
@@ -38,5 +51,8 @@ router.put("/approveMember/:id", async (req, res) => {
     res.status(500).json({ message: "Error updating approval", error: error.message });
   }
 });
+
+//for permission of dashboards
+router.put('/updatePermissions/:id', updateMemberPermissions);
 
 export default router;
