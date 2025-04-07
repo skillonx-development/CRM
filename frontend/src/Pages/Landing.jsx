@@ -1,4 +1,4 @@
-import React from "react"; 
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
@@ -12,24 +12,24 @@ const Landing = () => {
     <div className="bg-background text-text min-h-screen">
       {/* Header with Login Button */}
       <header className="relative bg-background-card shadow-card py-6 px-8 flex justify-between items-center">
-  <h2 className="text-3xl font-bold text-text">flariex</h2>
+        <h2 className="text-3xl font-bold text-text">flariex</h2>
 
-  {/* Login and Register Buttons - Positioned Together on the Right */}
-  <div className="flex gap-4">
-    <button 
-      onClick={() => navigate('/login')}
-      className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
-    >
-      Login
-    </button>
-    <button 
-      onClick={() => navigate('/register/lead')}
-      className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
-    >
-      Register
-    </button>
-  </div>
-</header>
+        {/* Login and Register Buttons - Positioned Together on the Right */}
+        <div className="flex gap-4">
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => navigate('/register/lead')}
+            className="bg-status-info text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Register
+          </button>
+        </div>
+      </header>
 
 
       {/* Hero Section */}
@@ -41,34 +41,9 @@ const Landing = () => {
           Automate lead generation, proposals, teacher recruitment, and
           workshop execution—all in one place.
         </p>
-        
+
         {/* Role Selection Buttons */}
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <button 
-            onClick={() => handleRoleSelection('/tech')}
-            className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-dark"
-          >
-            Tech Team
-          </button>
-          <button 
-            onClick={() => handleRoleSelection('/sales')}
-            className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-dark"
-          >
-            Sales Team
-          </button>
-          <button 
-            onClick={() => handleRoleSelection('/marketing')}
-            className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-dark"
-          >
-            Marketing Team
-          </button>
-          <button 
-            onClick={() => handleRoleSelection('/admin')}
-            className="bg-primary text-white px-6 py-3 rounded-md hover:bg-primary-dark"
-          >
-            Admin
-          </button>
-        </div>
+        {/* Removed role selection buttons and their functionalities */}
       </section>
 
       {/* Features Section */}

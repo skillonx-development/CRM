@@ -27,15 +27,16 @@ app.use(cookieParser());
 // CORS
 app.use(cors({
   origin: 'http://localhost:5173',
-  methods: 'GET,POST,PUT,DELETE,PATCH',
-  allowedHeaders: 'Content-Type,Authorization',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
+  exposedHeaders: ['set-cookie']
 }));
 
 // File upload serving
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -45,7 +46,7 @@ app.use('/api/proposals', proposalRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/tech/resources', resourceRoutes);
-app.use('/api/tech-proposals', techProposalsRoutes); 
+app.use('/api/tech-proposals', techProposalsRoutes);
 app.use('/api/teachers', teachersRoute);
 
 

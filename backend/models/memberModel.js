@@ -22,7 +22,10 @@ const memberSchema = new mongoose.Schema({
   team: {
     type: String,
     required: [true, 'Team is required'],
-    enum: ['Sales', 'Marketing', 'Tech'],
+    enum: {
+      values: ['Sales', 'Marketing', 'Tech'],
+      message: '{VALUE} is not a valid team'
+    },
     default: 'Sales'
   },
   password: {

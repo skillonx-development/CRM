@@ -1,27 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Landing from './Pages/Landing';
 import LoginPage from './Pages/LoginPage';
 import RegistrationPage from './Pages/RegistrationPage';
 
-// Tech Dashboaard
+// Tech Dashboard imports
 import TechDashboard from './Pages/Dashboard/Tech/TechDashboard';
-
-import Instructor from './Pages/Dashboard/Tech/Instructor';
-import Feedback from './Pages/Dashboard/Tech/Feedback';
-import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
-// Public Pages
-
-
 import Proposals from './Pages/Dashboard/Tech/Proposals';
-
-
 import Curriculum from './Pages/Dashboard/Tech/Curriculum';
 import Resources from './Pages/Dashboard/Tech/Resources';
 import ManageTeam from './Pages/Dashboard/Tech/ManageTeam';
 import TechSettings from './Pages/Dashboard/Tech/TechSettings';
 import TechHelp from './Pages/Dashboard/Tech/TechHelp';
-// Sales Dashboard
+
+// Sales Dashboard imports
 import SalesDashboard from './Pages/Dashboard/SalesDashboard/SalesDashboard';
 import SalesLead from './Pages/Dashboard/SalesDashboard/SalesLead';
 import SalesProposals from './Pages/Dashboard/SalesDashboard/SalesProposals';
@@ -30,106 +23,137 @@ import SalesBilling from './Pages/Dashboard/SalesDashboard/SalesBilling';
 import SalesSettings from './Pages/Dashboard/SalesDashboard/SalesSettings';
 import SalesHelp from './Pages/Dashboard/SalesDashboard/SalesHelp';
 
-
-// Marketing Dashboard
+// Marketing Dashboard imports
 import MarketingDashboard from './Pages/Dashboard/MarketingDashboard/MarketingDashboard';
 import MarketingProposal from './Pages/Dashboard/MarketingDashboard/MarketingProposal';
 import MarketingTeacher from './Pages/Dashboard/MarketingDashboard/MarketingTeacher';
 import MarketingSettings from './Pages/Dashboard/MarketingDashboard/MarketingSettings';
 import MarketingHelp from './Pages/Dashboard/MarketingDashboard/MarketingHelp';
 import MarketingFeedback from './Pages/Dashboard/MarketingDashboard/MarketingFeedback';
+import MarketingTeam from './Pages/Dashboard/MarketingDashboard/MarketingTeam';
 
-
-
-// Admin Dashboard
+// Admin Dashboard imports
 import AdminDashboard from './Pages/Dashboard/AdminDashboard/AdminDashboard';
 import AdminApproval from './Pages/Dashboard/AdminDashboard/AdminApproval';
 import AdminInvoices from './Pages/Dashboard/AdminDashboard/AdminInvoices';
 import AdminNotifications from './Pages/Dashboard/AdminDashboard/AdminNotifications';
-import SalesTeam from './Pages/Dashboard/SalesDashboard/SalesTeam';
-import MarketingTeam from './Pages/Dashboard/MarketingDashboard/MarketingTeam';
 import AdminTeamManage from './Pages/Dashboard/AdminDashboard/AdminTeamManage';
 import AdminSettings from './Pages/Dashboard/AdminDashboard/AdminSettings';
 import AdminControl from './Pages/Dashboard/AdminDashboard/AdminControl';
 
+const ProtectedLayout = () => {
+  const { isAuthenticated, loading, user } = useAuth();
+  const location = useLocation();
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  // Get the current dashboard from URL path
+  const currentPath = location.pathname.split('/')[1];
+
+  // Check if user has access to this dashboard based on their team
+  const hasAccess = user?.team?.toLowerCase() === currentPath;
+
+  // Admin has access to all dashboards
+  if (user?.team?.toLowerCase() === 'admin') {
+    return <Outlet />;
+  }
+
+  // Redirect to login if trying to access unauthorized dashboard
+  if (!hasAccess) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  return <Outlet />;
+};
+
+const RedirectIfAuthenticated = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={`/${JSON.parse(localStorage.getItem('user')).team.toLowerCase()}`} />;
+  }
+
+  return children;
+};
 
 const App = () => {
   return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Completely public route */}
+          <Route index element={<Landing />} />
+          <Route path="/register/:type" element={<RegistrationPage />} />
 
-    <Router>
-      <Routes>
-        <Route>
+          {/* Protected login route - redirects if already authenticated */}
+          <Route
+            path="/login"
+            element={
+              <RedirectIfAuthenticated>
+                <LoginPage />
+              </RedirectIfAuthenticated>
+            }
+          />
 
-        <Route path="/" element={<Landing/>} />
-        <Route path="/login" element={<LoginPage/>} />
-        <Route path="/register/lead" element={<RegistrationPage/>} />
-        <Route path="/register/member" element={<RegistrationPage/>} />
+          {/* Protected dashboard routes */}
+          <Route element={<ProtectedLayout />}>
+            {/* Tech Dashboard Routes */}
+            <Route path="/tech/*" element={<Outlet />}>
+              <Route index element={<TechDashboard />} />
+              <Route path="proposal" element={<Proposals />} />
+              <Route path="curriculum" element={<Curriculum />} />
+              <Route path="team" element={<ManageTeam />} />
+              <Route path="resources" element={<Resources />} />
+              <Route path="settings" element={<TechSettings />} />
+              <Route path="help" element={<TechHelp />} />
+            </Route>
 
-          {/* Sales Dashboard */}
-          <Route path="/sales" element={<SalesDashboard />} />
-          <Route path="/sales/lead" element={<SalesLead />} />
-          <Route path="/sales/proposals" element={<SalesProposals />} />
-          <Route path="/sales/orders" element={<SalesOrders />} />
-          <Route path="/salaes/orders" element={<SalesOrders />} />
+            {/* Sales Dashboard Routes */}
+            <Route path="/sales/*" element={<Outlet />}>
+              <Route index element={<SalesDashboard />} />
+              <Route path="lead" element={<SalesLead />} />
+              <Route path="proposals" element={<SalesProposals />} />
+              <Route path="orders" element={<SalesOrders />} />
+              <Route path="billing" element={<SalesBilling />} />
+              <Route path="settings" element={<SalesSettings />} />
+              <Route path="help" element={<SalesHelp />} />
+            </Route>
 
+            {/* Marketing Dashboard Routes */}
+            <Route path="/marketing/*" element={<Outlet />}>
+              <Route index element={<MarketingDashboard />} />
+              <Route path="proposals" element={<MarketingProposal />} />
+              <Route path="teachers" element={<MarketingTeacher />} />
+              <Route path="settings" element={<MarketingSettings />} />
+              <Route path="help" element={<MarketingHelp />} />
+              <Route path="feedback" element={<MarketingFeedback />} />
+              <Route path="team" element={<MarketingTeam />} />
+            </Route>
 
-          <Route path="/tech" element={<TechDashboard />} />
-          <Route path="/tech/instructor" element={<Instructor />} />
-          {/* <Route path="/tech/workshop" element={<Worksho/>} /> */}
-          <Route path="/tech/curriculum" element={<Curriculum />} />
-          <Route path="/tech/feedback" element={<Feedback />} />
-
-          <Route path="/sales/billing" element={<SalesBilling />} />
-          <Route path="/sales/team" element={<SalesTeam />} />
-          <Route path="/sales/settings" element={<SalesSettings />} />
-          <Route path="/sales/help" element={<SalesHelp />} />
-
-          {/* Tech Dashboard */}
-          <Route path="/tech" element={<TechDashboard />} />
-          <Route path="/tech/proposal" element={<Proposals />} />
-          <Route path="/tech/curriculum" element={<Curriculum />} />
-          <Route path="/tech/team" element={<ManageTeam />} />
-          <Route path="/tech/resources" element={<Resources />} />
-          <Route path="/tech/settings" element={<TechSettings />} />
-          <Route path="/tech/help" element={<TechHelp />} />
-
-          {/* Marketing Dahshboard */}
-          <Route path="/marketing" element={<MarketingDashboard />} />
-          <Route path="/marketing/proposals" element={<MarketingProposal />} />
-          <Route path="/marketing/teachers" element={<MarketingTeacher />} />
-          <Route path="/marketing/settings" element={<MarketingSettings />} />
-          <Route path="/marketing/help" element={<MarketingHelp />} />
-          <Route path="/marketing/feedback" element={<MarketingFeedback />} />
-          <Route path="/marketing/promotion" element={<MarketingPromotion />} />
-          <Route path="/marketing/team" element={<MarketingTeam />} />
-
-
-          {/* Admin Dashboard */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/approvals" element={<AdminApproval/>} />
-          <Route path="/admin/invoices" element={<AdminInvoices/>} />
-          <Route path="/admin/teams" element={<AdminTeamManage/>} />
-          <Route path="/admin/notifications" element={<AdminNotifications/>} />
-          <Route path="/admin/settings" element={<AdminSettings/>} />
-          <Route path="/admin/control" element={<AdminControl/>} />
-        </Route>
-
-        {/* 404 Route */}
-        <Route path="*" element={
-          <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <h1 className="text-6xl font-bold text-primary">404</h1>
-              <p className="text-xl text-gray-600 mt-4">Page not found</p>
-              <a href="/" className="mt-6 inline-block text-primary hover:underline">
-                Go back home
-              </a>
-            </div>
-          </div>
-        } />
-      </Routes>
-    </Router>
-
+            {/* Admin Dashboard Routes */}
+            <Route path="/admin/*" element={<Outlet />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="approvals" element={<AdminApproval />} />
+              <Route path="invoices" element={<AdminInvoices />} />
+              <Route path="teams" element={<AdminTeamManage />} />
+              <Route path="notifications" element={<AdminNotifications />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="control" element={<AdminControl />} />
+            </Route>
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 };
 
