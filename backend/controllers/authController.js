@@ -88,7 +88,11 @@ export async function login(req, res) {
   try {
     const { email, password, type } = req.body;
 
-    if (!type || (type !== 'lead' && type !== 'member')) {
+    if (!email || !password || !type) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    if (type !== 'lead' && type !== 'member') {
       return res.status(400).json({ success: false, message: 'Invalid user type' });
     }
 
@@ -119,15 +123,19 @@ export async function login(req, res) {
       default:
         return res.status(400).json({ success: false, message: 'Invalid or missing team' });
     }
-
+    
   } catch (error) {
-    console.error('Login Error:', error);
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 }
 
 // Logout
 export async function logout(req, res) {
-  res.clearCookie('jwt-crm');
-  res.status(200).json({ success: true, message: 'Logged out' });
+  try {
+    res.clearCookie('jwt-crm');
+    res.status(200).json({ success: true, message: 'Logged out' });
+  } catch (error) {
+    console.error('Error in logout:', error); // Log the error stack trace
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
 }

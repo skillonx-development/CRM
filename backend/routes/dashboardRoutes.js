@@ -3,6 +3,8 @@ import { protect, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
+hi 
+
 router.get('/admin', protect, authorize('admin'), (req, res) => {
   res.json({ message: 'Admin Dashboard' });
 });

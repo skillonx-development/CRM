@@ -21,6 +21,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Fixed import for urlencoded
 app.use(cookieParser());
 
 // CORS
