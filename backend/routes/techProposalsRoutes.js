@@ -6,6 +6,7 @@ import {
   markProposalAsSent,
   getSentProposals,
   updateTechProposal,
+  sendTechProposalEmail,
 } from "../controllers/techProposalsController.js";
 
 const router = express.Router();
@@ -25,4 +26,6 @@ router.get('/sent', getSentProposals);
 //update proposal before sending the email
 router.put("/:id", updateTechProposal);
 
+// Send email for the given proposal ID
+router.post("/send-email/:id", sendTechProposalEmail);
 export default router;

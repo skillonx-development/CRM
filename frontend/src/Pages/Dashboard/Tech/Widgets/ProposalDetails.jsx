@@ -9,14 +9,6 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
-const teachers = [
-  "Sarah Kim",
-  "David Chen",
-  "Aisha Patel",
-  "John Doe",
-  "Emily Wong",
-  "Michael Scott",
-];
 
 const ProposalDetails = ({ proposal }) => {
   const [draft, setDraft] = useState("");
@@ -80,6 +72,7 @@ const ProposalDetails = ({ proposal }) => {
     formData.append("institution", proposal.institution);
     formData.append("title", proposal.title);
     formData.append("price", proposal.price);
+    formData.append("collegeEmail", proposal.collegeEmail);
     formData.append("draft", draft);
     formData.append("selectedTeacher", selectedTeacher);
     formData.append("scheduledDate", scheduledDate);

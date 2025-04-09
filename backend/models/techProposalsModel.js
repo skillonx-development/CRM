@@ -13,6 +13,7 @@ const techProposalsSchema = new mongoose.Schema(
     institution: String,
     title: String,
     price: Number,
+    collegeEmail:String,
     scheduledDate: String,
     scheduledTime: String,
     selectedTeacher: String,
