@@ -4,7 +4,6 @@ import { Calendar, FileText, PlusCircle, Search, X } from "lucide-react";
 import axios from 'axios';
 
 const api = {
-  // Fetch all proposals from the database
   fetchProposals: async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/proposals'); 
@@ -14,7 +13,6 @@ const api = {
       return [];
     }
   },
-  // Create a new proposal in the database
   createProposal: async (proposal) => {
     try {
       const response = await axios.post('http://localhost:5001/api/proposals', proposal);
@@ -35,15 +33,16 @@ const ProposalTracking = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-const [newProposal, setNewProposal] = useState({
-  title: "",
-  price: "",
-  status: "Lead Acquired",
-  statusColor: "bg-primary",
-  institution: "",
-  scheduleDate: "", 
-  description: "",
-});
+  const [newProposal, setNewProposal] = useState({
+    title: "",
+    price: "",
+    status: "Lead Acquired",
+    statusColor: "bg-primary",
+    institution: "",
+    collegeEmail: "",  // Added collegeEmail
+    scheduleDate: "", 
+    description: "",
+  });
 
   useEffect(() => {
     const loadProposals = async () => {
@@ -58,15 +57,12 @@ const [newProposal, setNewProposal] = useState({
         setIsLoading(false);
       }
     };
-
     loadProposals();
   }, []);
 
-  // Filter function that runs whenever search or filter changes
   useEffect(() => {
     let results = [...proposals];
-    
-    // Apply status filter
+
     if (activeFilter !== "All") {
       const statusMap = {
         "Leads": "Lead Acquired",
@@ -76,8 +72,7 @@ const [newProposal, setNewProposal] = useState({
       };
       results = results.filter(item => item.status === statusMap[activeFilter]);
     }
-    
-    // Apply search filter
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(item => 
@@ -86,20 +81,19 @@ const [newProposal, setNewProposal] = useState({
         item.description.toLowerCase().includes(query)
       );
     }
-    
+
     setFilteredProposals(results);
   }, [activeFilter, searchQuery, proposals]);
 
-  // Handle new proposal form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === "status") {
       let statusColor = "bg-primary";
       if (value === "Proposal Sent") statusColor = "bg-status-info";
       else if (value === "Accepted") statusColor = "bg-status-success";
       else if (value === "Rejected") statusColor = "bg-status-error";
-      
+
       setNewProposal({
         ...newProposal,
         [name]: value,
@@ -113,11 +107,8 @@ const [newProposal, setNewProposal] = useState({
     }
   };
 
-  // Handle form submission - save to database
-  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const proposalToSave = {
         ...newProposal,
@@ -134,6 +125,7 @@ const [newProposal, setNewProposal] = useState({
         status: "Lead Acquired",
         statusColor: "bg-primary",
         institution: "",
+        collegeEmail: "",
         scheduleDate: "",
         description: "",
       });
@@ -144,7 +136,6 @@ const [newProposal, setNewProposal] = useState({
 
   return (
     <div className="bg-background p-6 rounded-xl shadow-card border border-border w-full">
-      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-text">Proposal Tracking</h1>
         <button 
@@ -154,14 +145,12 @@ const [newProposal, setNewProposal] = useState({
           <PlusCircle size={18} /> Create New Proposal
         </button>
       </div>
-      
-      {/* Main content */}
+
       <div className="bg-background p-4 rounded-lg shadow-card border border-border">
         <h2 className="text-xl font-semibold text-text flex items-center gap-2 mb-4">
           <FileText size={20} /> Proposals
         </h2>
-        
-        {/* Filter and search */}
+
         <div className="flex justify-between items-center mb-4">
           <div className="flex gap-2">
             {['All', 'Leads', 'Sent', 'Accepted', 'Rejected'].map((tab) => (
@@ -178,7 +167,7 @@ const [newProposal, setNewProposal] = useState({
               </button>
             ))}
           </div>
-          
+
           <div className="relative">
             <input
               type="text"
@@ -199,36 +188,22 @@ const [newProposal, setNewProposal] = useState({
             )}
           </div>
         </div>
-        
-        {/* Loading state */}
-        {isLoading && (
-          <div className="p-8 text-center text-text-muted">
-            Loading proposals...
-          </div>
-        )}
-        
-        {/* Error state */}
-        {error && (
-          <div className="p-8 text-center text-status-error">
-            {error}. Please try again later.
-          </div>
-        )}
-        
-        {/* Empty state */}
-        {!isLoading && !error && filteredProposals.length === 0 && (
+
+        {isLoading ? (
+          <div className="p-8 text-center text-text-muted">Loading proposals...</div>
+        ) : error ? (
+          <div className="p-8 text-center text-status-error">{error}</div>
+        ) : filteredProposals.length === 0 ? (
           <div className="p-8 text-center text-text-muted">
             {searchQuery || activeFilter !== "All" 
               ? "No matching proposals found." 
               : "No proposals yet. Create your first proposal!"}
           </div>
-        )}
-        
-        {/* Proposals grid */}
-        {!isLoading && !error && filteredProposals.length > 0 && (
+        ) : (
           <div className="grid md:grid-cols-2 gap-4">
             {filteredProposals.map((proposal, index) => (
               <motion.div
-                key={proposal.id || index}
+                key={proposal._id || index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -244,15 +219,11 @@ const [newProposal, setNewProposal] = useState({
                   <span className="text-lg font-semibold text-text">₹{proposal.price}</span>
                 </div>
                 <p className="text-text-muted text-sm">{proposal.institution}</p>
-                <div className="flex justify-between items-center text-text-muted text-sm mt-2">
-                  <div className="flex items-center">
-                    <Calendar size={16} className="mr-1" /> 
-                     {new Date(proposal.scheduleDate).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                      })}
-                  </div>
+                <div className="flex items-center text-text-muted text-sm mt-2">
+                  <Calendar size={16} className="mr-1" /> 
+                  {new Date(proposal.scheduleDate).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                  })}
                 </div>
                 <div className="flex justify-between items-center text-text mt-3">
                   <button className="text-sm flex items-center gap-2 text-text-muted hover:text-text">
@@ -264,8 +235,7 @@ const [newProposal, setNewProposal] = useState({
           </div>
         )}
       </div>
-      
-      {/* Modal for new proposal */}
+
       {showNewProposalForm && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <motion.div 
@@ -282,12 +252,10 @@ const [newProposal, setNewProposal] = useState({
                 <X size={20} />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Workshop Title
-                </label>
+                <label className="block text-sm font-medium text-text mb-1">Workshop Title</label>
                 <input
                   type="text"
                   name="title"
@@ -298,27 +266,23 @@ const [newProposal, setNewProposal] = useState({
                   required
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
-                    Price
-                  </label>
+                  <label className="block text-sm font-medium text-text mb-1">Price</label>
                   <input
                     type="text"
                     name="price"
                     value={newProposal.price}
                     onChange={handleInputChange}
                     className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
-                    placeholder="e.g. $4,500"
+                    placeholder="e.g. ₹4500"
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
-                    Status
-                  </label>
+                  <label className="block text-sm font-medium text-text mb-1">Status</label>
                   <select
                     name="status"
                     value={newProposal.status}
@@ -333,11 +297,9 @@ const [newProposal, setNewProposal] = useState({
                   </select>
                 </div>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Institution
-                </label>
+                <label className="block text-sm font-medium text-text mb-1">Institution</label>
                 <input
                   type="text"
                   name="institution"
@@ -348,26 +310,34 @@ const [newProposal, setNewProposal] = useState({
                   required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Schedule Date
-                </label>
+                <label className="block text-sm font-medium text-text mb-1">College Email</label>
                 <input
-                  type="text"
+                  type="email"
+                  name="collegeEmail"
+                  value={newProposal.collegeEmail}
+                  onChange={handleInputChange}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                  placeholder="e.g. contact@abcuniversity.edu"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Schedule Date</label>
+                <input
+                  type="date"
                   name="scheduleDate"
                   value={newProposal.scheduleDate}
                   onChange={handleInputChange}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
-                  placeholder="e.g. Mar 15, 2023"
                   required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-text mb-1">Description</label>
                 <textarea
                   name="description"
                   value={newProposal.description}
@@ -377,7 +347,7 @@ const [newProposal, setNewProposal] = useState({
                   required
                 />
               </div>
-              
+
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"

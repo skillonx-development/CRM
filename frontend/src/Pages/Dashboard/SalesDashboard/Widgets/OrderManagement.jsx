@@ -31,6 +31,7 @@ export default function OrderManagement() {
         title: p.title,
         status: p.status || "Pending",
         school: p.institution,
+        collegeEmail: p.collegeEmail,
         schedule: p.scheduledDate || "N/A",
         price: p.price || 0,
         participants: p.expectedParticipants || 0
@@ -72,8 +73,8 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       console.log("Sending email for:", order.title);
-
-      // Update status to 'Sent'
+  
+      // Step 1: Update the proposal if necessary
       await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
@@ -81,7 +82,10 @@ export default function OrderManagement() {
         scheduledDate: order.schedule,
         price: order.price,
       });
-
+  
+      // Step 2: Send actual email
+      await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
+  
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);
@@ -128,6 +132,7 @@ export default function OrderManagement() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">{order.school}</p>
+              <p className="text-sm text-text-muted">{order.collegeEmail}</p>
               <div className="mt-2 text-sm bg-muted p-2 rounded-xl">
                 📅 <span className="text-foreground">{order.schedule}</span>
               </div>

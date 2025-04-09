@@ -1,4 +1,5 @@
 import TechProposal from "../models/techProposalsModel.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 // Create a new tech proposal
 export const createTechProposal = async (req, res) => {
@@ -7,6 +8,7 @@ export const createTechProposal = async (req, res) => {
       institution,
       title,
       price,
+      collegeEmail,
       scheduledDate,
       scheduledTime,
       selectedTeacher,
@@ -22,6 +24,7 @@ export const createTechProposal = async (req, res) => {
       institution,
       title,
       price,
+      collegeEmail,
       scheduledDate,
       scheduledTime,
       selectedTeacher,
@@ -126,5 +129,34 @@ export const updateTechProposal = async (req, res) => {
   } catch (error) {
     console.error("Error updating proposal:", error);
     res.status(500).json({ message: "Server error while updating proposal" });
+  }
+};
+
+//sending email to the college
+export const sendTechProposalEmail = async (req, res) => {
+  try {
+    const proposal = await TechProposal.findById(req.params.id);
+    if (!proposal) return res.status(404).json({ message: "Proposal not found" });
+
+    const emailBody = `
+      <h2>${proposal.title}</h2>
+      <p><strong>Institution:</strong> ${proposal.institution}</p>
+      <p><strong>Scheduled Date:</strong> ${proposal.scheduledDate}</p>
+      <p><strong>Price:</strong> ₹${proposal.price}</p>
+    `;
+
+    await sendEmail({
+      to: proposal.collegeEmail,
+      subject: `Skiillonx Tech Proposal: ${proposal.title}`,
+      html: emailBody,
+    });
+
+    proposal.status = "Sent";
+    await proposal.save();
+
+    res.status(200).json({ message: "Email sent successfully." });
+  } catch (err) {
+    console.error("Error sending email:", err);
+    res.status(500).json({ message: "Failed to send email." });
   }
 };

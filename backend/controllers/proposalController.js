@@ -3,13 +3,27 @@ import Proposal from "../models/proposalModel.js";
 // Create Proposal
 export const createProposal = async (req, res) => {
   try {
-    let { title, price, status, institution, scheduleDate, description } = req.body;
+    let {
+      title,
+      price,
+      status,
+      institution,
+      scheduleDate,
+      collegeEmail,
+      description,
+      teacher,
+      resources,
+      draft,
+      timeline,
+      MOU,
+      sent
+    } = req.body;
 
-    if (!title || !price || !status || !institution || !scheduleDate) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
+    if (!title || !price || !status || !institution || !scheduleDate||!collegeEmail) {
+      return res.status(400).json({ success: false, message: "All required fields are missing" });
     }
 
-    // ✅ Remove "$" symbol and convert to number
+    // Sanitize price
     if (typeof price === 'string') {
       price = parseFloat(price.replace(/[^0-9.]/g, ''));
       if (isNaN(price)) {
@@ -23,7 +37,14 @@ export const createProposal = async (req, res) => {
       status,
       institution,
       scheduleDate,
+      collegeEmail,
       description,
+      teacher,
+      resources,
+      draft,
+      timeline,
+      MOU,
+      sent: sent || false,
     });
 
     await newProposal.save();
@@ -37,6 +58,7 @@ export const createProposal = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 // Get All Proposals
 export const getProposals = async (req, res) => {
   try {
@@ -65,9 +87,22 @@ export const getProposalById = async (req, res) => {
 // Update Proposal
 export const updateProposal = async (req, res) => {
   try {
-    const { title, price, status, institution, scheduleDate, description } = req.body;
-    const proposal = await Proposal.findById(req.params.id);
+    const {
+      title,
+      price,
+      status,
+      institution,
+      scheduleDate,
+      description,
+      teacher,
+      resources,
+      draft,
+      timeline,
+      MOU,
+      sent
+    } = req.body;
 
+    const proposal = await Proposal.findById(req.params.id);
     if (!proposal) {
       return res.status(404).json({ success: false, message: "Proposal not found" });
     }
@@ -78,6 +113,12 @@ export const updateProposal = async (req, res) => {
     proposal.institution = institution || proposal.institution;
     proposal.scheduleDate = scheduleDate || proposal.scheduleDate;
     proposal.description = description || proposal.description;
+    proposal.teacher = teacher || proposal.teacher;
+    proposal.resources = resources || proposal.resources;
+    proposal.draft = draft || proposal.draft;
+    proposal.timeline = timeline || proposal.timeline;
+    proposal.MOU = MOU || proposal.MOU;
+    proposal.sent = sent !== undefined ? sent : proposal.sent;
 
     await proposal.save();
 

@@ -29,6 +29,10 @@ const proposalSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    collegeEmail:{
+      type:String,
+      requuired:true
+    }
   },
   { timestamps: true }
 );
