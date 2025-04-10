@@ -1,7 +1,7 @@
 import express from "express";
 import Member from "../models/memberModel.js"; 
 import LeadMember from '../models/leadModel.js';
-import { updateMemberPermissions } from '../controllers/memberController.js';
+import { updateMemberPermissions, updateApprovalStatus} from '../controllers/memberController.js';
 
 
 const router = express.Router();
@@ -38,7 +38,7 @@ router.delete("/deleteMember/:id", async (req, res) => {
 });
 
 // ✅ Approve or reject a member
-router.put("/approveMember/:id", async (req, res) => {
+router.patch("/approveMember/:id", async (req, res) => {
   try {
     const { approve } = req.body;
     const updatedMember = await Member.findByIdAndUpdate(
@@ -54,5 +54,8 @@ router.put("/approveMember/:id", async (req, res) => {
 
 //for permission of dashboards
 router.put('/updatePermissions/:id', updateMemberPermissions);
+
+//toogle to approve
+router.patch("/updateApproval/:id", updateApprovalStatus);
 
 export default router;

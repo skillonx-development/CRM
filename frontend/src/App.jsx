@@ -40,6 +40,8 @@ import AdminNotifications from './Pages/Dashboard/AdminDashboard/AdminNotificati
 import AdminTeamManage from './Pages/Dashboard/AdminDashboard/AdminTeamManage';
 import AdminSettings from './Pages/Dashboard/AdminDashboard/AdminSettings';
 import AdminControl from './Pages/Dashboard/AdminDashboard/AdminControl';
+import SalesTeam from './Pages/Dashboard/SalesDashboard/SalesTeam';
+import MarketingPromotion from './Pages/Dashboard/MarketingDashboard/MarketingPromotion';
 
 const ProtectedLayout = () => {
   const { isAuthenticated, loading, user } = useAuth();
@@ -125,6 +127,7 @@ const App = () => {
               <Route path="proposals" element={<SalesProposals />} />
               <Route path="orders" element={<SalesOrders />} />
               <Route path="billing" element={<SalesBilling />} />
+              <Route path="team" element={<SalesTeam/>} />
               <Route path="settings" element={<SalesSettings />} />
               <Route path="help" element={<SalesHelp />} />
             </Route>
@@ -135,8 +138,9 @@ const App = () => {
               <Route path="proposals" element={<MarketingProposal />} />
               <Route path="teachers" element={<MarketingTeacher />} />
               <Route path="settings" element={<MarketingSettings />} />
-              <Route path="help" element={<MarketingHelp />} />
               <Route path="feedback" element={<MarketingFeedback />} />
+              <Route path="promotion" element={<MarketingPromotion/>} />
+              <Route path="help" element={<MarketingHelp />} />
               <Route path="team" element={<MarketingTeam />} />
             </Route>
 

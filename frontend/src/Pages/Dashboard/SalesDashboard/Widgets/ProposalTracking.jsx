@@ -6,7 +6,7 @@ import axios from 'axios';
 const api = {
   fetchProposals: async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/proposals'); 
+      const response = await axios.get('http://localhost:5001/api/proposals');
       return response.data.proposals;
     } catch (error) {
       console.error("Error fetching proposals:", error);
@@ -39,7 +39,7 @@ const ProposalTracking = () => {
     status: "Lead Acquired",
     statusColor: "bg-primary",
     institution: "",
-    collegeEmail: "",  // Added collegeEmail
+    collegeEmail: "",
     scheduleDate: "", 
     description: "",
   });

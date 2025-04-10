@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
@@ -16,15 +18,28 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuth = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/auth/check', {
+            const response = await axios.get(`${API_URL}/api/auth/check`, {
                 withCredentials: true
             });
-            setIsAuthenticated(response.data.success);
-            setUser(response.data.user); // Make sure backend sends user data including team
+
+            if (response.data.success) {
+                setIsAuthenticated(true);
+                setUser(response.data.user);
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+            } else {
+                throw new Error("Not authenticated");
+            }
         } catch (error) {
-            setIsAuthenticated(false);
-            setUser(null);
-            navigate('/login');
+            // Try fallback from localStorage
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (storedUser) {
+                setIsAuthenticated(true);
+                setUser(storedUser);
+            } else {
+                setIsAuthenticated(false);
+                setUser(null);
+                navigate("/login");
+            }
         } finally {
             setLoading(false);
         }
@@ -32,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password, type) => {
         try {
-            const response = await fetch("http://localhost:5001/api/auth/login", {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -49,9 +64,9 @@ export const AuthProvider = ({ children }) => {
 
             setIsAuthenticated(true);
             setUser(data.user);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem("user", JSON.stringify(data.user));
 
-            // Navigate to appropriate dashboard based on user's team
+            // Redirect to appropriate dashboard
             if (data.user && data.user.team) {
                 navigate(`/${data.user.team.toLowerCase()}`);
             }
@@ -65,26 +80,43 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post('http://localhost:5001/api/auth/logout', {}, { withCredentials: true });
+            await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
             setIsAuthenticated(false);
             setUser(null);
-            localStorage.removeItem('user');
-            navigate('/');
+            localStorage.removeItem("user");
+            navigate("/");
         } catch (error) {
-            console.error('Logout error:', error);
+            console.error("Logout error:", error);
+        }
+    };
+
+    const refreshUser = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/auth/check`, {
+                withCredentials: true,
+            });
+            if (response.data.success) {
+                setUser(response.data.user);
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+            }
+        } catch (error) {
+            console.error("Failed to refresh user:", error);
         }
     };
 
     return (
-        <AuthContext.Provider value={{
-            isAuthenticated,
-            user,
-            loading,
-            login,
-            logout,
-            setIsAuthenticated,
-            setUser
-        }}>
+        <AuthContext.Provider
+            value={{
+                isAuthenticated,
+                user,
+                loading,
+                login,
+                logout,
+                refreshUser,
+                setIsAuthenticated,
+                setUser
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
