@@ -1,55 +1,81 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthContext";
 import {
-    Home,
-    BarChart2,
-    Calendar,
-    ShoppingBag,
-    Settings,
+    LayoutGrid,
+    Users,
+    FileText,
+    Package,
+    CreditCard,
     ChevronLeft,
+    Settings,
     HelpCircle,
     LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../Assets/logo.png";
-function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
-    const { logout } = useAuth();
+
+function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
+    const { logout, user, loading } = useAuth();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation(); // Get current route
+    const location = useLocation();
+    
+    // On mount, attempt to restore role from localStorage if available
+    const [currentRole, setCurrentRole] = useState(() => {
+        // Try to get cached role from localStorage on initial load
+        const cachedRole = localStorage.getItem('userRole');
+        return cachedRole || null;
+    });
+    
+    // Update the role whenever the user changes
+    useEffect(() => {
+        if (!loading && user && user.role) {
+            setCurrentRole(user.role);
+            // Cache the role in localStorage for persistence during refreshes
+            localStorage.setItem('userRole', user.role);
+        } else if (!loading && !user) {
+            // If loading is done but no user, clear role and localStorage
+            setCurrentRole(null);
+            localStorage.removeItem('userRole');
+        }
+    }, [user, loading]);
 
-    const menuItems = [
-        { id: "dashboard", icon: Home, label: "Dashboard", path: "/tech" },
-        { id: "proposal", icon: BarChart2, label: "Proposals", path: "/tech/proposal" },
-        { id: "resources", icon: ShoppingBag, label: "Resources", path: "/tech/Resources" },
-        { id: "curriculum", icon: Calendar, label: "Curriculum", path: "/tech/curriculum" },
-        { id: "team", icon: Calendar, label: "Team Management", path: "/tech/team" },
-
-
+    const baseMenuItems = [
+        { id: "overview", icon: LayoutGrid, label: "Overview", path: "/tech" },
+        { id: "proposals", icon: Users, label: "Proposals", path: "/tech/proposal" },
+        { id: "resources", icon: FileText, label: "Resoruces", path: "/tech/resources" },
+        { id: "curriculum", icon: Package, label: "Curriculum", path: "/tech/curriculum" },
+        { id: "Team Management", icon: Users, label: "Team Management", path: "/tech/team" },
     ];
 
+    // Compute menu items based on current role
+    const menuItems = useMemo(() => {
+        // Return all items if user is a lead
+        if (currentRole === "lead") {
+            return baseMenuItems;
+        }
+        // Otherwise filter out Team Management
+        return baseMenuItems.filter(item => item.id !== "Team Management");
+    }, [currentRole]);
+
     const bottomMenuItems = [
-        { id: "settings", icon: Settings, label: "Settings", path: "/tech/settings" },
-        { id: 'help', icon: HelpCircle, label: 'Help', path: "/tech/help" },
+        { id: "settings", icon: Settings, label: "Settings", path: "/marketing/settings" },
+        { id: 'help', icon: HelpCircle, label: 'Help', path: "/marketing/help" },
         { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
 
-    // Update activeTab based on current route
     useEffect(() => {
-        const currentTab = menuItems.concat(bottomMenuItems).find((item) => item.path === location.pathname);
+        const allItems = [...menuItems, ...bottomMenuItems];
+        const currentTab = allItems.find(item => item.path === location.pathname);
         if (currentTab) {
             setActiveTab(currentTab.id);
         }
-    }, [location.pathname, setActiveTab]);
+    }, [location.pathname, menuItems, bottomMenuItems, setActiveTab]);
 
-    const toggleSidebar = () => {
-        setCollapsed(!collapsed);
-    };
-
-    const handleLogout = () => {
-        logout();
-    };
+    const toggleSidebar = () => setCollapsed(!collapsed);
 
     const sidebarVariants = {
         expanded: { width: 256, transition: { duration: 0.3, type: "spring", stiffness: 100 } },
@@ -61,6 +87,44 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
         hidden: { opacity: 0, x: -10, transition: { duration: 0.2 } }
     };
 
+    const toggleButtonVariants = {
+        expanded: { rotate: 0, transition: { duration: 0.3 } },
+        collapsed: { rotate: 180, transition: { duration: 0.3 } }
+    };
+
+    const handleLogout = () => {
+        // Clear cached role on logout
+        localStorage.removeItem('userRole');
+        setCurrentRole(null);
+        logout();
+    };
+
+    // Show loading state only if we have no role info at all
+    if (loading && !currentRole) {
+        return (
+            <motion.aside
+                className="fixed left-0 top-0 h-screen bg-background-sidebar border-r border-border-dark z-20 overflow-hidden"
+                initial="expanded"
+                animate={collapsed ? "collapsed" : "expanded"}
+                variants={sidebarVariants}
+            >
+                <div className="p-4 flex items-center justify-between">
+                    <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
+                        <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
+                        {!collapsed && (
+                            <div className="h-6 w-24 bg-background-hover animate-pulse rounded" />
+                        )}
+                    </div>
+                </div>
+                <div className="mt-6 px-4 space-y-2">
+                    {[1, 2, 3, 4, 5].map((item) => (
+                        <div key={item} className="h-12 bg-background-hover animate-pulse rounded-lg" />
+                    ))}
+                </div>
+            </motion.aside>
+        );
+    }
+
     return (
         <>
             <motion.aside
@@ -69,18 +133,27 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                 animate={collapsed ? "collapsed" : "expanded"}
                 variants={sidebarVariants}
             >
-                <div className="p-6 flex items-center justify-between">
-                    <AnimatePresence>
+                <div className="p-4 flex items-center justify-between">
+                    <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
                         <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
-                        {!collapsed && (
-                            <motion.h1 className="text-xl font-bold text-text" style={{ fontFamily: "'MotoyaLMaru'" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                Flariex
-                            </motion.h1>
-                        )}
-                    </AnimatePresence>
+                        <AnimatePresence>
+                            {!collapsed && (
+                                <motion.h1
+                                    className="text-xl font-bold text-text"
+                                    style={{ fontFamily: 'Morebi Rounded, sans-serif' }}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    Flariex
+                                </motion.h1>
+                            )}
+                        </AnimatePresence>
+                    </div>
                     <motion.button
                         onClick={toggleSidebar}
-                        className="p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text"
+                        className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-text ${collapsed ? "absolute top-4 right-4" : ""}`}
+                        variants={toggleButtonVariants}
                     >
                         <ChevronLeft size={20} />
                     </motion.button>
@@ -92,14 +165,23 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                             <li key={item.id}>
                                 <button
                                     onClick={() => navigate(item.path)}
-                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                        }`}
+                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
+                                        location.pathname === item.path
+                                            ? "bg-primary text-text"
+                                            : "text-text-muted hover:bg-background-hover"
+                                    }`}
                                     title={collapsed ? item.label : ""}
                                 >
                                     <item.icon className="h-5 w-5" />
                                     <AnimatePresence>
                                         {!collapsed && (
-                                            <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                                            <motion.span
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="hidden"
+                                                variants={textVariants}
+                                                className="ml-3"
+                                            >
                                                 {item.label}
                                             </motion.span>
                                         )}
@@ -116,14 +198,23 @@ function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
                             <li key={item.id}>
                                 <button
                                     onClick={() => item.id === 'logout' ? setShowLogoutModal(true) : navigate(item.path)}
-                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path ? "bg-primary text-text" : "text-text-muted hover:bg-background-hover"
-                                        }`}
+                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
+                                        location.pathname === item.path
+                                            ? "bg-primary text-text"
+                                            : "text-text-muted hover:bg-background-hover"
+                                    }`}
                                     title={collapsed ? item.label : ""}
                                 >
                                     <item.icon className="h-5 w-5" />
                                     <AnimatePresence>
                                         {!collapsed && (
-                                            <motion.span initial="hidden" animate="visible" exit="hidden" variants={textVariants} className="ml-3">
+                                            <motion.span
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="hidden"
+                                                variants={textVariants}
+                                                className="ml-3"
+                                            >
                                                 {item.label}
                                             </motion.span>
                                         )}

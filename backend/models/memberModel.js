@@ -43,6 +43,11 @@ const memberSchema = new mongoose.Schema({
     proposals: { type: Boolean, default: true },
     orders: { type: Boolean, default: false },
     billing: { type: Boolean, default: false },
+  },
+  userRole: {
+    type: String,
+    default: 'member',
+    immutable: true // prevents it from being changed after creation
   }
 }, {
   timestamps: true

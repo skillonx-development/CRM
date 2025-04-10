@@ -30,9 +30,14 @@ const leadSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Password should be at least 6 characters long']
   },
-  approve : {
+  approve: {
     type: Boolean,
     default: false
+  },
+  userRole: {
+    type: String,
+    default: 'lead',
+    immutable: true // prevents it from being changed after creation
   }
 }, {
   timestamps: true
