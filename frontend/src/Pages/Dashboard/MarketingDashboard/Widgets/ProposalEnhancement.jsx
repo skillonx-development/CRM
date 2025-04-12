@@ -34,8 +34,6 @@ export default function ProposalEnhancement() {
     }
   };
 
-  const handleNewEnhancement = () => alert("New Enhancement Clicked!");
-  const handleSort = () => alert("Sort Clicked!");
   const handleSearch = (e) => setSearchQuery(e.target.value.toLowerCase());
   const handleSendClick = (workshop) => {
     setSelectedWorkshop(workshop);
@@ -84,13 +82,7 @@ export default function ProposalEnhancement() {
             Enhance workshop proposals with research and value additions.
           </p>
         </div>
-        <button
-          onClick={handleNewEnhancement}
-          className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-dark transition"
-        >
-          <PlusCircle size={18} />
-          New Enhancement
-        </button>
+
       </div>
 
       {/* Search & Sort */}
@@ -104,13 +96,7 @@ export default function ProposalEnhancement() {
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary text-base text-text bg-background-muted"
           />
         </div>
-        <button
-          onClick={handleSort}
-          className="px-4 py-2 text-sm font-medium border border-border rounded-lg flex items-center gap-2 hover:bg-background-hover transition"
-        >
-          <ArrowUpDown size={18} />
-          Sort
-        </button>
+       
       </div>
 
       {/* Cards */}

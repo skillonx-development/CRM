@@ -109,6 +109,7 @@ export async function register(req, res) {
   }
 }
 
+
 // 🔐 Login
 export async function login(req, res) {
   try {
@@ -140,6 +141,14 @@ export async function login(req, res) {
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    // Check if the user is a member and if they are approved
+    if (type === 'member' && !user.approve) {
+      return res.status(403).json({
+        success: false,
+        message: 'Needs to be approved by the team lead'
+      });
     }
 
     generateTokenAndSetCookie(user._id, user.team, res);
@@ -185,7 +194,6 @@ export async function login(req, res) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 }
-
 // 🚪 Logout
 export async function logout(req, res) {
   try {

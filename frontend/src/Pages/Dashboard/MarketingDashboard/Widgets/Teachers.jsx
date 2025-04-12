@@ -1,9 +1,15 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { User, Star, CheckCircle, UserCheck, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
+import {
+  User,
+  Star,
+  CheckCircle,
+  UserCheck,
+  X,
+} from "lucide-react";
 
-const filters = ["All Teachers", "Available", "Busy", "Tentative"];
+const filters = ["All Teachers", "Available", "Busy"];
 
 export default function TeacherManagement() {
   const [teachers, setTeachers] = useState([]);
@@ -11,16 +17,17 @@ export default function TeacherManagement() {
   const [assignedWorkshops, setAssignedWorkshops] = useState({});
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [proposals, setProposals] = useState([]);
+  const [viewTeacher, setViewTeacher] = useState(null);
 
-  // Fetch teachers
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
         const res = await axios.get("http://localhost:5001/api/teachers");
-        const fetchedTeachers = Array.isArray(res.data) ? res.data : res.data.teachers || [];
+        const fetchedTeachers = Array.isArray(res.data)
+          ? res.data
+          : res.data.teachers || [];
         setTeachers(fetchedTeachers);
 
-        // Load assigned workshops into state
         const initialAssignments = {};
         fetchedTeachers.forEach((t) => {
           if (t.assignedWorkshop) {
@@ -36,7 +43,6 @@ export default function TeacherManagement() {
     fetchTeachers();
   }, []);
 
-  // Fetch proposals when a teacher is selected
   useEffect(() => {
     const fetchProposals = async () => {
       if (!selectedTeacher) return;
@@ -52,11 +58,10 @@ export default function TeacherManagement() {
     fetchProposals();
   }, [selectedTeacher]);
 
-  const filteredTeachers = Array.isArray(teachers)
-    ? teachers.filter(
-        (teacher) => activeFilter === "All Teachers" || teacher.status === activeFilter
-      )
-    : [];
+  const filteredTeachers = teachers.filter(
+    (teacher) =>
+      activeFilter === "All Teachers" || teacher.status === activeFilter
+  );
 
   const handleAssignClick = (teacherName) => {
     setSelectedTeacher(teacherName);
@@ -64,14 +69,30 @@ export default function TeacherManagement() {
 
   const handleAssignToWorkshop = async (proposal) => {
     try {
-      await axios.post(`http://localhost:5001/api/teachers/assign/${selectedTeacher}`, {
-        workshopTitle: proposal.title,
-      });
+      // Sending the assignment request to the backend
+      await axios.post(
+        `http://localhost:5001/api/teachers/assign/${selectedTeacher}`,
+        {
+          workshopTitle: proposal.title,
+          status: "Busy",
+        }
+      );
 
+      // Update the assigned workshops and statuses in the local state
       setAssignedWorkshops((prev) => ({
         ...prev,
         [selectedTeacher]: proposal.title,
       }));
+
+      setTeachers((prev) =>
+        prev.map((t) =>
+          t.name === selectedTeacher
+            ? { ...t, assignedWorkshop: proposal.title, status: "Busy" }
+            : t
+        )
+      );
+
+      // Reset selected teacher to null after assignment
       setSelectedTeacher(null);
     } catch (error) {
       console.error("Failed to assign proposal:", error);
@@ -80,7 +101,6 @@ export default function TeacherManagement() {
 
   return (
     <div className="p-6 bg-background rounded-2xl shadow-card">
-      {/* Filters */}
       <div className="flex space-x-4 border-b border-border pb-4 mb-4">
         {filters.map((tab) => (
           <button
@@ -97,7 +117,6 @@ export default function TeacherManagement() {
         ))}
       </div>
 
-      {/* Teacher Cards */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
         initial="hidden"
@@ -125,9 +144,7 @@ export default function TeacherManagement() {
                   <p className="text-sm text-text-muted">{teacher.specialty}</p>
                 </div>
               </div>
-              <span
-                className={`px-3 py-1 text-xs font-medium rounded-full ${teacher.statusColor}`}
-              >
+              <span className="px-3 py-1 text-xs font-medium rounded-full bg-muted">
                 {teacher.status}
               </span>
             </div>
@@ -150,31 +167,28 @@ export default function TeacherManagement() {
             )}
 
             <div className="flex justify-between mt-2">
-              <button className="px-4 py-2 text-sm font-medium text-text-muted border border-border rounded-lg hover:bg-background-hover transition">
+              <button
+                className="px-4 py-2 text-sm font-medium text-text-muted border border-border rounded-lg hover:bg-background-hover transition"
+                onClick={() => setViewTeacher(teacher)}
+              >
                 View Profile
               </button>
               <button
                 className={`px-4 py-2 text-sm font-medium rounded-lg shadow-md transition flex items-center gap-2 ${
-                  assignedWorkshops[teacher.name]
+                  teacher.status === "Busy"
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-primary hover:bg-primary-dark"
                 }`}
                 onClick={() => handleAssignClick(teacher.name)}
-                disabled={assignedWorkshops[teacher.name]}
+                disabled={teacher.status === "Busy"}
               >
                 <UserCheck size={16} />
-                {assignedWorkshops[teacher.name] ? "Assigned" : "Assign"}
+                {teacher.status === "Busy" ? "Assigned" : "Assign"}
               </button>
             </div>
           </motion.div>
         ))}
       </motion.div>
-
-      {filteredTeachers.length === 0 && (
-        <p className="text-center text-text-muted mt-4">
-          No teachers found for this category.
-        </p>
-      )}
 
       {/* Assign Modal */}
       {selectedTeacher && (
@@ -207,6 +221,116 @@ export default function TeacherManagement() {
                 <p className="text-sm text-text-muted">No proposals available</p>
               )}
             </ul>
+          </div>
+        </div>
+      )}
+
+      {/* View/Edit Modal with Unassign button */}
+      {viewTeacher && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-background-card p-6 rounded-lg shadow-lg w-[400px]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Edit Teacher</h2>
+              <button onClick={() => setViewTeacher(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form
+              className="space-y-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  await axios.put(
+                    `http://localhost:5001/api/teachers/${viewTeacher._id}`,
+                    viewTeacher
+                  );
+                  setTeachers((prev) =>
+                    prev.map((t) => (t._id === viewTeacher._id ? viewTeacher : t))
+                  );
+                  setViewTeacher(null);
+                } catch (err) {
+                  console.error("Update failed", err);
+                }
+              }}
+            >
+              <input
+                className="w-full px-3 py-2 rounded-md border border-border bg-background"
+                value={viewTeacher.name}
+                onChange={(e) =>
+                  setViewTeacher((prev) => ({ ...prev, name: e.target.value }))
+                }
+              />
+              <input
+                className="w-full px-3 py-2 rounded-md border border-border bg-background"
+                value={viewTeacher.specialty}
+                onChange={(e) =>
+                  setViewTeacher((prev) => ({ ...prev, specialty: e.target.value }))
+                }
+              />
+              <input
+                className="w-full px-3 py-2 rounded-md border border-border bg-background"
+                value={viewTeacher.assignedWorkshop || ""}
+                onChange={(e) =>
+                  setViewTeacher((prev) => ({ ...prev, assignedWorkshop: e.target.value }))
+                }
+              />
+              <select
+                className="w-full px-3 py-2 rounded-md border border-border bg-background"
+                value={viewTeacher.status || ""}
+                onChange={(e) =>
+                  setViewTeacher((prev) => ({ ...prev, status: e.target.value }))
+                }
+              >
+                <option value="">Select Status</option>
+                <option value="Available">Available</option>
+                <option value="Busy">Busy</option>
+              </select>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="bg-gray-300 px-4 py-2 rounded-lg"
+                  onClick={() => setViewTeacher(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-primary hover:bg-purple-600 px-4 py-2 text-white rounded-lg"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  className="bg-red-500 hover:bg-red-700 px-4 py-2 text-white rounded-lg"
+                  onClick={async () => {
+                    try {
+                      const updatedTeacher = {
+                        ...viewTeacher,
+                        status: "Available",
+                        assignedWorkshop: "",
+                      };
+
+                      await axios.put(
+                        `http://localhost:5001/api/teachers/${viewTeacher._id}`,
+                        updatedTeacher
+                      );
+
+                      setTeachers((prev) =>
+                        prev.map((t) =>
+                          t._id === viewTeacher._id ? updatedTeacher : t
+                        )
+                      );
+                      setViewTeacher(null);
+                    } catch (err) {
+                      console.error("Failed to unassign teacher", err);
+                    }
+                  }}
+                >
+                  Unassign
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
