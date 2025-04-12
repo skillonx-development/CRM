@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(false);
             setUser(null);
             localStorage.removeItem("user");
-            navigate("/");
+            navigate("/login"); // Change navigation from "/" to "/login"
         } catch (error) {
             console.error("Logout error:", error);
         }

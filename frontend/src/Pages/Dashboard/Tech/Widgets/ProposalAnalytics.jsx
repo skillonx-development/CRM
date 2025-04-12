@@ -12,7 +12,7 @@ const widgets = [
     description: "Scheduled for this month"
   },
   {
-    title: "Ready for MArketing",
+    title: "Ready for Marketing",
     value: "4",
     change: "N/A",
     positive: true,
