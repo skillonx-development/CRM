@@ -93,7 +93,7 @@ const ProposalDetails = ({ proposal }) => {
         throw new Error(errorText);
       }
 
-      const data = await response.json();
+      await response.json(); // Remove data assignment since it's not used
       alert("Proposal submitted successfully!");
     } catch (error) {
       console.error("Error submitting proposal:", error);
