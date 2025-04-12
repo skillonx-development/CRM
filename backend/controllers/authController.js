@@ -1,16 +1,33 @@
 import bcryptjs from 'bcryptjs';
 import Lead from '../models/leadModel.js';
-import Member from '../models/memberModel.js';
+import TechMember from '../models/techMemberModel.js';
+import SalesMember from '../models/salesMemberModel.js';
+import MarketingMember from '../models/marketingMemberModel.js';
 import { generateTokenAndSetCookie } from '../utils/generateToken.js';
 
 // Utility to check email format
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-// Register
+// Get appropriate member model based on team
+const getMemberModelByTeam = (team) => {
+  switch (team.toLowerCase()) {
+    case 'tech':
+      return TechMember;
+    case 'sales':
+      return SalesMember;
+    case 'marketing':
+      return MarketingMember;
+    default:
+      return null;
+  }
+};
+
+// 🔁 Register
 export async function register(req, res) {
   try {
-    const { type } = req.params;
+    const { type } = req.params; // 'lead' or 'member'
     const { name, contactNumber, email, team, password, confirmPassword } = req.body;
+
     const normalizedTeam = team.charAt(0).toUpperCase() + team.slice(1).toLowerCase();
 
     if (!type || !['lead', 'member'].includes(type)) {
@@ -29,21 +46,42 @@ export async function register(req, res) {
       return res.status(400).json({ success: false, message: 'Passwords do not match' });
     }
 
-    const existingLead = await Lead.findOne({ email });
-    const existingMember = await Member.findOne({ email });
+    // Check existing email in all models
+    const leadExists = await Lead.findOne({ email });
+    const techExists = await TechMember.findOne({ email });
+    const salesExists = await SalesMember.findOne({ email });
+    const marketingExists = await MarketingMember.findOne({ email });
 
-    if (existingLead || existingMember) {
+    if (leadExists || techExists || salesExists || marketingExists) {
       return res.status(400).json({ success: false, message: 'Email is already registered' });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
-    const UserModel = type === 'lead' ? Lead : Member;
+
+    let UserModel;
+    let userRole;
+
+    if (type === 'lead') {
+      UserModel = Lead;
+      userRole = 'lead'; // Changed to lowercase for consistency
+    } else {
+      const memberModel = getMemberModelByTeam(team);
+      if (!memberModel) {
+        return res.status(400).json({ success: false, message: 'Invalid team selection' });
+      }
+      UserModel = memberModel;
+      userRole = 'member'; // Changed to lowercase for consistency
+    }
+
     const newUser = new UserModel({
       name,
       contactNumber,
       email,
       team: normalizedTeam,
-      password: hashedPassword
+      password: hashedPassword,
+      role: userRole,
+      permissions: undefined,
+      approve: false
     });
 
     const savedUser = await newUser.save();
@@ -57,7 +95,7 @@ export async function register(req, res) {
         name: savedUser.name,
         email: savedUser.email,
         team: savedUser.team,
-        role: type               // ✅ Include role
+        role: userRole
       }
     });
 
@@ -71,7 +109,7 @@ export async function register(req, res) {
   }
 }
 
-// Login
+// 🔐 Login
 export async function login(req, res) {
   try {
     const { email, password, type } = req.body;
@@ -84,9 +122,16 @@ export async function login(req, res) {
       return res.status(400).json({ success: false, message: 'Invalid user type' });
     }
 
-    const user = type === 'lead'
-      ? await Lead.findOne({ email })
-      : await Member.findOne({ email });
+    let user;
+
+    if (type === 'lead') {
+      user = await Lead.findOne({ email });
+    } else {
+      // Check across all member collections
+      user = await TechMember.findOne({ email }) ||
+             await SalesMember.findOne({ email }) ||
+             await MarketingMember.findOne({ email });
+    }
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -131,7 +176,7 @@ export async function login(req, res) {
         name: user.name,
         email: user.email,
         team: user.team,
-        role: user.userRole          // ✅ Include role
+        role: user.role
       }
     });
 
@@ -141,7 +186,7 @@ export async function login(req, res) {
   }
 }
 
-// Logout
+// 🚪 Logout
 export async function logout(req, res) {
   try {
     res.clearCookie('jwt-crm');
@@ -152,7 +197,7 @@ export async function logout(req, res) {
   }
 }
 
-// Check Auth (if you have it)
+// 🔐 Auth Check
 export async function checkAuth(req, res) {
   try {
     const user = req.user;
@@ -161,7 +206,7 @@ export async function checkAuth(req, res) {
       return res.status(401).json({ success: false, message: 'Not authenticated' });
     }
 
-    const role = user instanceof Lead ? 'lead' : 'member';
+    const role = user instanceof Lead ? 'lead' : 'member'; // Changed to lowercase for consistency
 
     res.status(200).json({
       success: true,
@@ -170,7 +215,7 @@ export async function checkAuth(req, res) {
         name: user.name,
         email: user.email,
         team: user.team,
-        role                      // ✅ Include role here too
+        role
       }
     });
   } catch (error) {

@@ -1,6 +1,18 @@
 import jwt from 'jsonwebtoken';
-import Member from '../models/memberModel.js';
+import SalesMember from '../models/salesMemberModel.js';
+import MarketingMember from '../models/marketingMemberModel.js';
+import TechMember from '../models/techMemberModel.js';
 import Lead from '../models/leadModel.js';
+
+const userModels = [SalesMember, MarketingMember, TechMember, Lead];
+
+const findUserById = async (id) => {
+  for (const Model of userModels) {
+    const user = await Model.findById(id);
+    if (user) return user;
+  }
+  return null;
+};
 
 export const protect = async (req, res, next) => {
   const token = req.cookies?.['jwt-crm'];
@@ -11,7 +23,7 @@ export const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await Member.findById(decoded.id) || await Lead.findById(decoded.id);
+    const user = await findUserById(decoded.id);
     if (!user) {
       return res.status(401).json({ success: false, redirect: '/login', message: 'User not found' });
     }
