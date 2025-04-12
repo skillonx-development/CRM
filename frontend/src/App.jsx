@@ -141,7 +141,7 @@ const App = () => {
               <Route path="feedback" element={<MarketingFeedback />} />
               <Route path="promotion" element={<MarketingPromotion/>} />
               <Route path="help" element={<MarketingHelp />} />
-              <Route path="team" element={<MarketingTeam />} />
+              <Route path="team" element={<MarketingTeam/>} />
             </Route>
 
             {/* Admin Dashboard Routes */}

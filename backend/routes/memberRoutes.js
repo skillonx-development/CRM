@@ -1,22 +1,17 @@
 import express from "express";
-import Member from "../models/memberModel.js"; 
-import LeadMember from '../models/leadModel.js';
-import { updateMemberPermissions, updateApprovalStatus} from '../controllers/memberController.js';
-
+import LeadMember from "../models/leadModel.js";
+import { getMembersByTeam,updatePermissions, updateApprovalStatus, getPermissions, getUserById} from "../controllers/memberController.js";
+import { getMemberModelByTeam } from "../utils/getMemberModel.js";
 
 const router = express.Router();
 
-//  Get all members
-router.get("/getMembers", async (req, res) => {
-  try {
-    const members = await Member.find();
-    res.status(200).json(members);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-});
+//get user by id
+router.get('/:id', getUserById);
 
-//Get  all team leads
+// Get all members for a team
+router.get("/getMembers/:team", getMembersByTeam);
+
+// Get all team leads
 router.get("/getLeads", async (req, res) => {
   try {
     const leadMembers = await LeadMember.find();
@@ -26,36 +21,28 @@ router.get("/getLeads", async (req, res) => {
   }
 });
 
-// ✅ Delete a member
-router.delete("/deleteMember/:id", async (req, res) => {
+// Delete a member by team
+router.delete("/deleteMember/:team/:id", async (req, res) => {
+  const { team, id } = req.params;
+  const Model = getMemberModelByTeam(team);
+  if (!Model) return res.status(400).json({ message: "Invalid team specified" });
+
   try {
-    const memberId = req.params.id;
-    await Member.findByIdAndDelete(memberId);
+    await Model.findByIdAndDelete(id);
     res.status(200).json({ message: "Member deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting member", error: error.message });
   }
 });
 
-// ✅ Approve or reject a member
-router.patch("/approveMember/:id", async (req, res) => {
-  try {
-    const { approve } = req.body;
-    const updatedMember = await Member.findByIdAndUpdate(
-      req.params.id,
-      { approve },
-      { new: true }
-    );
-    res.status(200).json(updatedMember);
-  } catch (error) {
-    res.status(500).json({ message: "Error updating approval", error: error.message });
-  }
-});
+// Dashboard permissions update
+router.put("/updatePermissions/:id", updatePermissions);
 
-//for permission of dashboards
-router.put('/updatePermissions/:id', updateMemberPermissions);
+//fetcing dashboards permission data for user
+router.get('/getPermissions/:team/:id', getPermissions);
 
-//toogle to approve
-router.patch("/updateApproval/:id", updateApprovalStatus);
+// Update approval status
+router.patch("/updateApproval/:team/:id", updateApprovalStatus);
+
 
 export default router;

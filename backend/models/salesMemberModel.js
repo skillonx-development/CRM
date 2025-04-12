@@ -38,9 +38,9 @@ const memberSchema = new mongoose.Schema({
     default: false
   },
   permissions: {
-    overview: { type: Boolean, default: true },
-    leads: { type: Boolean, default: true },
-    proposals: { type: Boolean, default: true },
+    overview: { type: Boolean, default: false },
+    leads: { type: Boolean, default: false },
+    proposals: { type: Boolean, default: false},
     orders: { type: Boolean, default: false },
     billing: { type: Boolean, default: false },
   },
@@ -62,6 +62,6 @@ memberSchema.virtual('confirmPassword')
     this._confirmPassword = value;
   });
 
-const Member = mongoose.model('Member', memberSchema);
+const SalesMember = mongoose.model('SalesMember', memberSchema);
 
-export default Member;
+export default SalesMember;

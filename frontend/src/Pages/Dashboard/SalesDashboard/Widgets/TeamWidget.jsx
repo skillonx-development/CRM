@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Star, Mail, Phone, ArrowLeft, Database,
-  PieChart, FileText, ShoppingCart, CreditCard
+  Star, Mail, Phone, ArrowLeft,
+  FileText, Users, MessageSquare, Target
 } from "lucide-react";
 
-const API_BASE = "http://localhost:5001/api/members";
-
-// MemberCard Component
+// =======================
+// Member Card Component
+// =======================
 const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
   <motion.div
     key={member._id}
@@ -18,7 +18,7 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">
-        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-lg">
+        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-600 text-white font-bold text-lg">
           {member.name.split(" ").map(word => word[0]).join("").toUpperCase()}
         </div>
         <div>
@@ -43,7 +43,7 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
           onChange={() => onToggleApprove(member._id)}
           className="sr-only"
         />
-        <div className={`relative w-12 h-6 bg-gray-600 rounded-full ${member.approve ? "bg-green-500" : "bg-yellow-500"}`}>
+        <div className={`relative w-12 h-6 rounded-full transition-all ${member.approve ? "bg-green-500" : "bg-yellow-500"}`}>
           <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-all ${member.approve ? "translate-x-6" : "translate-x-1"}`} />
         </div>
         <span className="ml-2 text-sm text-gray-300">{member.approve ? "Approved" : "Pending"}</span>
@@ -51,7 +51,7 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
 
       <button
         onClick={() => onManage(member)}
-        className={`px-4 py-1 rounded-lg text-sm font-medium ${member.approve ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-600 text-gray-400 cursor-not-allowed"}`}
+        className={`px-4 py-1 rounded-lg text-sm font-medium ${member.approve ? "bg-purple-600 text-white hover:bg-purple-700" : "bg-gray-600 text-gray-400 cursor-not-allowed"}`}
         disabled={!member.approve}
       >
         Manage Access
@@ -60,118 +60,97 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
   </motion.div>
 );
 
-// ManageMemberModal Component
-const ManageMemberModal = ({ isOpen, onClose, member, onSavePermissions }) => {
+// ===========================
+// Permission Toggle Modal
+// ===========================
+const permissionOptions = [
+  { key: "leads", label: "Leads", description: "Manage leads and their access", icon: Target },
+  { key: "proposals", label: "Proposals", description: "Create and manage sales proposals", icon: FileText },
+  { key: "orders", label: "Orders", description: "Manage orders", icon: Users },
+  { key: "billing", label: "Billing", description: "Review billing and manage bills", icon: MessageSquare },
+];
+
+const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
   const [permissions, setPermissions] = useState({});
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     if (member) {
       setPermissions({
-        overview: false,
-        leads: false,
-        proposals: false,
-        orders: false,
-        billing: false,
-        ...(member.permissions || {})
+        leads: member.permissions?.leads || false,
+        proposals: member.permissions?.proposals || false,
+        orders: member.permissions?.orders || false,
+        billing: member.permissions?.billing || false,
       });
     }
   }, [member]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
 
   const handleTogglePermission = (key) => {
     setPermissions(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    setSaveError("");
-    try {
-      await onSavePermissions(member._id, permissions);
-      onClose();
-    } catch (err) {
-      setSaveError("Failed to save. Please try again.");
-    } finally {
-      setSaving(false);
-    }
+  const handleSave = () => {
+    onSave(member._id, permissions, member.team);
+    onClose();
   };
 
   if (!isOpen || !member) return null;
 
-  const permissionItems = [
-    { key: 'overview', icon: <PieChart />, label: 'Overview', desc: 'Dashboard overview with key metrics and KPIs' },
-    { key: 'leads', icon: <Database />, label: 'Leads', desc: 'Manage and track sales leads' },
-    { key: 'proposals', icon: <FileText />, label: 'Proposals', desc: 'Create and manage sales proposals' },
-    { key: 'orders', icon: <ShoppingCart />, label: 'Orders', desc: 'Track and manage customer orders' },
-    { key: 'billing', icon: <CreditCard />, label: 'Billing', desc: 'Manage invoices and payment tracking' },
-  ];
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-xl shadow-lg w-full max-w-2xl max-h-screen overflow-auto">
+      <div className="bg-gray-900 rounded-xl shadow-lg w-full max-w-2xl h-full md:h-auto max-h-screen overflow-auto">
         <div className="p-4">
           <button onClick={onClose} className="flex items-center text-gray-400 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to all members
           </button>
 
           <div className="flex items-center mb-6">
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold mr-3">
-              {member.name.split(" ").map(w => w[0]).join("").toUpperCase()}
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-purple-600 text-white font-bold mr-3">
+              {member.name.split(" ").map(word => word[0]).join("").toUpperCase()}
             </div>
             <div>
               <h2 className="text-white font-bold text-lg flex items-center">
-                {member.name} {member.isFavorite && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
+                {member.name}
+                {member.isFavorite && <Star className="w-4 h-4 text-yellow-400 ml-1" />}
               </h2>
               <p className="text-gray-400">{member.team}</p>
             </div>
           </div>
 
           <h3 className="text-white font-semibold mb-2">Manage Dashboard Access</h3>
-          <p className="text-gray-400 text-sm mb-6">Select which dashboard modules this team member can access.</p>
+          <p className="text-gray-400 text-sm mb-6">Set which modules this sales team member can access.</p>
 
           <div className="space-y-4 mb-6">
-            {permissionItems.map(({ key, icon, label, desc }) => (
+            {permissionOptions.map(({ key, label, description, icon: Icon }) => (
               <div key={key} className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
-                    {React.cloneElement(icon, { className: "w-4 h-4 text-blue-400" })}
+                  <div className="w-8 h-8 bg-purple-900 rounded flex items-center justify-center mr-3">
+                    <Icon className="w-4 h-4 text-purple-400" />
                   </div>
                   <div>
                     <h4 className="font-medium text-white">{label}</h4>
-                    <p className="text-xs text-gray-400">{desc}</p>
+                    <p className="text-xs text-gray-400">{description}</p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <span className={`text-xs mr-2 ${permissions[key] ? "text-green-400" : "text-red-400"}`}>
-                    {permissions[key] ? "✓ Granted" : "✕ No access"}
+                  <span className={`text-xs mr-2 ${permissions[key] ? 'text-green-400' : 'text-red-400'}`}>
+                    {permissions[key] ? '✓ Granted' : '✕ No access'}
                   </span>
                   <div
-                    className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions[key] ? "bg-blue-600" : "bg-gray-700"}`}
+                    className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions[key] ? 'bg-purple-600' : 'bg-gray-700'}`}
                     onClick={() => handleTogglePermission(key)}
                   >
-                    <div className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${permissions[key] ? "translate-x-6" : "translate-x-0"}`} />
+                    <div className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions[key] ? 'translate-x-6' : 'translate-x-0'}`} />
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {saveError && <p className="text-red-500 text-sm mb-4">{saveError}</p>}
-
           <button
             onClick={handleSave}
-            disabled={saving}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full transition-all"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full"
           >
-            {saving ? "Saving..." : "Save Permissions"}
+            Save Changes
           </button>
         </div>
       </div>
@@ -179,8 +158,10 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSavePermissions }) => {
   );
 };
 
-// TeamWidget Component
-const TeamWidget = () => {
+// ====================
+// Main TeamWidget
+// ====================
+const SalesTeamWidget = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -190,7 +171,7 @@ const TeamWidget = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(`${API_BASE}/getMembers`);
+        const response = await fetch("http://localhost:5001/api/members/getMembers/sales");
         if (!response.ok) throw new Error("Failed to fetch members");
         const data = await response.json();
         setMembers(data.filter(member => member.team === "Sales"));
@@ -203,86 +184,81 @@ const TeamWidget = () => {
     fetchMembers();
   }, []);
 
-  const handleManageMember = (member) => {
-    if (!member.approve) return;
+  const handleToggleApprove = async (id) => {
+    try {
+      const memberToUpdate = members.find(member => member._id === id);
+      const updatedApproveStatus = !memberToUpdate.approve;
+
+      const response = await fetch(`http://localhost:5001/api/members/updateApproval/Sales/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approve: updatedApproveStatus }),
+      });
+
+      if (response.ok) {
+        setMembers(prev =>
+          prev.map(member =>
+            member._id === id ? { ...member, approve: updatedApproveStatus } : member
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating approval:", error);
+    }
+  };
+
+  const handleManageAccess = (member) => {
     setSelectedMember(member);
     setIsManageModalOpen(true);
   };
 
-  const toggleApproval = async (id) => {
-    const updatedMembers = members.map(member =>
-      member._id === id ? { ...member, approve: !member.approve } : member
-    );
-    setMembers(updatedMembers);
+  const handleCloseModal = () => {
+    setIsManageModalOpen(false);
+    setSelectedMember(null);
+  };
 
+  const handleSavePermissions = async (memberId, permissions, team) => {
     try {
-      const toggledMember = updatedMembers.find(m => m._id === id);
-      await fetch(`${API_BASE}/updateApproval/${id}`, {
-        method: "PATCH",
+      const response = await fetch(`http://localhost:5001/api/members/updatePermissions/${memberId}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approve: toggledMember.approve })
+        body: JSON.stringify({ permissions, team }),
       });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to update permissions");
+
+      console.log("Permissions updated:", data);
     } catch (error) {
-      console.error("Failed to update approval:", error);
+      console.error("Error updating permissions:", error);
     }
   };
 
-  const handleSavePermissions = async (memberId, updatedPermissions) => {
-    const response = await fetch(`${API_BASE}/updatePermissions/${memberId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ permissions: updatedPermissions })
-    });
-
-    if (!response.ok) throw new Error("Failed to update permissions");
-
-    setMembers(prev =>
-      prev.map(member =>
-        member._id === memberId ? { ...member, permissions: updatedPermissions } : member
-      )
-    );
-  };
+  if (loading) return <div className="text-white">Loading sales team members...</div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
-    <div className="p-6 bg-gray-900 min-h-screen text-white">
-      <h2 className="text-2xl font-bold mb-6">Sales Team Members</h2>
-
-      {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-28 w-full bg-gray-700 animate-pulse rounded-2xl" />
-          ))}
-        </div>
-      )}
-
-      {error && <p className="text-red-400">{error}</p>}
-
-      {!loading && !error && members.length === 0 && (
-        <p className="text-gray-400">No team members found in Sales.</p>
-      )}
-
-      {!loading && !error && members.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {members.map((member, index) => (
-            <MemberCard
-              key={member._id}
-              member={member}
-              index={index}
-              onManage={handleManageMember}
-              onToggleApprove={toggleApproval}
-            />
-          ))}
-        </div>
-      )}
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {members.map((member, index) => (
+          <MemberCard
+            key={member._id}
+            member={member}
+            index={index}
+            onManage={handleManageAccess}
+            onToggleApprove={handleToggleApprove}
+          />
+        ))}
+      </div>
 
       <ManageMemberModal
         isOpen={isManageModalOpen}
-        onClose={() => setIsManageModalOpen(false)}
+        onClose={handleCloseModal}
         member={selectedMember}
-        onSavePermissions={handleSavePermissions}
+        onSave={handleSavePermissions}
       />
-    </div>
+    </>
   );
 };
 
-export default TeamWidget;
+export default SalesTeamWidget;
