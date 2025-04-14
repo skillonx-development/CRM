@@ -57,7 +57,7 @@ function TechSidebar({ setActiveTab, collapsed, setCollapsed }) {
 
     const baseMenuItems = [
         { id: "overview", icon: LayoutGrid, label: "Overview", path: "/tech", permissionKey: "overview" },
-        { id: "proposals", icon: FileText, label: "Proposals", path: "/tech/proposal", permissionKey: "proposals" },
+        { id: "proposals", icon: FileText, label: "Proposals", path: "/tech/proposals", permissionKey: "proposals" },
         { id: "resources", icon: Server, label: "Resources", path: "/tech/resources", permissionKey: "resources" },
         {id:"curriculum", icon: Package, label: "Curriculum", path: "/tech/curriculum", permissionKey: "curriculum"  },
         { id: "team-management", icon: ShieldCheck, label: "Team Management", path: "/tech/team", permissionKey: "team-management" },
