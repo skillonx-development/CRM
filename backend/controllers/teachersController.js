@@ -30,6 +30,7 @@ export const assignWorkshop = async (req, res) => {
       const teacher = await TeachersModel.findOneAndUpdate(
         { name: teacherName },
         { assignedWorkshop: workshopTitle },
+        {status:"Busy"},
         { new: true }
       );
   
@@ -40,5 +41,25 @@ export const assignWorkshop = async (req, res) => {
       res.status(200).json(teacher);
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+  };
+
+  //update teacher inofrmation
+  export const updateTeacher = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updatedData = req.body;
+  
+      const updatedTeacher = await TeachersModel.findByIdAndUpdate(id, updatedData, {
+        new: true,
+      });
+  
+      if (!updatedTeacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+  
+      res.json(updatedTeacher);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating teacher", error });
     }
   };
