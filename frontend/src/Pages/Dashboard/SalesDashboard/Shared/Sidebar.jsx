@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthContext";
@@ -59,7 +57,6 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
 
     const baseMenuItems = [
         { id: "overview", icon: LayoutGrid, label: "Overview", path: "/sales", permissionKey: "overview" },
-        { id: "leads", icon: Users, label: "Leads", path: "/sales/lead", permissionKey: "leads" },
         { id: "proposals", icon: FileText, label: "Proposals", path: "/sales/proposals", permissionKey: "proposals" },
         { id: "order", icon: Package, label: "Orders", path: "/sales/orders", permissionKey: "orders" },
         { id: "billing", icon: CreditCard, label: "Billing", path: "/sales/billing", permissionKey: "billing" },
@@ -171,13 +168,12 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                                     <button
                                         onClick={() => !isDisabled && navigate(item.path)}
                                         disabled={isDisabled}
-                                        className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                            location.pathname === item.path
+                                        className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
                                                 ? "bg-primary text-white"
                                                 : isDisabled
-                                                ? "text-text-muted cursor-not-allowed"
-                                                : "text-white hover:bg-background-hover"
-                                        }`}
+                                                    ? "text-text-muted cursor-not-allowed"
+                                                    : "text-white hover:bg-background-hover"
+                                            }`}
                                         title={collapsed ? item.label : ""}
                                     >
                                         <item.icon className="h-5 w-5" />
@@ -207,11 +203,10 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                             <li key={item.id}>
                                 <button
                                     onClick={() => item.id === "logout" ? setShowLogoutModal(true) : navigate(item.path)}
-                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${
-                                        location.pathname === item.path
+                                    className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
                                             ? "bg-primary text-white"
                                             : "text-white hover:bg-background-hover"
-                                    }`}
+                                        }`}
                                     title={collapsed ? item.label : ""}
                                 >
                                     <item.icon className="h-5 w-5" />

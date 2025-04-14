@@ -60,11 +60,8 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
   </motion.div>
 );
 
-// ===========================
-// Permission Toggle Modal
-// ===========================
+
 const permissionOptions = [
-  { key: "leads", label: "Leads", description: "Manage leads and their access", icon: Target },
   { key: "proposals", label: "Proposals", description: "Create and manage sales proposals", icon: FileText },
   { key: "orders", label: "Orders", description: "Manage orders", icon: Users },
   { key: "billing", label: "Billing", description: "Review billing and manage bills", icon: MessageSquare },
@@ -76,7 +73,6 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
   useEffect(() => {
     if (member) {
       setPermissions({
-        leads: member.permissions?.leads || false,
         proposals: member.permissions?.proposals || false,
         orders: member.permissions?.orders || false,
         billing: member.permissions?.billing || false,
