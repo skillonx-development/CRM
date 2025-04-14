@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const API_URL = "http://localhost:5001/api/proposals";
+// const API_URL = "http://localhost:5001/api/proposals";
 
 const RecentProposals = () => {
   const [proposals, setProposals] = useState([]);
@@ -12,11 +12,12 @@ const RecentProposals = () => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch("http://localhost:5001/api/proposals");
         if (!response.ok) {
           throw new Error("Failed to fetch proposals");
         }
         const data = await response.json();
+        console.log("Fetched proposals:", data);
         setProposals(data);
       } catch (error) {
         console.error("Error fetching proposals:", error);
@@ -36,13 +37,14 @@ const RecentProposals = () => {
           View all
         </a>
       </div>
+
       <div className="mt-4 space-y-4">
         {loading ? (
           <p className="text-text-muted text-center">Loading proposals...</p>
         ) : proposals.length > 0 ? (
           proposals.map((proposal, index) => (
             <motion.div
-              key={proposal.id}
+              key={proposal._id || index}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -51,15 +53,16 @@ const RecentProposals = () => {
               <div>
                 <h3 className="text-white font-medium">{proposal.title}</h3>
                 <p className="text-text-muted text-sm">{proposal.institution}</p>
-                <p className="text-text-disabled text-xs">
-                  Sent on {proposal.date} • {proposal.daysLeft}
-                </p>
+                {/* Placeholder text, since date is not available */}
+                <p className="text-text-disabled text-xs">Awaiting details</p>
               </div>
               <div className="text-right">
-                <span className={`px-3 py-1 text-xs font-semibold rounded-lg ${proposal.statusColor}`}>
+                <span
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg bg-yellow-600 text-white`}
+                >
                   {proposal.status}
                 </span>
-                <p className="text-xl font-semibold text-white mt-2">{proposal.price}</p>
+                <p className="text-xl font-semibold text-white mt-2">₹{proposal.price}</p>
               </div>
             </motion.div>
           ))

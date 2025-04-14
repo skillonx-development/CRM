@@ -82,7 +82,7 @@ const ResourceManager = () => {
         file: null,
       });
     } catch (error) {
-      console.error("Error adding resource:", error);
+      console.log(JSON.stringify(error, null, 2));
     }
   };
 
