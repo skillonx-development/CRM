@@ -3,14 +3,19 @@ import axios from "axios";
 
 const ProposalsTable = ({ onSelect }) => {
   const [proposals, setProposals] = useState([]);
+  const [loading, setLoading] = useState(true); // To track loading state
 
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/proposals");
-        setProposals(response.data.proposals);
+        const response = await axios.get("http://localhost:5001/api/tech-proposals");
+        // Filter proposals to include only those with the status "Accepted"
+        const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted");
+        setProposals(acceptedProposals);  // Set only the accepted proposals
       } catch (error) {
         console.error("Error fetching proposals:", error);
+      } finally {
+        setLoading(false);  // Stop loading after data is fetched
       }
     };
 
@@ -28,10 +33,18 @@ const ProposalsTable = ({ onSelect }) => {
         return "bg-gray-300 text-gray-800";
       case "Ready":
         return "bg-green-500 text-white";
+      case "Sent":
+        return "bg-purple-500 text-white";
+      case "Accepted":
+        return "bg-green-500 text-white";
       default:
         return "bg-gray-200 text-gray-800";
     }
   };
+
+  if (loading) {
+    return <div>Loading proposals...</div>;  // Show a loading message while fetching data
+  }
 
   return (
     <div className="bg-background-card p-6 shadow-card rounded-lg text-text-default">
@@ -48,27 +61,33 @@ const ProposalsTable = ({ onSelect }) => {
           </tr>
         </thead>
         <tbody>
-          {proposals.map((proposal) => (
-            <tr
-              key={proposal._id}
-              className="hover:bg-background-hover cursor-pointer transition"
-              onClick={() => onSelect(proposal)}
-            >
-              <td className="p-3 font-semibold">{proposal.institution}</td>
-              <td className="p-3">{proposal.title}</td>
-              <td className="p-3">{formatBudget(proposal.price)}</td>
-              <td className="p-3">
-                <span
-                  className={`px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(
-                    proposal.status
-                  )}`}
-                >
-                  {proposal.status}
-                </span>
-              </td>
-              <td className="p-3">{formatDate(proposal.scheduleDate)}</td>
+          {proposals.length > 0 ? (
+            proposals.map((proposal) => (
+              <tr
+                key={proposal._id}
+                className="hover:bg-background-hover cursor-pointer transition"
+                onClick={() => onSelect(proposal)}
+              >
+                <td className="p-3 font-semibold">{proposal.institution}</td>
+                <td className="p-3">{proposal.title}</td>
+                <td className="p-3">{formatBudget(proposal.price)}</td>
+                <td className="p-3">
+                  <span
+                    className={`px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(
+                      proposal.status
+                    )}`}
+                  >
+                    {proposal.status}
+                  </span>
+                </td>
+                <td className="p-3">{formatDate(proposal.scheduledDate)}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="p-3 text-center">No accepted proposals available</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

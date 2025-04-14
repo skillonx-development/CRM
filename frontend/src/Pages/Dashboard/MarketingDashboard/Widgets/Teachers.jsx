@@ -48,13 +48,20 @@ export default function TeacherManagement() {
       if (!selectedTeacher) return;
       try {
         const res = await axios.get("http://localhost:5001/api/tech-proposals");
-        setProposals(Array.isArray(res.data) ? res.data : res.data.proposals || []);
+        const allProposals = Array.isArray(res.data) ? res.data : res.data.proposals || [];
+  
+        // Filter only accepted proposals
+        const acceptedProposals = allProposals.filter(
+          (proposal) => proposal.status === "Accepted"
+        );
+  
+        setProposals(acceptedProposals);
       } catch (err) {
         console.error("Failed to fetch proposals:", err);
         setProposals([]);
       }
     };
-
+  
     fetchProposals();
   }, [selectedTeacher]);
 

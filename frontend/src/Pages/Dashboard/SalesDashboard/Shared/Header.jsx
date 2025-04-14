@@ -1,19 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 
 function Header() {
-    const navigate = useNavigate();
-
     const user = {
         name: "John Carter",
         avatar: "/anton.png", // Replace with actual user avatar URL
-    };
-
-    const handleLogout = () => {
-        // Clear any auth data
-        localStorage.removeItem("token"); // Adjust key as needed
-        // Redirect to login
-        navigate("/login");
     };
 
     return (
@@ -29,12 +19,9 @@ function Header() {
                     />
                 </div>
 
-                {/* Logout Button */}
-                <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 text-sm rounded-lg bg-primary text-white hover:bg-primary/90"
-                >
-                    Logout
+                {/* Notification Bell */}
+                <button className="p-2 rounded-lg hover:bg-background-hover">
+                    <Bell className="h-5 w-5 text-text-muted" />
                 </button>
 
                 {/* User Avatar */}
