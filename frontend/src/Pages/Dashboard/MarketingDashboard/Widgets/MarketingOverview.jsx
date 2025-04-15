@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, Users, Calendar, FileText } from "lucide-react";
-
-const stats = [
-  { title: "Total Proposals", icon: FileText, value: 48, change: 12, period: "This month" },
-  { title: "Proposal Acceptance Rate", icon: TrendingUp, value: 78, change: 8, period: "Last 30 days", suffix: "%" },
-  { title: "Active Teachers", icon: Users, value: 24, change: 2, period: "Available for assignment" },
-  { title: "Upcoming Workshops", icon: Calendar, value: 12, change: 3, period: "Next 30 days" }
-];
+import { TrendingUp, Users, FileText } from "lucide-react";
+import axios from "axios";
 
 const Counter = ({ target }) => {
   const [count, setCount] = useState(0);
@@ -27,14 +21,71 @@ const Counter = ({ target }) => {
       }
       setCount(start);
     }, incrementTime);
+
+    return () => clearInterval(timer);
   }, [target]);
 
   return <span>{count}</span>;
 };
 
 export default function MarketingOverview() {
+  const [stats, setStats] = useState([
+    { title: "Total Proposals", icon: FileText, value: 0, change: 0, period: "This month" },
+    { title: "Proposal Acceptance Rate", icon: TrendingUp, value: 0, change: 0, period: "Last 30 days", suffix: "%" },
+    { title: "Active Teachers", icon: Users, value: 0, change: 0, period: "Available for assignment" },
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [proposalsRes, teachersRes] = await Promise.all([
+          axios.get("http://localhost:5001/api/tech-proposals"),
+          axios.get("http://localhost:5001/api/teachers"),
+        ]);
+
+        const proposals = proposalsRes.data || [];
+        const teachers = teachersRes.data || [];
+
+        const totalProposals = proposals.length;
+        const acceptedProposals = proposals.filter(p => p.sent === true).length;
+        const acceptanceRate = totalProposals > 0 ? Math.round((acceptedProposals / totalProposals) * 100) : 0;
+
+        const activeTeachers = teachers.filter(t => t.status === "active" || t.status ==="Available").length;
+
+        setStats([
+          {
+            title: "Total Proposals",
+            icon: FileText,
+            value: totalProposals,
+            change: 12, // you can calculate this with historical data
+            period: "This month",
+          },
+          {
+            title: "Proposal Acceptance Rate",
+            icon: TrendingUp,
+            value: acceptanceRate,
+            change: 8, // placeholder
+            period: "Last 30 days",
+            suffix: "%",
+          },
+          {
+            title: "Active Teachers",
+            icon: Users,
+            value: activeTeachers,
+            change: 2, // placeholder
+            period: "Available for assignment",
+          },
+        ]);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
-    <div className="grid grid-cols-4 gap-4 p-4 bg-background-default">
+    <div className="grid grid-cols-3 gap-4 p-4 bg-background-default">
       {stats.map((stat, index) => (
         <motion.div
           key={index}

@@ -31,7 +31,7 @@ const techProposalsSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Sent", "Accepted", "Rejected"],
+      enum: ["Pending", "Sent", "Accepted", "Rejected", "Completed"],
       default: "Pending"
     }
   },

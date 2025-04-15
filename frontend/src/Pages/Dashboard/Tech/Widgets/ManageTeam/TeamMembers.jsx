@@ -169,7 +169,7 @@ const TeamWidget = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/members/getMembers/tech");
+        const response = await fetch("http://localhost:5001/api/members/getMembers/Tech");
         if (!response.ok) throw new Error("Failed to fetch members");
         const data = await response.json();
         setMembers(data.filter(member => member.team === "Tech"));

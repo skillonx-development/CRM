@@ -12,7 +12,7 @@ export default function UpcomingWorkshop() {
       <div className="bg-background-card rounded-2xl shadow-card p-4 border border-border w-96">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-text">Upcoming Workshops</h2>
-          <a href="#" className="text-sm text-status-info hover:underline">
+          <a href="/marketing/proposals" className="text-sm text-status-info hover:underline">
             View all
           </a>
         </div>
