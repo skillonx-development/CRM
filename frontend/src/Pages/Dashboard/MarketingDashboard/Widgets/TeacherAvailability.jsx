@@ -1,33 +1,58 @@
+import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell } from "recharts";
+import axios from "axios";
 
-const data = [
-  { name: "Available", value: 18, color: "#10b981" }, // Green (Success)
-  { name: "Busy", value: 12, color: "#ef4444" }, // Red (Error)
-  { name: "Tentative", value: 8, color: "#eab308" }, // Yellow (Warning)
-];
-
-const assignments = [
-  {
-    teacher: "Sarah Wilson",
-    workshop: "Advanced JavaScript",
-    institution: "Tech University",
-    date: "June 5-7, 2023",
-  },
-  {
-    teacher: "Michael Chen",
-    workshop: "UI/UX Masterclass",
-    institution: "Design Academy",
-    date: "June 15-16, 2023",
-  },
-  {
-    teacher: "James Anderson",
-    workshop: "Data Science Fundamentals",
-    institution: "Analytics College",
-    date: "June 20-24, 2023",
-  },
-];
+const COLORS = {
+  available: "#10b981",
+  busy: "#ef4444",
+  tentative: "#eab308",
+};
 
 export default function TeacherDashboard() {
+  const [availabilityData, setAvailabilityData] = useState([]);
+  const [assignments, setAssignments] = useState([]);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5001/api/teachers");
+        const teachers = res.data || [];
+
+        // Prepare availability data
+        const statusCount = { available: 0, busy: 0, tentative: 0 };
+        const assignmentsList = [];
+
+        teachers.forEach((teacher) => {
+          const status = teacher.status?.toLowerCase();
+          if (statusCount[status] !== undefined) {
+            statusCount[status]++;
+          }
+
+          // Extract upcoming assignments if any
+          teacher.assignments?.forEach((assignment) => {
+            assignmentsList.push({
+              teacher: teacher.name,
+              ...assignment,
+            });
+          });
+        });
+
+        const availabilityPie = Object.keys(statusCount).map((status) => ({
+          name: status.charAt(0).toUpperCase() + status.slice(1),
+          value: statusCount[status],
+          color: COLORS[status],
+        }));
+
+        setAvailabilityData(availabilityPie);
+        setAssignments(assignmentsList);
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-sm mx-auto">
       {/* Teacher Availability Widget */}
@@ -41,7 +66,7 @@ export default function TeacherDashboard() {
         <div className="flex justify-center my-4">
           <PieChart width={200} height={200}>
             <Pie
-              data={data}
+              data={availabilityData}
               cx="50%"
               cy="50%"
               innerRadius={50}
@@ -49,7 +74,7 @@ export default function TeacherDashboard() {
               paddingAngle={3}
               dataKey="value"
             >
-              {data.map((entry, index) => (
+              {availabilityData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -58,7 +83,7 @@ export default function TeacherDashboard() {
 
         {/* Legend */}
         <div className="flex justify-center gap-4">
-          {data.map((item, index) => (
+          {availabilityData.map((item, index) => (
             <div
               key={index}
               className="flex flex-col items-center bg-background-hover p-2 rounded-lg shadow-sm w-20"
@@ -96,7 +121,9 @@ export default function TeacherDashboard() {
                   {assignment.teacher}
                 </h4>
                 <p className="text-sm text-text-muted">{assignment.workshop}</p>
-                <p className="text-xs text-text-muted">{assignment.institution}</p>
+                <p className="text-xs text-text-muted">
+                  {assignment.institution}
+                </p>
                 <p className="text-xs text-text-muted">{assignment.date}</p>
               </div>
               <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">

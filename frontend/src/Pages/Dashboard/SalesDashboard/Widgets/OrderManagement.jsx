@@ -6,10 +6,11 @@ const statusColors = {
   Accepted: "bg-green-500",
   Pending: "bg-yellow-500",
   Rejected: "bg-red-500",
-  Sent: "bg-blue-500"
+  Sent: "bg-blue-500",
+  Completed: "bg-emerald-600" // ✅ new status color
 };
 
-const statusOptions = ["Pending","Sent", "Accepted", "Rejected"];
+const statusOptions = ["Pending", "Sent", "Accepted", "Rejected", "Completed"]; // ✅ added "Completed"
 const filters = ["All", ...statusOptions];
 
 export default function OrderManagement() {
@@ -73,8 +74,7 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       console.log("Sending email for:", order.title);
-  
-      // Step 1: Update the proposal if necessary
+
       await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
@@ -82,10 +82,9 @@ export default function OrderManagement() {
         scheduledDate: order.schedule,
         price: order.price,
       });
-  
-      // Step 2: Send actual email
+
       await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
-  
+
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);
@@ -105,7 +104,7 @@ export default function OrderManagement() {
         <h1 className="text-2xl font-bold">Order Management</h1>
       </div>
 
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex gap-2 flex-wrap">
         {filters.map((status) => (
           <button
             key={status}
@@ -137,6 +136,9 @@ export default function OrderManagement() {
                 📅 <span className="text-foreground">{order.schedule}</span>
               </div>
               <p className="text-xl font-bold mt-4 text-primary">₹{order.price}</p>
+              {order.status === "Completed" && (
+                <p className="text-xs mt-2 text-emerald-600 font-semibold">✅ This order is completed</p>
+              )}
               <button
                 className="w-full mt-4 bg-primary hover:bg-primary-dark px-4 py-2 rounded-xl text-white font-medium transition"
                 onClick={() => handleManageOrder(order)}

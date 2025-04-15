@@ -1,64 +1,85 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const Settings = () => {
-  const [activeTab, setActiveTab] = useState("general");
-
-  return (
-    <div className="p-6 bg-background-default text-text-default min-h-screen">
-      {/* Heading */}
-      <h2 className="text-2xl font-semibold">Settings</h2>
-      <p className="text-text-muted">Manage your account settings and preferences.</p>
-
-      {/* Tabs */}
-      <div className="mt-4 flex border-b border-border-dark bg-background-card rounded-lg p-2">
-        {["General", "Notifications", "Account"].map((tab) => (
-          <button
-            key={tab}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition ${
-              activeTab === tab.toLowerCase()
-                ? "border-b-2 border-primary text-primary"
-                : "text-text-muted hover:text-text-default"
-            }`}
-            onClick={() => setActiveTab(tab.toLowerCase())}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Content Sections */}
-      <div className="mt-6 space-y-6">
-        {activeTab === "general" && <GeneralSettings />}
-        {activeTab === "account" && <AccountSettings />}
-        {activeTab === "notifications" && <NotificationSettings />}
-      </div>
-    </div>
-  );
-};
-
-// General Settings Section
-const GeneralSettings = () => {
-  return (
-    <div className="bg-background-card p-6 rounded-lg shadow-card border border-border-dark">
-      <h3 className="text-lg font-semibold text-text-default">Appearance</h3>
-      <p className="text-text-muted text-sm mb-4">Customize how the dashboard looks and feels.</p>
-      <div className="space-y-4">
-        {[
-          { label: "Dark Mode", id: "dark-mode" },
-          { label: "Compact View", id: "compact-view" }
-        ].map((setting) => (
-          <div key={setting.id} className="flex items-center justify-between">
-            <span className="text-text-default">{setting.label}</span>
-            <input type="checkbox" className="toggle-checkbox" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Account Settings Section
 const AccountSettings = () => {
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [userId, setUserId] = useState("");
+  const [team, setTeam] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUserData({
+        name: storedUser.name || "",
+        email: storedUser.email || "",
+      });
+      setUserId(storedUser._id);
+      setTeam(storedUser.team);
+      setUserRole(storedUser.userRole || "member");
+    }
+  }, []);
+
+  const handleChange = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5001/api/members/update-profile/${team}/${userId}/${userRole}`,
+        {
+          name: userData.name,
+          email: userData.email,
+        }
+      );
+
+      const updatedUser = response.data.user;
+
+      localStorage.setItem("user", JSON.stringify({ ...updatedUser, team, userRole }));
+
+      alert(response.data.message || "Profile updated successfully");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update profile");
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert("New passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5001/api/members/update-password/${team}/${userId}/${userRole}`,
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }
+      );
+
+      alert(response.data.message || "Password updated successfully");
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update password");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Account Information */}
@@ -68,18 +89,25 @@ const AccountSettings = () => {
         <div className="space-y-4">
           <input
             type="text"
+            name="name"
             placeholder="Name"
+            value={userData.name}
+            onChange={handleChange}
             className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
-            defaultValue="Sales Agent"
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
+            value={userData.email}
+            onChange={handleChange}
             className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
-            defaultValue="sales@example.com"
           />
         </div>
-        <button className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">
+        <button
+          onClick={handleUpdateProfile}
+          className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+        >
           Save Changes
         </button>
       </div>
@@ -91,21 +119,33 @@ const AccountSettings = () => {
         <div className="space-y-4">
           <input
             type="password"
+            name="currentPassword"
             placeholder="Current Password"
+            value={passwordData.currentPassword}
+            onChange={handlePasswordChange}
             className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
           />
           <input
             type="password"
+            name="newPassword"
             placeholder="New Password"
+            value={passwordData.newPassword}
+            onChange={handlePasswordChange}
             className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
           />
           <input
             type="password"
+            name="confirmPassword"
             placeholder="Confirm Password"
+            value={passwordData.confirmPassword}
+            onChange={handlePasswordChange}
             className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
           />
         </div>
-        <button className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">
+        <button
+          onClick={handleUpdatePassword}
+          className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+        >
           Update Password
         </button>
       </div>
@@ -113,57 +153,4 @@ const AccountSettings = () => {
   );
 };
 
-// Notification Settings Section
-const NotificationSettings = () => {
-  return (
-    <div className="bg-background-card p-6 rounded-lg shadow-card border border-border-dark">
-      <h3 className="text-lg font-semibold text-text-default">Notification Settings</h3>
-      <p className="text-text-muted text-sm mb-4">Configure how you receive notifications.</p>
-      <div className="space-y-4">
-        {["Email Notifications", "SMS Notifications", "Automated Follow-ups"].map((setting, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <span className="text-text-default">{setting}</span>
-            <input type="checkbox" className="toggle-checkbox" defaultChecked={index !== 1} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Custom Tailwind Toggle
-const toggleStyles = `
-  .toggle-checkbox {
-    width: 40px;
-    height: 20px;
-    appearance: none;
-    background: #6b7280;
-    border-radius: 9999px;
-    position: relative;
-    transition: background 0.2s;
-  }
-  .toggle-checkbox:checked {
-    background: #8b5cf6;
-  }
-  .toggle-checkbox::before {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: white;
-    border-radius: 9999px;
-    top: 2px;
-    left: 2px;
-    transition: transform 0.2s;
-  }
-  .toggle-checkbox:checked::before {
-    transform: translateX(20px);
-  }
-`;
-
-export default () => (
-  <>
-    <style>{toggleStyles}</style>
-    <Settings />
-  </>
-);
+export default AccountSettings;

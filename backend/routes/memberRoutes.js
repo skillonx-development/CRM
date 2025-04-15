@@ -1,7 +1,13 @@
 import express from "express";
 import LeadMember from "../models/leadModel.js";
-import { getMembersByTeam,updatePermissions, updateApprovalStatus, getPermissions, getUserById} from "../controllers/memberController.js";
-import { getMemberModelByTeam } from "../utils/getMemberModel.js";
+import { getMembersByTeam,
+  updatePermissions, 
+  updateApprovalStatus,
+   getPermissions, 
+   getUserById,
+  updateMemberPassword,
+  updateProfile} from "../controllers/memberController.js";
+import { getModelByTeamAndType } from "../utils/getMemberModel.js";
 
 const router = express.Router();
 
@@ -43,6 +49,13 @@ router.get('/getPermissions/:team/:id', getPermissions);
 
 // Update approval status
 router.patch("/updateApproval/:team/:id", updateApprovalStatus);
+
+//update user password
+router.put('/update-password/:team/:id/:type', updateMemberPassword);
+
+//update profile data
+
+router.put('/update-profile/:team/:id/:type', updateProfile);
 
 
 export default router;

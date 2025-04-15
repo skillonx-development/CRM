@@ -1,49 +1,74 @@
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import CountUp from "react-countup";
-import { CreditCard, Users, FileText, Package } from "lucide-react";
-
-const widgets = [
-  {
-    title: "Total Revenue",
-    value: 125600,
-    prefix: "$",
-    change: "12.5% from last month",
-    positive: true,
-    icon: CreditCard,
-  },
-  {
-    title: "Active Leads",
-    value: 48,
-    change: "7.2% from last month",
-    positive: true,
-    icon: Users,
-  },
-  {
-    title: "Proposals Sent",
-    value: 32,
-    change: "4.1% from last month",
-    positive: true,
-    icon: FileText,
-  },
-  {
-    title: "Completed Orders",
-    value: 18,
-    change: "2.3% from last month",
-    positive: false,
-    icon: Package,
-  },
-];
+import { CreditCard, FileText, Package } from "lucide-react";
+import axios from "axios";
 
 const AnalyticsOverview = () => {
-  const [animate, setAnimate] = useState(false);
+  const [data, setData] = useState({
+    totalRevenue: 0,
+    proposalsSent: 0,
+    completedOrders: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  const fetchAnalyticsData = async () => {
+    try {
+      const [invoiceRes, proposalsRes] = await Promise.all([
+        axios.get("http://localhost:5001/api/invoice"),
+        axios.get("http://localhost:5001/api/tech-proposals"),
+      ]);
+
+      const invoices = invoiceRes.data || [];
+      const proposals = proposalsRes.data || [];
+
+      // Only sum revenue from invoices with status "Paid"
+      const totalRevenue = invoices
+        .filter(inv => inv.status === "Paid")
+        .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+
+      const proposalsSent = proposals.length;
+      const completedOrders = proposals.filter(p => p.status === "Completed").length;
+
+      setData({ totalRevenue, proposalsSent, completedOrders });
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching analytics data:", err);
+    }
+  };
 
   useEffect(() => {
-    setAnimate(true);
+    fetchAnalyticsData();
   }, []);
 
+  const widgets = [
+    {
+      title: "Total Revenue",
+      value: data.totalRevenue,
+      prefix: "₹",
+      change: "12.5% from last month",
+      positive: true,
+      icon: CreditCard,
+    },
+    {
+      title: "Proposals Sent",
+      value: data.proposalsSent,
+      change: "4.1% from last month",
+      positive: true,
+      icon: FileText,
+    },
+    {
+      title: "Completed Orders",
+      value: data.completedOrders,
+      change: "2.3% from last month",
+      positive: data.completedOrders >= 0,
+      icon: Package,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6 mt-[-10px]">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6 mt-[-10px]">
       {widgets.map((widget, index) => (
         <motion.div
           key={index}
@@ -58,10 +83,23 @@ const AnalyticsOverview = () => {
             </div>
             <div className="mt-2">
               <div className="text-2xl font-semibold">
-                <CountUp start={0} end={widget.value} duration={2} prefix={widget.prefix || ""} />
+                {loading ? (
+                  "..."
+                ) : (
+                  <CountUp
+                    start={0}
+                    end={widget.value}
+                    duration={2}
+                    prefix={widget.prefix || ""}
+                  />
+                )}
               </div>
-              <div className={`text-xs mt-2 font-medium ${widget.positive ? "text-green-600" : "text-red-600"}`}>
-                {widget.positive ? "\u2191" : "\u2193"} {widget.change}
+              <div
+                className={`text-xs mt-2 font-medium ${
+                  widget.positive ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {widget.positive ? "↑" : "↓"} {widget.change}
               </div>
             </div>
           </div>
