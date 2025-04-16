@@ -10,7 +10,6 @@ const COLORS = {
 
 export default function TeacherDashboard() {
   const [availabilityData, setAvailabilityData] = useState([]);
-  const [assignments, setAssignments] = useState([]);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -20,21 +19,12 @@ export default function TeacherDashboard() {
 
         // Prepare availability data
         const statusCount = { available: 0, busy: 0, tentative: 0 };
-        const assignmentsList = [];
 
         teachers.forEach((teacher) => {
           const status = teacher.status?.toLowerCase();
           if (statusCount[status] !== undefined) {
             statusCount[status]++;
           }
-
-          // Extract upcoming assignments if any
-          teacher.assignments?.forEach((assignment) => {
-            assignmentsList.push({
-              teacher: teacher.name,
-              ...assignment,
-            });
-          });
         });
 
         const availabilityPie = Object.keys(statusCount).map((status) => ({
@@ -44,7 +34,6 @@ export default function TeacherDashboard() {
         }));
 
         setAvailabilityData(availabilityPie);
-        setAssignments(assignmentsList);
       } catch (error) {
         console.error("Error fetching teachers:", error);
       }
@@ -96,39 +85,6 @@ export default function TeacherDashboard() {
               <p className="text-lg font-semibold text-text-default">
                 {item.value}
               </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Upcoming Assignments Widget */}
-      <div className="bg-background-card p-6 rounded-2xl shadow-card">
-        <h3 className="text-lg font-semibold text-text-default">
-          Upcoming Assignments
-        </h3>
-        <p className="text-sm text-text-muted">
-          Teacher assignments for workshops
-        </p>
-
-        <div className="mt-4 space-y-4">
-          {assignments.map((assignment, index) => (
-            <div
-              key={index}
-              className="p-4 bg-background-hover rounded-lg shadow-sm flex justify-between items-center"
-            >
-              <div>
-                <h4 className="text-base font-semibold text-text-default">
-                  {assignment.teacher}
-                </h4>
-                <p className="text-sm text-text-muted">{assignment.workshop}</p>
-                <p className="text-xs text-text-muted">
-                  {assignment.institution}
-                </p>
-                <p className="text-xs text-text-muted">{assignment.date}</p>
-              </div>
-              <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">
-                Assigned
-              </span>
             </div>
           ))}
         </div>
