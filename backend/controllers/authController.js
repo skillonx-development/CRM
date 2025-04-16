@@ -128,7 +128,12 @@ export async function login(req, res) {
 
     if (type === 'admin') {
       user = await Admin.findOne({ email });
-      if (!user || user.password !== password) {
+      if (!user) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+
+      const isMatch = await bcryptjs.compare(password, user.password);
+      if (!isMatch) {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
       }
 
@@ -141,7 +146,8 @@ export async function login(req, res) {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: 'admin'
+          role: 'admin',
+          team: 'admin'
         }
       });
     }
@@ -151,8 +157,8 @@ export async function login(req, res) {
       user = await Lead.findOne({ email });
     } else {
       user = await TechMember.findOne({ email }) ||
-             await SalesMember.findOne({ email }) ||
-             await MarketingMember.findOne({ email });
+        await SalesMember.findOne({ email }) ||
+        await MarketingMember.findOne({ email });
     }
 
     if (!user) {
