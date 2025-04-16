@@ -1,4 +1,5 @@
 import bcryptjs from 'bcryptjs';
+import Admin from '../models/adminModel.js';  // Adjust the import path based on your file structure
 import Lead from '../models/leadModel.js';
 import TechMember from '../models/techMemberModel.js';
 import SalesMember from '../models/salesMemberModel.js';
@@ -119,16 +120,36 @@ export async function login(req, res) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
-    if (type !== 'lead' && type !== 'member') {
+    if (type !== 'lead' && type !== 'member' && type !== 'admin') {
       return res.status(400).json({ success: false, message: 'Invalid user type' });
     }
 
     let user;
 
+    if (type === 'admin') {
+      user = await Admin.findOne({ email });
+      if (!user || user.password !== password) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+
+      generateTokenAndSetCookie(user._id, 'admin', res);
+
+      return res.status(200).json({
+        success: true,
+        redirect: '/admin',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: 'admin'
+        }
+      });
+    }
+
+    // Lead or Member
     if (type === 'lead') {
       user = await Lead.findOne({ email });
     } else {
-      // Check across all member collections
       user = await TechMember.findOne({ email }) ||
              await SalesMember.findOne({ email }) ||
              await MarketingMember.findOne({ email });
@@ -143,7 +164,7 @@ export async function login(req, res) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // Check if the user is a member and if they are approved
+    // Check member approval
     if (type === 'member' && !user.approve) {
       return res.status(403).json({
         success: false,
@@ -166,9 +187,6 @@ export async function login(req, res) {
         break;
       case 'marketing':
         redirectPath = isLead ? '/marketing' : '/marketing/team';
-        break;
-      case 'admin':
-        redirectPath = '/admin';
         break;
       default:
         return res.status(400).json({
@@ -194,6 +212,9 @@ export async function login(req, res) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 }
+
+
+
 // 🚪 Logout
 export async function logout(req, res) {
   try {

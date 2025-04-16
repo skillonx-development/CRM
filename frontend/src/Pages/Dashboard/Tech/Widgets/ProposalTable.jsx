@@ -3,27 +3,30 @@ import axios from "axios";
 
 const ProposalsTable = ({ onSelect }) => {
   const [proposals, setProposals] = useState([]);
-  const [loading, setLoading] = useState(true); // To track loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/tech-proposals");
-        // Filter proposals to include only those with the status "Accepted"
-        const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted");
-        setProposals(acceptedProposals);  // Set only the accepted proposals
+        const response = await axios.get("http://localhost:5001/api/proposals");
+        setProposals(response.data.proposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);
       } finally {
-        setLoading(false);  // Stop loading after data is fetched
+        setLoading(false);
       }
     };
 
     fetchProposals();
   }, []);
 
-  const formatBudget = (price) => `$${Number(price).toLocaleString()}`;
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US");
+  const formatBudget = (price) => `₹${Number(price).toLocaleString("en-IN")}`;
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -36,14 +39,16 @@ const ProposalsTable = ({ onSelect }) => {
       case "Sent":
         return "bg-purple-500 text-white";
       case "Accepted":
-        return "bg-green-500 text-white";
+        return "bg-green-600 text-white";
+      case "Lead Acquired":
+        return "bg-yellow-500 text-black";
       default:
         return "bg-gray-200 text-gray-800";
     }
   };
 
   if (loading) {
-    return <div>Loading proposals...</div>;  // Show a loading message while fetching data
+    return <div>Loading proposals...</div>;
   }
 
   return (
@@ -54,10 +59,10 @@ const ProposalsTable = ({ onSelect }) => {
         <thead>
           <tr className="bg-background-hover text-text-default">
             <th className="p-3 text-left">Client</th>
-            <th className="p-3 text-left">Type</th>
+            <th className="p-3 text-left">Title</th>
             <th className="p-3 text-left">Budget</th>
             <th className="p-3 text-left">Status</th>
-            <th className="p-3 text-left">Received</th>
+            <th className="p-3 text-left">Scheduled</th>
           </tr>
         </thead>
         <tbody>
@@ -80,12 +85,14 @@ const ProposalsTable = ({ onSelect }) => {
                     {proposal.status}
                   </span>
                 </td>
-                <td className="p-3">{formatDate(proposal.scheduledDate)}</td>
+                <td className="p-3">{formatDate(proposal.scheduleDate)}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="p-3 text-center">No accepted proposals available</td>
+              <td colSpan="5" className="p-3 text-center">
+                No proposals available
+              </td>
             </tr>
           )}
         </tbody>

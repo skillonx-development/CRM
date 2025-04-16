@@ -21,6 +21,15 @@ const api = {
       console.error("Error creating proposal:", error);
       throw error;
     }
+  },
+  updateProposal: async (id, proposal) => {
+    try {
+      const response = await axios.put(`http://localhost:5001/api/proposals/${id}`, proposal);
+      return response.data.proposal;
+    } catch (error) {
+      console.error("Error updating proposal:", error);
+      throw error;
+    }
   }
 };
 
@@ -30,14 +39,27 @@ const ProposalTracking = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewProposalForm, setShowNewProposalForm] = useState(false);
+  const [showEditProposalForm, setShowEditProposalForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentProposal, setCurrentProposal] = useState(null);
 
   const [newProposal, setNewProposal] = useState({
     title: "",
     price: "",
     status: "Lead Acquired",
     statusColor: "bg-primary",
+    institution: "",
+    collegeEmail: "",
+    scheduleDate: "", 
+    description: "",
+  });
+
+  const [editProposal, setEditProposal] = useState({
+    title: "",
+    price: "",
+    status: "",
+    statusColor: "",
     institution: "",
     collegeEmail: "",
     scheduleDate: "", 
@@ -85,8 +107,10 @@ const ProposalTracking = () => {
     setFilteredProposals(results);
   }, [activeFilter, searchQuery, proposals]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, formType) => {
     const { name, value } = e.target;
+    const updateFunction = formType === 'new' ? setNewProposal : setEditProposal;
+    const currentForm = formType === 'new' ? newProposal : editProposal;
 
     if (name === "status") {
       let statusColor = "bg-primary";
@@ -94,14 +118,14 @@ const ProposalTracking = () => {
       else if (value === "Accepted") statusColor = "bg-status-success";
       else if (value === "Rejected") statusColor = "bg-status-error";
 
-      setNewProposal({
-        ...newProposal,
+      updateFunction({
+        ...currentForm,
         [name]: value,
         statusColor
       });
     } else {
-      setNewProposal({
-        ...newProposal,
+      updateFunction({
+        ...currentForm,
         [name]: value
       });
     }
@@ -134,6 +158,46 @@ const ProposalTracking = () => {
     }
   };
 
+  const handleEdit = (proposal) => {
+    setCurrentProposal(proposal);
+    
+    // Format the date for the date input
+    const dateObj = new Date(proposal.scheduleDate);
+    const formattedDate = dateObj.toISOString().split('T')[0];
+    
+    setEditProposal({
+      ...proposal,
+      scheduleDate: formattedDate
+    });
+    
+    setShowEditProposalForm(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const response = await fetch(`http://localhost:5001/api/proposals/${editProposal._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editProposal), // This should match the proposal structure
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        alert("Proposal updated successfully!");
+        // Optionally refetch proposals or update UI state
+        setShowEditProposalForm(false);
+      } else {
+        alert("Failed to update proposal");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("An error occurred while updating proposal");
+    }
+  };
+  
   return (
     <div className="bg-background p-6 rounded-xl shadow-card border border-border w-full">
       <div className="flex justify-between items-center mb-4">
@@ -226,8 +290,11 @@ const ProposalTracking = () => {
                   })}
                 </div>
                 <div className="flex justify-between items-center text-text mt-3">
-                  <button className="text-sm flex items-center gap-2 text-text-muted hover:text-text">
-                    <FileText size={16} /> View proposal details
+                  <button 
+                    className="text-sm flex items-center gap-2 text-text-muted hover:text-text"
+                    onClick={() => handleEdit(proposal)}
+                  >
+                    <FileText size={16} /> Edit proposal details
                   </button>
                 </div>
               </motion.div>
@@ -236,6 +303,7 @@ const ProposalTracking = () => {
         )}
       </div>
 
+      {/* Create New Proposal Modal */}
       {showNewProposalForm && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <motion.div 
@@ -260,7 +328,7 @@ const ProposalTracking = () => {
                   type="text"
                   name="title"
                   value={newProposal.title}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, 'new')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                   placeholder="e.g. React Workshop"
                   required
@@ -274,7 +342,7 @@ const ProposalTracking = () => {
                     type="text"
                     name="price"
                     value={newProposal.price}
-                    onChange={handleInputChange}
+                    onChange={(e) => handleInputChange(e, 'new')}
                     className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                     placeholder="e.g. ₹4500"
                     required
@@ -286,7 +354,7 @@ const ProposalTracking = () => {
                   <select
                     name="status"
                     value={newProposal.status}
-                    onChange={handleInputChange}
+                    onChange={(e) => handleInputChange(e, 'new')}
                     className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                     required
                   >
@@ -304,7 +372,7 @@ const ProposalTracking = () => {
                   type="text"
                   name="institution"
                   value={newProposal.institution}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, 'new')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                   placeholder="e.g. ABC University"
                   required
@@ -317,7 +385,7 @@ const ProposalTracking = () => {
                   type="email"
                   name="collegeEmail"
                   value={newProposal.collegeEmail}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, 'new')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                   placeholder="e.g. contact@abcuniversity.edu"
                   required
@@ -330,7 +398,7 @@ const ProposalTracking = () => {
                   type="date"
                   name="scheduleDate"
                   value={newProposal.scheduleDate}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, 'new')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
                   required
                 />
@@ -341,7 +409,7 @@ const ProposalTracking = () => {
                 <textarea
                   name="description"
                   value={newProposal.description}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, 'new')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm h-24"
                   placeholder="Enter workshop description..."
                   required
@@ -361,6 +429,139 @@ const ProposalTracking = () => {
                   className="px-4 py-2 bg-primary hover:bg-primary-dark text-text rounded-lg shadow-card"
                 >
                   Create Proposal
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Edit Proposal Modal */}
+      {showEditProposalForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-background p-6 rounded-xl shadow-card border border-border w-full max-w-md"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-text">Edit Proposal</h2>
+              <button 
+                onClick={() => setShowEditProposalForm(false)}
+                className="text-text-muted hover:text-text"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Workshop Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editProposal.title}
+                  onChange={(e) => handleInputChange(e, 'edit')}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                  placeholder="e.g. React Workshop"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">Price</label>
+                  <input
+                    type="text"
+                    name="price"
+                    value={editProposal.price}
+                    onChange={(e) => handleInputChange(e, 'edit')}
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                    placeholder="e.g. ₹4500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">Status</label>
+                  <select
+                    name="status"
+                    value={editProposal.status}
+                    onChange={(e) => handleInputChange(e, 'edit')}
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                    required
+                  >
+                    <option value="Lead Acquired">Lead Acquired</option>
+                    <option value="Proposal Sent">Proposal Sent</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Institution</label>
+                <input
+                  type="text"
+                  name="institution"
+                  value={editProposal.institution}
+                  onChange={(e) => handleInputChange(e, 'edit')}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                  placeholder="e.g. ABC University"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">College Email</label>
+                <input
+                  type="email"
+                  name="collegeEmail"
+                  value={editProposal.collegeEmail}
+                  onChange={(e) => handleInputChange(e, 'edit')}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                  placeholder="e.g. contact@abcuniversity.edu"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Schedule Date</label>
+                <input
+                  type="date"
+                  name="scheduleDate"
+                  value={editProposal.scheduleDate}
+                  onChange={(e) => handleInputChange(e, 'edit')}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Description</label>
+                <textarea
+                  name="description"
+                  value={editProposal.description}
+                  onChange={(e) => handleInputChange(e, 'edit')}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm h-24"
+                  placeholder="Enter workshop description..."
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditProposalForm(false)}
+                  className="px-4 py-2 border border-border rounded-lg text-text bg-background-hover hover:bg-background-sidebar"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary hover:bg-primary-dark text-text rounded-lg shadow-card"
+                >
+                  Update Proposal
                 </button>
               </div>
             </form>

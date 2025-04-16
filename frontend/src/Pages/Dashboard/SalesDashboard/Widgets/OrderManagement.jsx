@@ -19,6 +19,8 @@ export default function OrderManagement() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState({});
+  const [isSending, setIsSending] = useState(false);
+
 
   useEffect(() => {
     fetchSentProposals();
@@ -73,8 +75,8 @@ export default function OrderManagement() {
 
   const sendEmail = async (order) => {
     try {
-      console.log("Sending email for:", order.title);
-
+      setIsSending(true); // 🔄 Start sending
+  
       await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
@@ -82,17 +84,20 @@ export default function OrderManagement() {
         scheduledDate: order.schedule,
         price: order.price,
       });
-
+  
       await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
-
+  
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to send email:", error);
       alert("Failed to send email.");
+    } finally {
+      setIsSending(false); // ✅ Reset state
     }
   };
+  
 
   const filteredOrders = orders.filter(order =>
     filter === "All" ? true : order.status === filter
@@ -227,11 +232,15 @@ export default function OrderManagement() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => sendEmail(editData)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl"
-                >
-                  Send Email
-                </button>
+  onClick={() => sendEmail(editData)}
+  disabled={isSending}
+  className={`px-4 py-2 rounded-xl text-white ${
+    isSending ? "bg-green-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+  }`}
+>
+  {isSending ? "Sending..." : "Send Email"}
+</button>
+
                 <button
                   onClick={saveChanges}
                   className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl"
