@@ -15,8 +15,6 @@ const MarketingDashboard = () => {
         <Teachers />
         <TeacherAvailability className="flex-1"/>
         </div>
-
-
         </div>
     </Layout>
   );

@@ -3,9 +3,6 @@ import Layout from "./Shared/Layout";
 import Analytics from "./Widgets/Overview/Analytics"; 
 import WorkshopPerformance from "./Widgets/Overview/WorkshopPerformance";
 import RecentProposals from "./Widgets/RecentProposals";
-import QuickActions from "./Widgets/QuickaActions";
-import RecentActivity from "./Widgets/Overview/RecentActivity";
-import Resources from "./Resources";
 import WorkshopChart from "./Widgets/Overview/WorkshopChart";
 const TechDashboard = () => {
     return (
@@ -18,15 +15,12 @@ const TechDashboard = () => {
             <Analytics />
           </div>
 
-          {/* Row 2: Workshop Performance (3 Columns) & Recent Activity (1 Column) */}
-          <div className="col-span-3">
+          {/* Row 2: Workshop Performance (Full Width) */}
+          <div className="col-span-4 min-h-[400px]">
             <WorkshopPerformance />
           </div>
-          <div className="col-span-1">
-            <RecentActivity />
-          </div>
 
-          {/* Row 3: Recent Proposals (2 Columns) & Quick Actions (2 Columns) */}
+          {/* Row 3: Recent Proposals & Workshop Chart */}
           <div className="col-span-2">
             <RecentProposals />
           </div>
