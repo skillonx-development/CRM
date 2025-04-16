@@ -1,7 +1,6 @@
 import React from "react";
 import Layout from "./Shared/Layout";
 import ResourceManager from "./Widgets/Resources/ResourceManager";
-import WorkshopSchedule from "./Widgets/Resources/WorkshopSchedule";
 import TodaysTasks from "./Widgets/Overview/Todaystask";
 const Resources = () => {
     return (
@@ -12,10 +11,6 @@ const Resources = () => {
             <TodaysTasks/>
             
           </div>
-          
-        
-    
-  
       </Layout>
   
     );

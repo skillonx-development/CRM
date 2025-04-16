@@ -21,6 +21,7 @@ const ResourceManager = () => {
     link: "",
     file: null,
   });
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchResources();
@@ -87,13 +88,27 @@ const ResourceManager = () => {
   };
 
   const deleteResource = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this resource?")) {
+      return;
+    }
+
+    setDeletingId(id);
     try {
       await axios.delete(`http://localhost:5001/api/resources/${id}`, {
         withCredentials: true,
       });
-      fetchResources();
+
+      // Update the UI by filtering out the deleted resource
+      setResources(prev => ({
+        videos: prev.videos.filter(video => video._id !== id),
+        pdfs: prev.pdfs.filter(pdf => pdf._id !== id)
+      }));
+
     } catch (error) {
       console.error("Error deleting resource:", error);
+      alert("Failed to delete resource. Please try again.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -190,31 +205,33 @@ const ResourceManager = () => {
       {/* Display Resources */}
       <div className="mt-8 flex flex-col lg:flex-row gap-8">
         {/* Videos */}
-<div className="w-full lg:w-1/2">
-  <h2 className="text-lg font-semibold mb-2">Videos</h2>
-  <div className="space-y-4">
-    {resources.videos.map((video, index) => (
-      <div key={`${video._id}-${index}`} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <h3 className="text-md font-medium">{video.title}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{video.description}</p>
-        <a
-          href={video.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-400 transition mr-2 mt-2"
-        >
-          Watch Video
-        </a>
-        <button
-          className="inline-block bg-red-500 text-white px-3 py-1.5 rounded-md hover:bg-red-400 transition mt-2"
-          onClick={() => deleteResource(video._id)}
-        >
-          Delete
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
+        <div className="w-full lg:w-1/2">
+          <h2 className="text-lg font-semibold mb-2">Videos</h2>
+          <div className="space-y-4">
+            {resources.videos.map((video, index) => (
+              <div key={`${video._id}-${index}`} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <h3 className="text-md font-medium">{video.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{video.description}</p>
+                <a
+                  href={video.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-400 transition mr-2 mt-2"
+                >
+                  Watch Video
+                </a>
+                <button
+                  className={`inline-block ${deletingId === video._id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-400'
+                    } text-white px-3 py-1.5 rounded-md transition mt-2`}
+                  onClick={() => deleteResource(video._id)}
+                  disabled={deletingId === video._id}
+                >
+                  {deletingId === video._id ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
 
 
         {/* PDFs */}
@@ -234,10 +251,12 @@ const ResourceManager = () => {
                   View PDF
                 </a>
                 <button
-                  className="inline-block bg-red-500 text-white px-3 py-1.5 rounded-md hover:bg-red-400 transition mt-2"
+                  className={`inline-block ${deletingId === pdf._id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-400'
+                    } text-white px-3 py-1.5 rounded-md transition mt-2`}
                   onClick={() => deleteResource(pdf._id)}
+                  disabled={deletingId === pdf._id}
                 >
-                  Delete
+                  {deletingId === pdf._id ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
             ))}
