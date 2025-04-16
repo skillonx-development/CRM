@@ -46,20 +46,36 @@ export const createResource = asyncHandler(async (req, res) => {
 });
 
 export const deleteResource = asyncHandler(async (req, res) => {
-    const resource = await Resource.findById(req.params.id);
-    if (!resource) {
-        res.status(404);
-        throw new Error("Resource not found");
-    }
+    try {
+        const resource = await Resource.findById(req.params.id);
 
-    if (resource.public_id !== "external_link") {
-        await cloudinary.uploader.destroy(resource.public_id, {
-            resource_type: "auto",
+        if (!resource) {
+            res.status(404);
+            throw new Error("Resource not found");
+        }
+
+        // Only attempt to delete from Cloudinary if it's not an external link
+        if (resource.public_id && resource.public_id !== "external_link") {
+            try {
+                await cloudinary.uploader.destroy(resource.public_id, {
+                    resource_type: resource.type === "PDF" ? "raw" : "video",
+                });
+            } catch (cloudinaryError) {
+                console.error("Cloudinary deletion error:", cloudinaryError);
+                // Continue with database deletion even if Cloudinary fails
+            }
+        }
+
+        await Resource.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: "Resource deleted successfully" });
+    } catch (error) {
+        console.error("Delete resource error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting resource",
+            error: error.message
         });
     }
-
-    await resource.remove();
-    res.json({ message: "Resource deleted" });
 });
 
 export const getResourceById = asyncHandler(async (req, res) => {

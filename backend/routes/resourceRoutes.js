@@ -7,11 +7,10 @@ import {
     deleteResource,
 } from '../controllers/resourceController.js';
 import { upload } from '../middlewares/uploadMiddleware.js';
-// import { protect } from '../middlewares/authMiddleware.js'; // ❌ Removed for now
 
 const router = express.Router();
 
-// 🚫 Authentication temporarily removed from all routes
+// Base routes
 router.route('/')
     .get(getResources)
     .post(upload.single('file'), createResource);
