@@ -46,6 +46,19 @@ export const createResource = asyncHandler(async (req, res) => {
 });
 
 export const deleteResource = asyncHandler(async (req, res) => {
+<<<<<<< HEAD
+    const resource = await Resource.findById(req.params.id);
+    console.log(req.params.id)
+    if (!resource) {
+      return res.status(404).json({ message: "Resource not found" });
+    }
+  
+    // Only delete from Cloudinary if it's not an external link
+    if (resource.public_id !== "external_link") {
+      try {
+        await cloudinary.uploader.destroy(resource.public_id, {
+          resource_type: "auto",
+=======
     try {
         const resource = await Resource.findById(req.params.id);
 
@@ -74,9 +87,20 @@ export const deleteResource = asyncHandler(async (req, res) => {
             success: false,
             message: "Error deleting resource",
             error: error.message
+>>>>>>> 8c8fce1fa5aad38a68222c29644c3f686c66ed6c
         });
+      } catch (err) {
+        return res.status(500).json({ message: "Error deleting from Cloudinary", error: err.message });
+      }
     }
+<<<<<<< HEAD
+  
+    await resource.remove();
+    res.json({ message: "Resource deleted successfully" });
+  });
+=======
 });
+>>>>>>> 8c8fce1fa5aad38a68222c29644c3f686c66ed6c
 
 export const getResourceById = asyncHandler(async (req, res) => {
     const resource = await Resource.findById(req.params.id);

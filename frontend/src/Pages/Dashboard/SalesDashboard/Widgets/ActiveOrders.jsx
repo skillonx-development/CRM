@@ -1,29 +1,45 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-const orders = [
-  {
-    title: "AI & Machine Learning",
-    institution: "Tech Institute",
-    date: "Apr 10 - Apr 14",
-    participants: 35,
-    price: "$8,750",
-    status: "Accepted",
-    statusColor: "bg-status-success text-white",
-  },
-  {
-    title: "Web Development",
-    institution: "Digital Academy",
-    date: "Apr 18 - Apr 20",
-    participants: 28,
-    price: "$5,600",
-    status: "Pending",
-    statusColor: "bg-status-warning text-white",
-  },
-];
-
 const ActiveOrders = () => {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const fetchProposals = async () => {
+      try {
+        const response = await fetch("http://localhost:5001/api/tech-proposals");
+        const data = await response.json();
+
+        const activeOrders = data.filter(order => order.status !== "Completed" && order.status!=="Rejected");
+
+        const formattedOrders = activeOrders.map(order => ({
+          title: order.title,
+          institution: order.institution,
+          date: order.schedule,
+          participants: order.participants || 0,
+          price: `₹${Number(order.price).toLocaleString()}`,
+          status: order.status,
+          statusColor:
+            order.status === "Accepted"
+              ? "bg-status-success text-white"
+              : order.status === "Pending"
+              ? "bg-status-warning text-white"
+               : order.status === "Rejected"
+              ? "bg-red-600 text-white"
+              : "bg-blue-600 text-white",
+        }));
+
+        setOrders(formattedOrders);
+      } catch (error) {
+        console.error("Failed to fetch tech proposals:", error);
+      }
+    };
+
+    fetchProposals();
+  }, []);
+
   return (
     <div className="bg-background-card p-6 rounded-xl shadow-card border border-border">
       <div className="flex justify-between items-center">

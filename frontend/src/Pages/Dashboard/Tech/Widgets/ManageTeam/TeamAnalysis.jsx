@@ -1,42 +1,83 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MoreHorizontal } from "lucide-react";
 
-const widgets = [
-  {
-    title: "Total Team Members",
-    value: "6",
-    change: "8%",
-    positive: true,
-    description: "vs last month",
-  },
-  {
-    title: "Active Members",
-    value: "83%",
-    change: "0%",
-    positive: true,
-    description: "No change",
-  },
-  {
-    title: "Total Revenue Generated",
-    value: "$535.0k",
-    change: "12%",
-    positive: true,
-    description: "vs last quarter",
-  },
-  {
-    title: "Avg. Performance Score",
-    value: "80%",
-    change: "5%",
-    positive: true,
-    description: "vs last quarter",
-  },
-];
-
 const TeamAnalysis = () => {
+  const [widgets, setWidgets] = useState([
+    {
+      title: "Total Team Members",
+      value: "-",
+      change: "0%",
+      positive: true,
+      description: "vs last month",
+    },
+    {
+      title: "Active Members",
+      value: "-",
+      change: "0%",
+      positive: true,
+      description: "No change",
+    },
+    {
+      title: "Total Revenue Generated",
+      value: "-",
+      change: "0%",
+      positive: true,
+      description: "vs last quarter",
+    },
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [teamRes, invoiceRes] = await Promise.all([
+          fetch("http://localhost:5001/api/members/getMembers/Tech"),
+          fetch("http://localhost:5001/api/invoice"),
+        ]);
+
+        const teamData = await teamRes.json();
+        const invoiceData = await invoiceRes.json();
+
+        const totalMembers = teamData.length;
+        const activeMembers = teamData.filter(m => m.approved).length;
+
+        // Sum up invoice amounts, filtering out "Paid" status
+        const totalRevenue = invoiceData.reduce((sum, inv) => {
+          if (inv.status !== "Paid") {
+           const amount = typeof inv.amount === "number" ? inv.amount : 0;
+            return sum + amount;
+          }
+          return sum;
+        }, 0);
+
+        const updatedWidgets = [
+          {
+            ...widgets[0],
+            value: totalMembers.toString(),
+          },
+          {
+            ...widgets[1],
+            value: totalMembers > 0 ? `${Math.round((activeMembers / totalMembers) * 100)}%` : "0%",
+          },
+          {
+            ...widgets[2],
+            value: `₹${totalRevenue}`,
+          },
+        ];
+
+        setWidgets(updatedWidgets);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
       {widgets.map((widget, index) => (
         <motion.div
           key={index}

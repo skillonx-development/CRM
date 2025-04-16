@@ -1,21 +1,46 @@
-import React from 'react';
-import { Line } from 'recharts';
-import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line } from 'recharts';
 
 const WorkshopPerformance = () => {
-  // Sample data based on the image
-  const data = [
-    { month: 'Jan', workshops: 4, proposals: 6 },
-    { month: 'Feb', workshops: 6, proposals: 8 },
-    { month: 'Mar', workshops: 5, proposals: 10 },
-    { month: 'Apr', workshops: 8, proposals: 12 },
-    { month: 'May', workshops: 10, proposals: 15 },
-    { month: 'Jun', workshops: 9, proposals: 13 },
-  ];
+  const [data, setData] = useState([]);
 
-  // Custom tooltip component
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/tech-proposals");
+        const proposals = await res.json();
+
+        // Group by month
+        const monthlyData = months.map((monthName, idx) => {
+          const proposalsThisMonth = proposals.filter(p => {
+            const date = new Date(p.createdAt || p.schedule?.startDate || p.schedule?.date);
+            return date.getMonth() === idx;
+          });
+
+          const completedWorkshops = proposalsThisMonth.filter(p => p.status === "Completed").length;
+
+          return {
+            month: monthName,
+            proposals: proposalsThisMonth.length,
+            workshops: completedWorkshops,
+          };
+        });
+
+        setData(monthlyData);
+      } catch (err) {
+        console.error("Error fetching workshop performance data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
       return (
         <div className="bg-background-card p-4 border border-border-dark rounded shadow-md">
           <p className="text-lg font-medium text-text mb-2">{label}</p>
@@ -45,7 +70,7 @@ const WorkshopPerformance = () => {
           </svg>
         </button>
       </div>
-      
+
       <div className="flex items-center mb-4 space-x-6">
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-chart-indigo mr-2"></div>
@@ -64,33 +89,22 @@ const WorkshopPerformance = () => {
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-            <XAxis 
-              dataKey="month" 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#9ca3af' }}
-            />
-            <YAxis 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#9ca3af' }}
-              domain={[0, 16]}
-              ticks={[0, 4, 8, 12, 16]}
-            />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }} domain={[0, 16]} ticks={[0, 4, 8, 12, 16]} />
             <Tooltip content={<CustomTooltip />} />
-            <Line 
-              type="monotone" 
-              dataKey="workshops" 
-              stroke="#6366f1" 
-              strokeWidth={2} 
+            <Line
+              type="monotone"
+              dataKey="workshops"
+              stroke="#6366f1"
+              strokeWidth={2}
               dot={{ r: 4, strokeWidth: 2, fill: "#111827" }}
               activeDot={{ r: 6, strokeWidth: 0, fill: "#6366f1" }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="proposals" 
-              stroke="#3b82f6" 
-              strokeWidth={2} 
+            <Line
+              type="monotone"
+              dataKey="proposals"
+              stroke="#3b82f6"
+              strokeWidth={2}
               dot={{ r: 4, strokeWidth: 2, fill: "#111827" }}
               activeDot={{ r: 6, strokeWidth: 0, fill: "#3b82f6" }}
             />

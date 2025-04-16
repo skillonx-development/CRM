@@ -56,28 +56,31 @@ export const AuthProvider = ({ children }) => {
                 credentials: "include",
                 body: JSON.stringify({ email, password, type }),
             });
-
+    
             const data = await response.json();
-
+    
             if (!response.ok) {
                 throw new Error(data.message || "Login failed");
             }
-
+    
             setIsAuthenticated(true);
             setUser(data.user);
             localStorage.setItem("user", JSON.stringify(data.user));
-
-            // Redirect to appropriate dashboard
-            if (data.user && data.user.team) {
-                navigate(`/${data.user.team.toLowerCase()}`);
+    
+            // Use backend-provided redirect
+            if (data.redirect) {
+                navigate(data.redirect);
             }
-
+    
             return { success: true };
         } catch (error) {
             console.error("Login error:", error);
             return { success: false, error: error.message };
         }
     };
+    
+    
+    
 
     const logout = async () => {
         try {

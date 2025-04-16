@@ -11,7 +11,7 @@ export default function RecentProposals() {
     const fetchProposals = async () => {
       try {
         const response = await axios.get("http://localhost:5001/api/proposals"); // Update the endpoint if needed
-        setProposals(response.data.proposals); // ✅ Assuming the data is inside `proposals`
+        setProposals(response.data.proposals); 
       } catch (error) {
         console.error("Error fetching proposals:", error);
       }
@@ -39,7 +39,7 @@ export default function RecentProposals() {
   return (
     <div 
       className="bg-background-card p-6 rounded-xl shadow-card cursor-pointer hover:bg-background-hover transition"
-      onClick={() => navigate("/tech/proposal")}
+      onClick={() => navigate("/tech/proposals")}
     >
       <h2 className="text-lg font-semibold text-white mb-4">Recent Proposals</h2>
       <table className="w-full text-left">
