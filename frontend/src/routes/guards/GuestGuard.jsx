@@ -9,8 +9,13 @@ export const GuestGuard = ({ children }) => {
     }
 
     if (isAuthenticated) {
-        const user = JSON.parse(localStorage.getItem('user'));
-        return <Navigate to={`/${user.team.toLowerCase()}`} />;
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        // Add null checks and provide a default redirect
+        if (storedUser?.team) {
+            return <Navigate to={`/${storedUser.team.toLowerCase()}`} />;
+        }
+        // If no team is found, redirect to login as fallback
+        return <Navigate to="/login" />;
     }
 
     return children;

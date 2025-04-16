@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,21 +27,14 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
                 setUser(response.data.user);
                 localStorage.setItem("user", JSON.stringify(response.data.user));
-            } else {
-                throw new Error("Not authenticated");
             }
         } catch (error) {
             console.error("Authentication check failed:", error.message);
-            // Try fallback from localStorage
-            const storedUser = JSON.parse(localStorage.getItem("user"));
-            if (storedUser) {
-                setIsAuthenticated(true);
-                setUser(storedUser);
-            } else {
-                setIsAuthenticated(false);
-                setUser(null);
-                navigate("/login");
-            }
+            // Clear stored data if auth check fails
+            setIsAuthenticated(false);
+            setUser(null);
+            localStorage.removeItem("user");
+            setError(error.message);
         } finally {
             setLoading(false);
         }
@@ -48,49 +42,46 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password, type) => {
         try {
-            const response = await fetch(`${API_URL}/api/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify({ email, password, type }),
-            });
-    
-            const data = await response.json();
-    
-            if (!response.ok) {
-                throw new Error(data.message || "Login failed");
+            setLoading(true);
+            const response = await axios.post(`${API_URL}/api/auth/login`,
+                { email, password, type },
+                { withCredentials: true }
+            );
+
+            if (response.data.success) {
+                setIsAuthenticated(true);
+                setUser(response.data.user);
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+
+                if (response.data.redirect) {
+                    navigate(response.data.redirect);
+                }
+
+                return { success: true };
+            } else {
+                throw new Error(response.data.message || "Login failed");
             }
-    
-            setIsAuthenticated(true);
-            setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
-    
-            // Use backend-provided redirect
-            if (data.redirect) {
-                navigate(data.redirect);
-            }
-    
-            return { success: true };
         } catch (error) {
             console.error("Login error:", error);
-            return { success: false, error: error.message };
+            return {
+                success: false,
+                error: error.response?.data?.message || error.message || "Invalid credentials"
+            };
+        } finally {
+            setLoading(false);
         }
     };
-    
-    
-    
 
     const logout = async () => {
         try {
             await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+        } catch (error) {
+            console.error("Logout error:", error);
+        } finally {
             setIsAuthenticated(false);
             setUser(null);
             localStorage.removeItem("user");
-            navigate("/login"); // Change navigation from "/" to "/login"
-        } catch (error) {
-            console.error("Logout error:", error);
+            navigate("/login");
         }
     };
 
@@ -102,11 +93,18 @@ export const AuthProvider = ({ children }) => {
             if (response.data.success) {
                 setUser(response.data.user);
                 localStorage.setItem("user", JSON.stringify(response.data.user));
+                return true;
             }
+            return false;
         } catch (error) {
             console.error("Failed to refresh user:", error);
+            return false;
         }
     };
+
+    if (loading) {
+        return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    }
 
     return (
         <AuthContext.Provider
@@ -114,6 +112,7 @@ export const AuthProvider = ({ children }) => {
                 isAuthenticated,
                 user,
                 loading,
+                error,
                 login,
                 logout,
                 refreshUser,
