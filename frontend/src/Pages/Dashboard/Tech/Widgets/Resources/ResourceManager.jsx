@@ -22,6 +22,7 @@ const ResourceManager = () => {
     file: null,
   });
   const [deletingId, setDeletingId] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     fetchResources();
@@ -56,6 +57,7 @@ const ResourceManager = () => {
       return;
     }
 
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("title", newResource.title);
     formData.append("description", newResource.description);
@@ -84,6 +86,8 @@ const ResourceManager = () => {
       });
     } catch (error) {
       console.log(JSON.stringify(error, null, 2));
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -193,10 +197,11 @@ const ResourceManager = () => {
               disabled={newResource.link !== ""}
             />
             <button
-              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition disabled:bg-green-400"
               onClick={addResource}
+              disabled={isUploading}
             >
-              Add Resource
+              {isUploading ? 'Adding...' : 'Add Resource'}
             </button>
           </div>
         </div>
