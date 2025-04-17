@@ -3,8 +3,9 @@ import SalesMember from '../models/salesMemberModel.js';
 import MarketingMember from '../models/marketingMemberModel.js';
 import TechMember from '../models/techMemberModel.js';
 import Lead from '../models/leadModel.js';
+import Admin from '../models/adminModel.js';
 
-const userModels = [SalesMember, MarketingMember, TechMember, Lead];
+const userModels = [Admin, SalesMember, MarketingMember, TechMember, Lead];
 
 const findUserById = async (id) => {
   for (const Model of userModels) {
