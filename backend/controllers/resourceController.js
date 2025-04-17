@@ -3,13 +3,13 @@ import cloudinary from "../config/cloudinary.js";
 import asyncHandler from 'express-async-handler';
 import fs from 'fs';
 
-
-
+// Get all resources
 export const getResources = asyncHandler(async (req, res) => {
     const resources = await Resource.find({});
     res.json({ resources });
 });
 
+// Create a new resource
 export const createResource = asyncHandler(async (req, res) => {
     const { title, description, type, link } = req.body;
     let fileData = {};
@@ -19,7 +19,6 @@ export const createResource = asyncHandler(async (req, res) => {
             resource_type: type === "PDF" ? "raw" : "auto",
             folder: "tech-resources",
         });
-
 
         fileData = {
             url: uploaded.secure_url,
@@ -45,63 +44,35 @@ export const createResource = asyncHandler(async (req, res) => {
     res.status(201).json(resource);
 });
 
+// Delete a resource by ID
 export const deleteResource = asyncHandler(async (req, res) => {
-<<<<<<< HEAD
     const resource = await Resource.findById(req.params.id);
-    console.log(req.params.id)
+    console.log("Deleting resource:", req.params.id);
+
     if (!resource) {
-      return res.status(404).json({ message: "Resource not found" });
+        return res.status(404).json({ message: "Resource not found" });
     }
-  
+
     // Only delete from Cloudinary if it's not an external link
-    if (resource.public_id !== "external_link") {
-      try {
-        await cloudinary.uploader.destroy(resource.public_id, {
-          resource_type: "auto",
-=======
-    try {
-        const resource = await Resource.findById(req.params.id);
-
-        if (!resource) {
-            res.status(404);
-            throw new Error("Resource not found");
+    if (resource.public_id && resource.public_id !== "external_link") {
+        try {
+            await cloudinary.uploader.destroy(resource.public_id, {
+                resource_type: resource.type === "PDF" ? "raw" : "video",
+            });
+        } catch (cloudinaryError) {
+            console.error("Cloudinary deletion error:", cloudinaryError);
+            return res.status(500).json({
+                message: "Error deleting from Cloudinary",
+                error: cloudinaryError.message,
+            });
         }
-
-        // Only attempt to delete from Cloudinary if it's not an external link
-        if (resource.public_id && resource.public_id !== "external_link") {
-            try {
-                await cloudinary.uploader.destroy(resource.public_id, {
-                    resource_type: resource.type === "PDF" ? "raw" : "video",
-                });
-            } catch (cloudinaryError) {
-                console.error("Cloudinary deletion error:", cloudinaryError);
-                // Continue with database deletion even if Cloudinary fails
-            }
-        }
-
-        await Resource.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Resource deleted successfully" });
-    } catch (error) {
-        console.error("Delete resource error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error deleting resource",
-            error: error.message
->>>>>>> 8c8fce1fa5aad38a68222c29644c3f686c66ed6c
-        });
-      } catch (err) {
-        return res.status(500).json({ message: "Error deleting from Cloudinary", error: err.message });
-      }
     }
-<<<<<<< HEAD
-  
-    await resource.remove();
-    res.json({ message: "Resource deleted successfully" });
-  });
-=======
-});
->>>>>>> 8c8fce1fa5aad38a68222c29644c3f686c66ed6c
 
+    await Resource.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Resource deleted successfully" });
+});
+
+// Get a resource by ID
 export const getResourceById = asyncHandler(async (req, res) => {
     const resource = await Resource.findById(req.params.id);
     if (resource) {
@@ -112,6 +83,7 @@ export const getResourceById = asyncHandler(async (req, res) => {
     }
 });
 
+// Optional: Update a resource (to be implemented if needed)
 export const updateResource = asyncHandler(async (req, res) => {
-    // Optional - can be added if needed
+    res.status(501).json({ message: "Update resource functionality not implemented yet" });
 });
