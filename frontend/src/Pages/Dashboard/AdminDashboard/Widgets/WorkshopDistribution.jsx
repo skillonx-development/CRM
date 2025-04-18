@@ -30,15 +30,6 @@ const WorkshopDistribution = () => {
                         <h3 className="text-white text-xl font-semibold">Popular Workshops</h3>
                         <p className="text-gray-400">Distribution by subject</p>
                     </div>
-                    <motion.div
-                        className="flex items-center"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.8, type: "spring" }}
-                    >
-                        <div className="w-3 h-3 rounded-full bg-[#8884d8] mr-2"></div>
-                        <span className="text-gray-400 text-sm">value</span>
-                    </motion.div>
                 </div>
             </motion.div>
             <motion.div

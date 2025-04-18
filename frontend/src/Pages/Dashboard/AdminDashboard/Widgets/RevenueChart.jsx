@@ -1,25 +1,58 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 const RevenueChart = () => {
-    // Sample data for the last 6 months
-    const data = [
-        { month: 'Jan', revenue: 12000 },
-        { month: 'Feb', revenue: 19000 },
-        { month: 'Mar', revenue: 18000 },
-        { month: 'Apr', revenue: 21000 },
-        { month: 'May', revenue: 16000 },
-        { month: 'Jun', revenue: 24000 },
-        { month: 'Jul', revenue: 32000 },
-    ];
+    const [data, setData] = useState([]);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [avgMonthlyRevenue, setAvgMonthlyRevenue] = useState(0);
 
-    // Calculate total revenue
-    const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+    // Fetch data from the API on component mount
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5001/api/invoice');
+                const invoiceData = response.data; // Assuming the data structure is an array of invoices
 
-    // Calculate average monthly revenue
-    const avgMonthlyRevenue = Math.round(totalRevenue / data.length);
+                // Transform the data to monthly revenue format
+                const monthlyRevenue = invoiceData.reduce((acc, invoice) => {
+                    const month = new Date(invoice.createdAt).toLocaleString('default', { month: 'short' });
+                    const revenue = invoice.amount;
+                
+                    // Group by month and accumulate revenue
+                    if (acc[month]) {
+                        acc[month] += revenue;
+                    } else {
+                        acc[month] = revenue;
+                    }
+                
+                    return acc;
+                }, {});
+                
+
+                // Prepare data for the chart
+                const chartData = Object.keys(monthlyRevenue).map((month) => ({
+                    month,
+                    revenue: monthlyRevenue[month],
+                }));
+
+                setData(chartData);
+
+                // Calculate total and average revenue
+                const total = chartData.reduce((sum, item) => sum + item.revenue, 0);
+                const avg = Math.round(total / chartData.length);
+
+                setTotalRevenue(total);
+                setAvgMonthlyRevenue(avg);
+            } catch (error) {
+                console.error('Error fetching invoice data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <motion.div
@@ -74,7 +107,7 @@ const RevenueChart = () => {
                                 backgroundColor: '#374151',
                                 border: 'none',
                                 borderRadius: '0.375rem',
-                                color: 'white'
+                                color: 'white',
                             }}
                         />
                         <Area

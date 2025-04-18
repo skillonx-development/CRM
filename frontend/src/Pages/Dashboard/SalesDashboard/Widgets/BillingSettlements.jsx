@@ -42,7 +42,7 @@ export default function BillingSettlements() {
       try {
         setLoadingProposals(true);
         const response = await axios.get("http://localhost:5001/api/tech-proposals");
-        const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted");
+        const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted" && proposal.adminApproval===true);
         setProposals(acceptedProposals);
       } catch (err) {
         console.error("Error fetching proposals:", err);
