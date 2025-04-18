@@ -1,32 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
-
-const data = [
-    { name: 'Jan', workshops: 5, proposals: 12 },
-    { name: 'Feb', workshops: 8, proposals: 15 },
-    { name: 'Mar', workshops: 7, proposals: 10 },
-    { name: 'Apr', workshops: 6, proposals: 8 },
-    { name: 'May', workshops: 9, proposals: 16 },
-    { name: 'Jun', workshops: 10, proposals: 12 },
-    { name: 'Jul', workshops: 12, proposals: 18 },
-];
+import axios from 'axios';
 
 const MonthlyPerformance = () => {
+    const [data, setData] = useState([]);
     const [activeMonth, setActiveMonth] = useState(null);
 
-    const handleMouseOver = (data) => {
-        setActiveMonth(data);
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5001/api/tech-proposals');
+                const proposals = response.data;
 
-    const handleMouseLeave = () => {
-        setActiveMonth(null);
-    };
+                const monthlyStats = proposals.reduce((acc, item) => {
+                    const date = new Date(item.createdAt);
+                    const month = date.toLocaleString('default', { month: 'short' });
+
+                    if (!acc[month]) {
+                        acc[month] = { name: month, completed: 0, proposals: 0 };
+                    }
+
+                    acc[month].proposals += 1;
+                    if (item.status === "Completed") acc[month].completed += 1;
+
+
+                    return acc;
+                }, {});
+
+                const sortedMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const chartData = sortedMonths.map((month) =>
+                    monthlyStats[month] || { name: month, completed: 0, proposals: 0 }
+                );
+
+                setData(chartData);
+            } catch (error) {
+                console.error('Error fetching tech proposals:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const handleMouseOver = (data) => setActiveMonth(data);
+    const handleMouseLeave = () => setActiveMonth(null);
 
     return (
         <motion.div
-            className="bg-background-card rounded-lg p-6"
+            className="bg-background-card rounded-lg p-6 relative"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
@@ -35,16 +57,16 @@ const MonthlyPerformance = () => {
             <div className="flex justify-between items-center mb-4">
                 <div>
                     <h3 className="text-white text-xl font-semibold">Monthly Performance</h3>
-                    <p className="text-gray-400">Workshops, proposals, and revenue</p>
+                    <p className="text-gray-400">Proposals and completions</p>
                 </div>
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-[#8b5cf6] mr-2"></div>
-                        <span className="text-gray-400 text-sm">workshops</span>
-                    </div>
-                    <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-[#3b82f6] mr-2"></div>
                         <span className="text-gray-400 text-sm">proposals</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-[#10b981] mr-2"></div>
+                        <span className="text-gray-400 text-sm">completed</span>
                     </div>
                 </div>
             </div>
@@ -80,11 +102,11 @@ const MonthlyPerformance = () => {
                                     return (
                                         <div className="bg-gray-800 p-3 rounded-md border border-gray-700 shadow-lg">
                                             <p className="text-white font-medium mb-1">{payload[0].payload.name}</p>
-                                            <p className="text-[#8b5cf6] text-sm">
-                                                workshops : {payload[0].payload.workshops}
-                                            </p>
                                             <p className="text-[#3b82f6] text-sm">
                                                 proposals : {payload[0].payload.proposals}
+                                            </p>
+                                            <p className="text-[#10b981] text-sm">
+                                                completed : {payload[0].payload.completed}
                                             </p>
                                         </div>
                                     );
@@ -92,8 +114,8 @@ const MonthlyPerformance = () => {
                                 return null;
                             }}
                         />
-                        <Bar dataKey="workshops" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={20} />
                         <Bar dataKey="proposals" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={20} />
+                        <Bar dataKey="completed" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -110,8 +132,8 @@ const MonthlyPerformance = () => {
                         <Calendar size={16} className="text-gray-400 mr-2" />
                         <h4 className="text-white font-medium">{activeMonth.name}</h4>
                     </div>
-                    <p className="text-[#8b5cf6]">workshops : {activeMonth.workshops}</p>
                     <p className="text-[#3b82f6]">proposals : {activeMonth.proposals}</p>
+                    <p className="text-[#10b981]">completed : {activeMonth.completed}</p>
                 </motion.div>
             )}
         </motion.div>

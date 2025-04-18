@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { getModelByTeamAndType, getMemberModelByTeam } from '../utils/getMemberModel.js';
-
+import LeadMember from '../models/leadModel.js'; // Import the LeadMember model
 // Get user by ID
 export const getUserById = async (req, res) => {
   const { team, id } = req.params;
@@ -32,6 +32,22 @@ export const getMembersByTeam = async (req, res) => {
   }
 };
 
+export const getLeadsByTeam = async (req, res) => {
+  try {
+    const { team } = req.params; // Extract the team parameter from the request URL
+    const leadMembers = await LeadMember.find({ team }); // Fetch leads based on the team
+
+    if (leadMembers.length === 0) {
+      return res.status(404).json({ message: `No leads found for team: ${team}` });
+    }
+
+    res.status(200).json(leadMembers); // Send the lead members as a JSON response
+  } catch (error) {
+    // Handle any errors during the fetch operation
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
 // Update approval status
 export const updateApprovalStatus = async (req, res) => {
   const { team, id } = req.params;
@@ -53,6 +69,35 @@ export const updateApprovalStatus = async (req, res) => {
     res.status(500).json({ message: "Failed to update approval status", error: error.message });
   }
 };
+
+
+//approve lead by admin
+
+export const updateLeadApprovalStatus = async (req, res) => {
+  const { id } = req.params;
+  const { approve } = req.body; // boolean value: true/false
+
+  try {
+    const updatedLead = await LeadMember.findByIdAndUpdate(
+      id,
+      { approve },
+      { new: true }
+    );
+
+    if (!updatedLead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+
+    res.status(200).json(updatedLead);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update lead approval status",
+      error: error.message,
+    });
+  }
+};
+
+
 
 // Update dashboard permissions
 export const updatePermissions = async (req, res) => {
