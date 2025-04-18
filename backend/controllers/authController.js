@@ -241,7 +241,14 @@ export async function checkAuth(req, res) {
       return res.status(401).json({ success: false, message: 'Not authenticated' });
     }
 
-    const role = user instanceof Lead ? 'lead' : 'member'; // Changed to lowercase for consistency
+    let role;
+    if (user instanceof Admin) {
+      role = 'admin';
+    } else if (user instanceof Lead) {
+      role = 'lead';
+    } else {
+      role = 'member';
+    } // Changed to lowercase for consistency
 
     res.status(200).json({
       success: true,
