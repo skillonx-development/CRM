@@ -29,6 +29,10 @@ const techProposalsSchema = new mongoose.Schema(
     mou: {
       type: String,
     },
+    adminApproval: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
       enum: ["Pending", "Sent", "Accepted", "Rejected", "Completed"],

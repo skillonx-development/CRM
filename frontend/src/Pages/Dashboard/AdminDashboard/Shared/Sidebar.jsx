@@ -29,7 +29,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
         { id: "approvals", icon: ClipboardCheck, label: "Approvals", path: "/admin/approvals" },
         { id: "invoices", icon: BarChart3, label: "Invoices", path: "/admin/invoices" },
-        { id: "teams", icon: Users, label: "Manage Team", path: "/admin/teams" },
+        { id: "teams", icon: Users, label: "Manage Team", path: "/admin/team" },
         { id: "notifications", icon: Bell, label: "Notifications", path: "/admin/notifications" },
     ];
 

@@ -160,3 +160,25 @@ export const sendTechProposalEmail = async (req, res) => {
     res.status(500).json({ message: "Failed to send email." });
   }
 };
+
+//admin approval for the proposal
+export const updateAdminApproval = async (req, res) => {
+  const { id } = req.params;
+  const { adminApproval } = req.body; // expected: true or false
+
+  try {
+    const updatedProposal = await TechProposal.findByIdAndUpdate(
+      id,
+      { adminApproval },
+      { new: true }
+    );
+
+    if (!updatedProposal) {
+      return res.status(404).json({ message: 'Proposal not found' });
+    }
+
+    res.status(200).json(updatedProposal);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update admin approval', error });
+  }
+};

@@ -6,45 +6,52 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("lead");
-  const [error, setError] = useState("");
+  const [generalError, setGeneralError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const location = useLocation();
 
-  // Handle registration success message
   useEffect(() => {
     if (location.state?.message) {
       setSuccess(location.state.message);
       if (location.state.email) {
         setEmail(location.state.email);
       }
-      // Clear the message from location state
       window.history.replaceState({}, document.title);
     }
   }, [location]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
+    setGeneralError("");
+    setEmailError("");
+    setPasswordError("");
+
+    let isValid = true;
 
     if (!email.includes("@")) {
-      setError("Please enter a valid email address.");
-      return;
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
+      setPasswordError("Password must be at least 6 characters.");
+      isValid = false;
     }
+
+    if (!isValid) return;
 
     try {
       const result = await login(email, password, role);
       if (!result.success) {
-        setError(result.error);
+        console.log("error",result.error)
+        setGeneralError(result.error);
       }
     } catch (err) {
-      setError(err.message || "An error occurred during login");
+      setGeneralError(err.message || "An error occurred during login");
     }
   };
 
@@ -56,7 +63,8 @@ const LoginPage = () => {
           Sign in to access your dashboard and manage your resources efficiently.
         </p>
 
-        {error && <p className="text-status-error text-sm text-center mb-4">{error}</p>}
+        {generalError && <p className="text-red-600 text-sm text-center mb-4">{generalError}</p>}
+
         {success && <p className="text-status-success text-sm text-center mb-4">{success}</p>}
 
         <form onSubmit={handleLogin} className="space-y-5">
@@ -70,9 +78,10 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-background-hover text-text rounded-md border border-border focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition"
+              className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${emailError ? "border-status-error" : "border-border"} focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
               placeholder="Enter your email"
             />
+            {emailError && <p className="text-status-error text-sm mt-1">{emailError}</p>}
           </div>
 
           <div>
@@ -86,7 +95,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-background-hover text-text rounded-md border border-border focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition"
+                className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${passwordError ? "border-status-error" : "border-border"} focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
                 placeholder="Enter your password"
               />
               <button
@@ -97,44 +106,25 @@ const LoginPage = () => {
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
+            {passwordError && <p className="text-status-error text-sm mt-1">{passwordError}</p>}
           </div>
 
           <fieldset>
             <legend className="block text-text-muted font-medium mb-2">Select Role</legend>
             <div className="flex space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="role"
-                  value="lead"
-                  checked={role === "lead"}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="form-radio h-5 w-5 accent-purple-500"
-                />
-                <span className="ml-2 text-text">Lead</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="role"
-                  value="member"
-                  checked={role === "member"}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="form-radio h-5 w-5 accent-purple-500"
-                />
-                <span className="ml-2 text-text">Member</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="role"
-                  value="admin"
-                  checked={role === "admin"}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="form-radio h-5 w-5 accent-purple-500"
-                />
-                <span className="ml-2 text-text">Admin</span>
-              </label>
+              {["lead", "member", "admin"].map((r) => (
+                <label className="flex items-center" key={r}>
+                  <input
+                    type="radio"
+                    name="role"
+                    value={r}
+                    checked={role === r}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="form-radio h-5 w-5 accent-purple-500"
+                  />
+                  <span className="ml-2 text-text capitalize">{r}</span>
+                </label>
+              ))}
             </div>
           </fieldset>
 

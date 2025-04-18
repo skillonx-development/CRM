@@ -42,35 +42,43 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password, type) => {
         try {
-            setLoading(true);
-            const response = await axios.post(`${API_URL}/api/auth/login`,
-                { email, password, type },
-                { withCredentials: true }
-            );
-
-            if (response.data.success) {
-                setIsAuthenticated(true);
-                setUser(response.data.user);
-                localStorage.setItem("user", JSON.stringify(response.data.user));
-
-                if (response.data.redirect) {
-                    navigate(response.data.redirect);
-                }
-
-                return { success: true };
-            } else {
-                throw new Error(response.data.message || "Login failed");
+          setLoading(true);
+      
+          const response = await axios.post(`${API_URL}/api/auth/login`,
+            { email, password, type },
+            { withCredentials: true }
+          );
+      
+          const { success, user, redirect, message } = response.data;
+      
+          if (success) {
+            setIsAuthenticated(true);
+            setUser(user);
+            localStorage.setItem("user", JSON.stringify(user));
+      
+            if (redirect) {
+              navigate(redirect);
             }
-        } catch (error) {
-            console.error("Login error:", error);
+      
+            return { success: true };
+          } else {
             return {
-                success: false,
-                error: error.response?.data?.message || error.message || "Invalid credentials"
+              success: false,
+              error: message || "Login failed"
             };
+          }
+      
+        } catch (error) {
+          console.error("Login error:", error);
+          return {
+            success: false,
+            error: error.response?.data?.message || error.message || "Invalid credentials"
+          };
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
+      };
+      
 
     const logout = async () => {
         try {

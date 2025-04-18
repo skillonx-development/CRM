@@ -7,6 +7,7 @@ import {
   getSentProposals,
   updateTechProposal,
   sendTechProposalEmail,
+  updateAdminApproval,
 } from "../controllers/techProposalsController.js";
 
 const router = express.Router();
@@ -28,4 +29,7 @@ router.put("/:id", updateTechProposal);
 
 // Send email for the given proposal ID
 router.post("/send-email/:id", sendTechProposalEmail);
+
+//admin approval for the proposal
+router.put('/:id/admin-approval', updateAdminApproval);
 export default router;

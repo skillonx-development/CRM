@@ -2,9 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import StatCard from "./Widgets/StatCrad";
 import RevenueChart from "./Widgets/RevenueChart";
-import WorkshopDistribution from "./Widgets/WorkshopDistribution";
 import MonthlyPerformance from "./Widgets/MonthlyPerformance";
-import FeedbackAnalysis from "./Widgets/FeedbackAnalysis";
 import { DollarSign, BookOpen, FileText, Users } from "lucide-react";
 import Layout from "./Shared/Layout";
 
@@ -95,35 +93,17 @@ const AdminDashboard = () => {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 gap-6"
           variants={containerVariants}
         >
           <motion.div
-            className="lg:col-span-2"
             variants={itemVariants}
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <RevenueChart />
           </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <WorkshopDistribution />
-          </motion.div>
         </motion.div>
-
-          <motion.div
-          className="mt-6"
-            variants={itemVariants}
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <MonthlyPerformance />
-          </motion.div>
 
         <motion.div
           className="mt-6"
@@ -131,7 +111,7 @@ const AdminDashboard = () => {
           whileHover={{ scale: 1.02 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <FeedbackAnalysis />
+          <MonthlyPerformance />
         </motion.div>
       </motion.div>
     </Layout>
