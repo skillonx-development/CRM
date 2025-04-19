@@ -107,8 +107,8 @@ const ManageTeam = () => {
     const fetchData = async () => {
       try {
         const [membersRes, leadsRes] = await Promise.all([
-          axios.get(`http://localhost:5001/api/members/getMembers/${activeTeam}`),
-          axios.get(`http://localhost:5001/api/members/getLeads/${activeTeam}`),
+          axios.get(`https://crm-r11b.onrender.com/api/members/getMembers/${activeTeam}`),
+          axios.get(`https://crm-r11b.onrender.com/api/members/getLeads/${activeTeam}`),
         ]);
 
         setTeamMembers(membersRes.data || []);
@@ -131,7 +131,7 @@ const ManageTeam = () => {
     try {
       // Send the request to the backend to update the approval status
       const response = await axios.put(
-        `http://localhost:5001/api/members/updateLeadApproval/${leadId}`,
+        `https://crm-r11b.onrender.com/api/members/updateLeadApproval/${leadId}`,
         { approve: newApprovalStatus }
       );
   

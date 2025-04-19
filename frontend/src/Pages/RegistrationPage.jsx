@@ -71,7 +71,7 @@ const RegistrationPage = () => {
         confirmPassword: '***hidden***'
       });
 
-      const response = await fetch(`http://localhost:5001/api/auth/register/${userType}`, {
+      const response = await fetch(`https://crm-r11b.onrender.com/api/auth/register/${userType}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

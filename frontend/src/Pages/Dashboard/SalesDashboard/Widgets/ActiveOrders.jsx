@@ -9,7 +9,7 @@ const ActiveOrders = () => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/tech-proposals");
+        const response = await fetch("https://crm-r11b.onrender.com/api/tech-proposals");
         const data = await response.json();
 
         const activeOrders = data.filter(order => order.status !== "Completed" && order.status!=="Rejected");
