@@ -228,6 +228,7 @@ const RegistrationPage = () => {
           >
             {isLoading ? "Registering..." : "Register"}
           </button>
+          <p className="mt-4">Already a member? <a className="text-primary" href="/login">Login in</a></p>
         </form>
       </div>
     </div>

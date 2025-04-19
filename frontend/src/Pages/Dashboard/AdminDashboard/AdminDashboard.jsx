@@ -1,13 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import StatCard from "./Widgets/StatCrad";
 import RevenueChart from "./Widgets/RevenueChart";
 import MonthlyPerformance from "./Widgets/MonthlyPerformance";
-import { DollarSign, BookOpen, FileText, Users } from "lucide-react";
+import { DollarSign, BookOpen, FileText } from "lucide-react";
 import Layout from "./Shared/Layout";
+import axios from "axios";
 
 const AdminDashboard = () => {
-  // Container animation variants
+  const [revenue, setRevenue] = useState(0);
+  const [workshopsCount, setWorkshopsCount] = useState(0);
+  const [pendingProposals, setPendingProposals] = useState(0);
+  const [rejectedProposals, setRejectedProposals] = useState(0);
+
+  // Fetch revenue and workshops
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch invoice data
+        const invoiceRes = await axios.get("http://localhost:5001/api/invoice");
+        const totalRevenue = invoiceRes.data?.reduce(
+          (sum, inv) => sum + (inv.amount || 0),
+          0
+        );
+        setRevenue(totalRevenue);
+
+        // Fetch tech proposals
+        const proposalsRes = await axios.get("http://localhost:5001/api/tech-proposals");
+        const proposals = proposalsRes.data || [];
+
+        const completed = proposals.filter(p => p.status === "Completed").length;
+        const pending = proposals.filter(p => p.status === "Pending" || p.status === "Accepted").length;
+        const rejected = proposals.filter(p => p.status === "Rejected").length;
+
+        setWorkshopsCount(completed);
+        setPendingProposals(pending);
+        setRejectedProposals(rejected);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -19,7 +56,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Item animation variants
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -54,7 +90,7 @@ const AdminDashboard = () => {
           <motion.div variants={itemVariants}>
             <StatCard
               title="Total Revenue"
-              value="$143,500"
+              value={`$${revenue.toLocaleString()}`}
               icon={<DollarSign className="text-primary" />}
               percentChange={12}
               isPositive={true}
@@ -64,7 +100,7 @@ const AdminDashboard = () => {
           <motion.div variants={itemVariants}>
             <StatCard
               title="Workshops Completed"
-              value="57"
+              value={workshopsCount.toString()}
               icon={<BookOpen className="text-primary" />}
               percentChange={8}
               isPositive={true}
@@ -74,7 +110,7 @@ const AdminDashboard = () => {
           <motion.div variants={itemVariants}>
             <StatCard
               title="Pending Proposals"
-              value="14"
+              value={pendingProposals.toString()}
               icon={<FileText className="text-primary" />}
               percentChange={3}
               isPositive={false}
@@ -83,11 +119,11 @@ const AdminDashboard = () => {
 
           <motion.div variants={itemVariants}>
             <StatCard
-              title="Workshop Participants"
-              value="1,248"
-              icon={<Users className="text-primary" />}
-              percentChange={15}
-              isPositive={true}
+              title="Rejected Proposals"
+              value={rejectedProposals.toString()}
+              icon={<FileText className="text-primary" />}
+              percentChange={5}
+              isPositive={false}
             />
           </motion.div>
         </motion.div>

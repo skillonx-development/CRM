@@ -30,12 +30,10 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "approvals", icon: ClipboardCheck, label: "Approvals", path: "/admin/approvals" },
         { id: "invoices", icon: BarChart3, label: "Invoices", path: "/admin/invoices" },
         { id: "teams", icon: Users, label: "Manage Team", path: "/admin/team" },
-        { id: "notifications", icon: Bell, label: "Notifications", path: "/admin/notifications" },
     ];
 
     const bottomMenuItems = [
         { id: "settings", icon: Settings, label: "Settings", path: "/admin/settings" },
-        { id: "control", icon: Lock, label: "Access Control", path: "/admin/control" },
         { id: 'logout', icon: LogOut, label: 'Logout' },
     ];
 
