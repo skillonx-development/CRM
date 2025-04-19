@@ -14,7 +14,7 @@ const PendingApprovals = () => {
   const fetchApprovals = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:5001/api/tech-proposals');
+      const response = await axios.get('https://crm-r11b.onrender.com/api/tech-proposals');
       const acceptedApprovals = response.data.filter(
         (item) => item.status === 'Accepted'
       );
@@ -53,7 +53,7 @@ const PendingApprovals = () => {
     try {
       // Send the update to the backend
       await axios.put(
-        `http://localhost:5001/api/tech-proposals/${selectedApproval._id}/admin-approval`,
+        `https://crm-r11b.onrender.com/api/tech-proposals/${selectedApproval._id}/admin-approval`,
         { adminApproval: approved }
       );
 

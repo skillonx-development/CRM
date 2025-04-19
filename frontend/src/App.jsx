@@ -14,6 +14,7 @@ import { TechRoutes } from './routes/config/TechRoutes';
 import { SalesRoutes } from './routes/config/SalesRoutes';
 import { MarketingRoutes } from './routes/config/MarketingRoutes';
 import { AdminRoutes } from './routes/config/AdminRoutes';
+import Landing from './Pages/Landing';
 
 // Separate component for authenticated routes
 const AuthenticatedApp = () => {
@@ -27,6 +28,9 @@ const AuthenticatedApp = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
+  if (!isAuthenticated) {
+    return <Landing/>;
+  }
   return null;
 };
 

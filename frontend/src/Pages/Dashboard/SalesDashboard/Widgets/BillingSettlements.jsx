@@ -41,7 +41,7 @@ export default function BillingSettlements() {
     const fetchProposals = async () => {
       try {
         setLoadingProposals(true);
-        const response = await axios.get("http://localhost:5001/api/tech-proposals");
+        const response = await axios.get("https://crm-r11b.onrender.com/api/tech-proposals");
         const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted" && proposal.adminApproval===true);
         setProposals(acceptedProposals);
       } catch (err) {
@@ -54,7 +54,7 @@ export default function BillingSettlements() {
     const fetchInvoices = async () => {
       try {
         setLoadingInvoices(true);
-        const res = await axios.get("http://localhost:5001/api/invoice");
+        const res = await axios.get("https://crm-r11b.onrender.com/api/invoice");
         setInvoices(res.data);
       } catch (err) {
         console.error("Error fetching invoices:", err);
@@ -65,7 +65,7 @@ export default function BillingSettlements() {
 
     const fetchPayments = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/invoice"); // Add your actual endpoint here
+        const res = await axios.get("https://crm-r11b.onrender.com/api/invoice"); // Add your actual endpoint here
         setPayments(res.data);
       } catch (err) {
         console.error("Error fetching payments:", err);
@@ -84,7 +84,7 @@ export default function BillingSettlements() {
     try {
       setSendingReminder(id); // Set loading state for this specific invoice
       
-      const response = await fetch("http://localhost:5001/api/invoice/sendReminder", {
+      const response = await fetch("https://crm-r11b.onrender.com/api/invoice/sendReminder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +154,7 @@ export default function BillingSettlements() {
     const invoiceToAdd = { id: newId, ...newInvoice };
 
     try {
-      const response = await axios.post("http://localhost:5001/api/invoice/create", invoiceToAdd);
+      const response = await axios.post("https://crm-r11b.onrender.com/api/invoice/create", invoiceToAdd);
       if (response.status === 201) {
         setInvoices([invoiceToAdd, ...invoices]);
         setNewInvoice({ title: "", email: "", amount: "", issued: "", due: "", status: "Awaiting Payment" });
@@ -175,7 +175,7 @@ export default function BillingSettlements() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://localhost:5001/api/invoice/update/${editInvoice._id}`, editInvoice);
+      const response = await axios.put(`https://crm-r11b.onrender.com/api/invoice/update/${editInvoice._id}`, editInvoice);
       if (response.status === 200) {
         const updatedList = invoices.map(inv => inv._id === editInvoice._id ? editInvoice : inv);
         setInvoices(updatedList);
