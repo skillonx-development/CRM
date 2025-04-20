@@ -27,7 +27,7 @@ app.use(cookieParser());
 
 // CORS
 app.use(cors({
-  origin: 'https://skillonxcrm.netlify.app/',
+  origin: 'https://skillonxcrm.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
