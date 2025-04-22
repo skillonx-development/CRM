@@ -45,7 +45,7 @@ function TechSidebar({ setActiveTab, collapsed, setCollapsed }) {
                 const cachedUser = JSON.parse(localStorage.getItem("user"));
                 if (!cachedUser?._id) return;
 
-                const res = await fetch(`https://crm-r11b.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                 const data = await res.json();
                 setPermissions(data.permissions || {});
             } catch (err) {
@@ -59,7 +59,6 @@ function TechSidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "overview", icon: LayoutGrid, label: "Overview", path: "/tech", permissionKey: "overview" },
         { id: "proposals", icon: FileText, label: "Proposals", path: "/tech/proposals", permissionKey: "proposals" },
         { id: "resources", icon: Server, label: "Resources", path: "/tech/resources", permissionKey: "resources" },
-        {id:"curriculum", icon: Package, label: "Curriculum", path: "/tech/curriculum", permissionKey: "curriculum"  },
         { id: "team-management", icon: ShieldCheck, label: "Team Management", path: "/tech/team", permissionKey: "team-management" },
     ];
 
@@ -240,7 +239,7 @@ function TechSidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <div className="flex justify-end space-x-4">
                             <button
                                 onClick={() => setShowLogoutModal(false)}
-                                className="px-4 py-2 bg-gray-300 text-text-muted rounded-md hover:bg-gray-400 hover:text-black transition"
+                                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400 hover:text-black transition"
                             >
                                 Cancel
                             </button>

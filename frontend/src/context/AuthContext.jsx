@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
-const API_URL ="https://crm-r11b.onrender.com";
+const API_URL ="http://localhost:5001";
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -56,9 +56,9 @@ export const AuthProvider = ({ children }) => {
             setUser(user);
             localStorage.setItem("user", JSON.stringify(user));
       
-            if (redirect) {
-              navigate(redirect);
-            }
+            // if (redirect) {
+            //   navigate(redirect);
+            // }
       
             return { success: true };
           } else {

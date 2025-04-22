@@ -30,7 +30,7 @@ const ResourceManager = () => {
 
   const fetchResources = async () => {
     try {
-      const res = await axios.get("https://crm-r11b.onrender.com/api/resources", {
+      const res = await axios.get("http://localhost:5001/api/resources", {
         withCredentials: true,
       });
       const allResources = Array.isArray(res.data.resources) ? res.data.resources : [];
@@ -70,7 +70,7 @@ const ResourceManager = () => {
     }
 
     try {
-      await axios.post("https://crm-r11b.onrender.com/api/resources", formData, {
+      await axios.post("http://localhost:5001/api/resources", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -98,7 +98,7 @@ const ResourceManager = () => {
 
     setDeletingId(id);
     try {
-      await axios.delete(`https://crm-r11b.onrender.com/api/resources/${id}`, {
+      await axios.delete(`http://localhost:5001/api/resources/${id}`, {
         withCredentials: true,
       });
 
@@ -115,6 +115,33 @@ const ResourceManager = () => {
       setDeletingId(null);
     }
   };
+
+  const ResourceCard = ({ resource, type }) => (
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow h-full flex flex-col">
+      <div className="flex-grow">
+        <h3 className="text-md font-medium mb-2">{resource.title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 h-12 line-clamp-2 overflow-hidden">{resource.description}</p>
+      </div>
+      <div className="mt-4 flex items-center">
+        <a
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-400 transition mr-2 w-32 text-center"
+        >
+          {type === "Video" ? "Watch Video" : "View PDF"}
+        </a>
+        <button
+          className={`inline-block ${deletingId === resource._id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-400'} 
+            text-white px-3 py-1.5 rounded-md transition w-24 text-center`}
+          onClick={() => deleteResource(resource._id)}
+          disabled={deletingId === resource._id}
+        >
+          {deletingId === resource._id ? 'Deleting...' : 'Delete'}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
@@ -211,59 +238,37 @@ const ResourceManager = () => {
       <div className="mt-8 flex flex-col lg:flex-row gap-8">
         {/* Videos */}
         <div className="w-full lg:w-1/2">
-          <h2 className="text-lg font-semibold mb-2">Videos</h2>
-          <div className="space-y-4">
-            {resources.videos.map((video, index) => (
-              <div key={`${video._id}-${index}`} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                <h3 className="text-md font-medium">{video.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{video.description}</p>
-                <a
-                  href={video.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-400 transition mr-2 mt-2"
-                >
-                  Watch Video
-                </a>
-                <button
-                  className={`inline-block ${deletingId === video._id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-400'
-                    } text-white px-3 py-1.5 rounded-md transition mt-2`}
-                  onClick={() => deleteResource(video._id)}
-                  disabled={deletingId === video._id}
-                >
-                  {deletingId === video._id ? 'Deleting...' : 'Delete'}
-                </button>
+          <h2 className="text-lg font-semibold mb-4">Videos</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {resources.videos.length > 0 ? (
+              resources.videos.map((video, index) => (
+                <div key={`${video._id || index}`} className="h-40">
+                  <ResourceCard resource={video} type="Video" />
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow h-40">
+                <p className="text-gray-500 dark:text-gray-400">No videos available</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
         
         {/* PDFs */}
         <div className="w-full lg:w-1/2">
-          <h2 className="text-lg font-semibold mb-2">PDFs</h2>
-          <div className="space-y-4">
-            {resources.pdfs.map((pdf, index) => (
-              <div key={`${pdf._id}-${index}`} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                <h3 className="text-md font-medium">{pdf.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{pdf.description}</p>
-                <a
-                  href={pdf.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-400 transition mr-2 mt-2"
-                >
-                  View PDF
-                </a>
-                <button
-                  className={`inline-block ${deletingId === pdf._id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-400'
-                    } text-white px-3 py-1.5 rounded-md transition mt-2`}
-                  onClick={() => deleteResource(pdf._id)}
-                  disabled={deletingId === pdf._id}
-                >
-                  {deletingId === pdf._id ? 'Deleting...' : 'Delete'}
-                </button>
+          <h2 className="text-lg font-semibold mb-4">PDFs</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {resources.pdfs.length > 0 ? (
+              resources.pdfs.map((pdf, index) => (
+                <div key={`${pdf._id || index}`} className="h-40">
+                  <ResourceCard resource={pdf} type="PDF" />
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow h-40">
+                <p className="text-gray-500 dark:text-gray-400">No PDFs available</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

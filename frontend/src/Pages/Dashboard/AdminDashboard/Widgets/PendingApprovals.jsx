@@ -7,33 +7,35 @@ const PendingApprovals = () => {
   const [approvals, setApprovals] = useState([]);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Store badge status in state
   const [badgeStatus, setBadgeStatus] = useState({});
 
   const fetchApprovals = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('https://crm-r11b.onrender.com/api/tech-proposals');
-      const acceptedApprovals = response.data.filter(
-        (item) => item.status === 'Accepted'
-      );
+      const response = await axios.get('http://localhost:5001/api/tech-proposals/sent');
+      const acceptedApprovals = response.data;
 
-      // Initialize badge statuses
-      const initialBadgeStatus = {};
+      const newBadgeStatus = { ...badgeStatus };
       acceptedApprovals.forEach((item) => {
-        const adminApproved = Boolean(item.adminApproved);
-        if (adminApproved === true) {
-          initialBadgeStatus[item._id] = 'Approved';
-        } else if (item.adminApproved === false) {
-          initialBadgeStatus[item._id] = 'Disapproved';
-        } else {
-          initialBadgeStatus[item._id] = 'Pending';
+        if (!newBadgeStatus[item._id]) {
+          if (item.adminApproved === true) {
+            newBadgeStatus[item._id] = 'Approved';
+          } else if (item.adminApproved === false) {
+            newBadgeStatus[item._id] = 'Disapproved';
+          } else {
+            newBadgeStatus[item._id] = 'Pending';
+          }
+        }
+
+        if (item.adminApproved === true && newBadgeStatus[item._id] !== 'Approved') {
+          newBadgeStatus[item._id] = 'Approved';
+        } else if (item.adminApproved === false && newBadgeStatus[item._id] !== 'Disapproved') {
+          newBadgeStatus[item._id] = 'Disapproved';
         }
       });
 
+      setBadgeStatus(newBadgeStatus);
       setApprovals(acceptedApprovals);
-      setBadgeStatus(initialBadgeStatus);
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching proposals:', error);
@@ -51,26 +53,30 @@ const PendingApprovals = () => {
     if (!selectedApproval) return;
 
     try {
-      // Send the update to the backend
       await axios.put(
-        `https://crm-r11b.onrender.com/api/tech-proposals/${selectedApproval._id}/admin-approval`,
+        `http://localhost:5001/api/tech-proposals/${selectedApproval._id}/admin-approval`,
         { adminApproval: approved }
       );
 
-      // Optimistically update the badge status in state
       setBadgeStatus((prev) => ({
         ...prev,
         [selectedApproval._id]: approved ? 'Approved' : 'Disapproved',
       }));
 
-      // Close the modal after action
+      setApprovals((prevApprovals) =>
+        prevApprovals.map((approval) =>
+          approval._id === selectedApproval._id
+            ? { ...approval, adminApproved: approved }
+            : approval
+        )
+      );
+
       setSelectedApproval(null);
       alert(`Proposal ${approved ? 'approved' : 'disapproved'} successfully.`);
 
-      // Optionally refetch the updated list of approvals after a slight delay
       setTimeout(() => {
         fetchApprovals();
-      }, 2000); // Allow backend to update before refetching
+      }, 2000);
     } catch (error) {
       console.error('Error updating admin approval:', error);
       alert('Failed to update approval. Please try again.');
@@ -82,8 +88,8 @@ const PendingApprovals = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
     hover: {
       boxShadow: '0px 8px 20px rgba(0,0,0,0.2)',
-      transition: { duration: 0.2, ease: 'easeInOut' }
-    }
+      transition: { duration: 0.2, ease: 'easeInOut' },
+    },
   };
 
   const modalVariants = {
@@ -91,18 +97,18 @@ const PendingApprovals = () => {
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { type: 'spring', stiffness: 300, damping: 25 }
+      transition: { type: 'spring', stiffness: 300, damping: 25 },
     },
     exit: {
       opacity: 0,
       scale: 0.9,
-      transition: { duration: 0.2 }
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   const buttonVariants = {
     hover: { scale: 1.01, transition: { duration: 0.2 } },
-    tap: { scale: 0.97 }
+    tap: { scale: 0.97 },
   };
 
   return (
@@ -126,7 +132,7 @@ const PendingApprovals = () => {
             </p>
           ) : (
             approvals.map((approval, index) => {
-              const badgeStatusText = badgeStatus[approval._id];
+              const badgeStatusText = badgeStatus[approval._id] || 'Pending';
 
               return (
                 <motion.div
@@ -148,26 +154,24 @@ const PendingApprovals = () => {
                         <Check size={12} className="mr-1" />
                         {approval.status}
                       </div>
-                      {badgeStatusText && (
-                        <div
-                          className={`text-xs font-medium px-2 py-1 rounded-full flex items-center ${
-                            badgeStatusText === 'Approved'
-                              ? 'bg-blue-900/30 text-blue-400'
-                              : badgeStatusText === 'Disapproved'
-                              ? 'bg-red-900/30 text-red-400'
-                              : 'bg-yellow-900/30 text-yellow-400'
-                          }`}
-                        >
-                          {badgeStatusText === 'Approved' ? (
-                            <Check size={12} className="mr-1" />
-                          ) : badgeStatusText === 'Disapproved' ? (
-                            <AlertTriangle size={12} className="mr-1" />
-                          ) : (
-                            <AlertTriangle size={12} className="mr-1" />
-                          )}
-                          {badgeStatusText}
-                        </div>
-                      )}
+                      <div
+                        className={`text-xs font-medium px-2 py-1 rounded-full flex items-center ${
+                          badgeStatusText === 'Approved'
+                            ? 'bg-blue-900/30 text-blue-400'
+                            : badgeStatusText === 'Disapproved'
+                            ? 'bg-red-900/30 text-red-400'
+                            : 'bg-yellow-900/30 text-yellow-400'
+                        }`}
+                      >
+                        {badgeStatusText === 'Approved' ? (
+                          <Check size={12} className="mr-1" />
+                        ) : badgeStatusText === 'Disapproved' ? (
+                          <X size={12} className="mr-1" />
+                        ) : (
+                          <AlertTriangle size={12} className="mr-1" />
+                        )}
+                        {badgeStatusText}
+                      </div>
                     </div>
                   </div>
 
@@ -184,7 +188,7 @@ const PendingApprovals = () => {
 
                   <motion.button
                     className="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 py-2 rounded-md flex items-center justify-center transition-colors"
-                    onClick={() => setSelectedApproval(approval)} 
+                    onClick={() => setSelectedApproval(approval)}
                     variants={buttonVariants}
                     whileHover="hover"
                     whileTap="tap"
@@ -253,31 +257,46 @@ const PendingApprovals = () => {
                   </div>
                 </div>
 
-                {selectedApproval.description && (
-                  <div>
-                    <p className="text-gray-400 text-sm mb-1">Description</p>
-                    <p className="text-white">{selectedApproval.description}</p>
-                  </div>
-                )}
-
-                <div className="flex justify-end gap-4 pt-4">
-                  <motion.button
-                    className="bg-red-500/10 text-red-400 px-4 py-2 rounded-md"
-                    onClick={() => handleAdminApproval(false)}
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
+                <div className="flex items-center">
+                  <p className="text-gray-400 text-sm mr-2">Admin Status:</p>
+                  <div
+                    className={`text-xs font-medium px-2 py-1 rounded-full inline-flex items-center ${
+                      badgeStatus[selectedApproval._id] === 'Approved'
+                        ? 'bg-blue-900/30 text-blue-400'
+                        : badgeStatus[selectedApproval._id] === 'Disapproved'
+                        ? 'bg-red-900/30 text-red-400'
+                        : 'bg-yellow-900/30 text-yellow-400'
+                    }`}
                   >
-                    Disapprove
-                  </motion.button>
+                    {badgeStatus[selectedApproval._id] === 'Approved' ? (
+                      <Check size={12} className="mr-1" />
+                    ) : badgeStatus[selectedApproval._id] === 'Disapproved' ? (
+                      <X size={12} className="mr-1" />
+                    ) : (
+                      <AlertTriangle size={12} className="mr-1" />
+                    )}
+                    {badgeStatus[selectedApproval._id]}
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
                   <motion.button
-                    className="bg-blue-500/10 text-blue-400 px-4 py-2 rounded-md"
+                    className="w-full bg-green-700/20 hover:bg-green-700/40 text-green-400 py-2 rounded-md"
                     onClick={() => handleAdminApproval(true)}
-                    variants={buttonVariants}
                     whileHover="hover"
                     whileTap="tap"
+                    variants={buttonVariants}
                   >
                     Approve
+                  </motion.button>
+                  <motion.button
+                    className="w-full bg-red-700/20 hover:bg-red-700/40 text-red-400 py-2 rounded-md"
+                    onClick={() => handleAdminApproval(false)}
+                    whileHover="hover"
+                    whileTap="tap"
+                    variants={buttonVariants}
+                  >
+                    Disapprove
                   </motion.button>
                 </div>
               </div>

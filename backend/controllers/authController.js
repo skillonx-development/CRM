@@ -1,5 +1,5 @@
 import bcryptjs from 'bcryptjs';
-import Admin from '../models/adminModel.js';  // Adjust the import path based on your file structure
+import Admin from '../models/adminModel.js';  
 import Lead from '../models/leadModel.js';
 import TechMember from '../models/techMemberModel.js';
 import SalesMember from '../models/salesMemberModel.js';
@@ -112,6 +112,7 @@ export async function register(req, res) {
 
 
 // 🔐 Login
+// 🔐 Login
 export async function login(req, res) {
   try {
     const { email, password, type } = req.body;
@@ -155,6 +156,37 @@ export async function login(req, res) {
     // Lead or Member
     if (type === 'lead') {
       user = await Lead.findOne({ email });
+      if (!user) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+
+      const isMatch = await bcryptjs.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+
+      // Check if lead is approved
+      if (!user.approve) {
+        return res.status(403).json({
+          success: false,
+          message: 'Lead must be approved before logging in'
+        });
+      }
+
+      generateTokenAndSetCookie(user._id, user.team, res);
+
+      let redirectPath = user.team?.toLowerCase() === 'tech' ? '/tech' : '/lead';
+      return res.status(200).json({
+        success: true,
+        redirect: redirectPath,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          team: user.team,
+          role: 'lead'
+        }
+      });
     } else {
       user = await TechMember.findOne({ email }) ||
         await SalesMember.findOne({ email }) ||

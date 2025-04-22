@@ -1,5 +1,5 @@
 import React from 'react'
-import Settings from './Widgets/Settings'
+import Settings from './Widgets/settings'
 import Layout from './Shared/Layout'
 
 const AdminSettings = () => {

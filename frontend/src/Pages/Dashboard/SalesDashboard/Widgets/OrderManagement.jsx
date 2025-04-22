@@ -7,10 +7,10 @@ const statusColors = {
   Pending: "bg-yellow-500",
   Rejected: "bg-red-500",
   Sent: "bg-blue-500",
-  Completed: "bg-emerald-600" // ✅ new status color
+  Completed: "bg-emerald-600"
 };
 
-const statusOptions = ["Pending", "Sent", "Accepted", "Rejected", "Completed"]; // ✅ added "Completed"
+const statusOptions = ["Pending", "Sent", "Accepted", "Rejected", "Completed"];
 const filters = ["All", ...statusOptions];
 
 export default function OrderManagement() {
@@ -21,14 +21,13 @@ export default function OrderManagement() {
   const [editData, setEditData] = useState({});
   const [isSending, setIsSending] = useState(false);
 
-
   useEffect(() => {
     fetchSentProposals();
   }, []);
 
   const fetchSentProposals = async () => {
     try {
-      const res = await axios.get("https://crm-r11b.onrender.com/api/tech-proposals/sent");
+      const res = await axios.get("http://localhost:5001/api/tech-proposals/sent");
       const mapped = res.data.map((p) => ({
         id: p._id,
         title: p.title,
@@ -37,7 +36,8 @@ export default function OrderManagement() {
         collegeEmail: p.collegeEmail,
         schedule: p.scheduledDate || "N/A",
         price: p.price || 0,
-        participants: p.expectedParticipants || 0
+        participants: p.expectedParticipants || 0,
+        adminApproval: p.adminApproval || false
       }));
       setOrders(mapped);
     } catch (err) {
@@ -47,7 +47,7 @@ export default function OrderManagement() {
 
   const handleManageOrder = (order) => {
     setSelectedOrder(order);
-    setEditData(order); // Set initial form data
+    setEditData(order);
     setIsModalOpen(true);
   };
 
@@ -57,12 +57,13 @@ export default function OrderManagement() {
 
   const saveChanges = async () => {
     try {
-      await axios.put(`https://crm-r11b.onrender.com/api/tech-proposals/${editData.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${editData.id}`, {
         title: editData.title,
         status: editData.status,
         institution: editData.school,
         scheduledDate: editData.schedule,
         price: editData.price,
+        adminApproval: editData.adminApproval
       });
       setIsModalOpen(false);
       fetchSentProposals();
@@ -75,18 +76,17 @@ export default function OrderManagement() {
 
   const sendEmail = async (order) => {
     try {
-      setIsSending(true); // 🔄 Start sending
-  
-      await axios.put(`https://crm-r11b.onrender.com/api/tech-proposals/${order.id}`, {
+      setIsSending(true);
+      await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
         institution: order.school,
         scheduledDate: order.schedule,
         price: order.price,
+        adminApproval: order.adminApproval
       });
-  
-      await axios.post(`https://crm-r11b.onrender.com/api/tech-proposals/send-email/${order.id}`);
-  
+
+      await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);
@@ -94,10 +94,9 @@ export default function OrderManagement() {
       console.error("Failed to send email:", error);
       alert("Failed to send email.");
     } finally {
-      setIsSending(false); // ✅ Reset state
+      setIsSending(false);
     }
   };
-  
 
   const filteredOrders = orders.filter(order =>
     filter === "All" ? true : order.status === filter
@@ -222,32 +221,51 @@ export default function OrderManagement() {
                     className="w-full p-2 mt-1 border rounded-xl bg-background"
                   />
                 </div>
+                <div>
+  <label className="block text-sm font-medium">Admin Approval</label>
+  <input
+    type="text"
+    readOnly
+    value={editData.adminApproval ? "Approved" : "Not Approved"}
+    className="w-full p-2 mt-1 border rounded-xl bg-muted cursor-not-allowed text-muted-foreground"
+  />
+</div>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-muted px-4 py-2 rounded-xl text-muted-foreground hover:bg-muted/70"
-                >
-                  Cancel
-                </button>
-                <button
-  onClick={() => sendEmail(editData)}
-  disabled={isSending}
-  className={`px-4 py-2 rounded-xl text-white ${
-    isSending ? "bg-green-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-  }`}
->
-  {isSending ? "Sending..." : "Send Email"}
-</button>
+  <button
+    onClick={() => setIsModalOpen(false)}
+    className="bg-muted px-4 py-2 rounded-xl text-muted-foreground hover:bg-muted/70"
+  >
+    Cancel
+  </button>
 
-                <button
-                  onClick={saveChanges}
-                  className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl"
-                >
-                  Save
-                </button>
-              </div>
+  <button
+    onClick={() => sendEmail(editData)}
+    disabled={isSending || !editData.adminApproval}
+    className={`px-4 py-2 rounded-xl text-white transition ${
+      !editData.adminApproval
+        ? "bg-gray-400 cursor-not-allowed"
+        : isSending
+        ? "bg-green-400 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700"
+    }`}
+  >
+    {!editData.adminApproval
+      ? "Admin Approval Required"
+      : isSending
+      ? "Sending..."
+      : "Send Email"}
+  </button>
+
+  <button
+    onClick={saveChanges}
+    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl"
+  >
+    Save
+  </button>
+</div>
+
             </motion.div>
           </motion.div>
         )}

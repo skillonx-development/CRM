@@ -8,7 +8,6 @@ const Resources = () => {
           {/* Widgets Section */}
         <div className="p-6">
             <ResourceManager/>
-            <TodaysTasks/>
             
           </div>
       </Layout>
