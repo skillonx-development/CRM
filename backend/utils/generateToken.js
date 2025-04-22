@@ -11,7 +11,7 @@ export const generateTokenAndSetCookie = (userId, team, res) => {
 
     res.cookie('jwt-crm', token, {
       httpOnly: true,
-      secure: true,            // Important for cross-site cookies!
+      secure: process.env.NODE_ENV || "production",            // Important for cross-site cookies!
       sameSite: 'None',        // Must be 'None' when frontend and backend are on different domains
       maxAge: 30 * 24 * 60 * 60 * 1000,
       path: '/',

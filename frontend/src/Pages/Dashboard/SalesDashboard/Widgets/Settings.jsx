@@ -41,7 +41,7 @@ const AccountSettings = () => {
   const handleUpdateProfile = async () => {
     try {
       const response = await axios.put(
-        `https://crm-r11b.onrender.com/api/members/update-profile/${team}/${userId}/${userRole}`,
+        `http://localhost:5001/api/members/update-profile/${team}/${userId}/${userRole}`,
         {
           name: userData.name,
           email: userData.email,
@@ -66,7 +66,7 @@ const AccountSettings = () => {
 
     try {
       const response = await axios.put(
-        `https://crm-r11b.onrender.com/api/members/update-password/${team}/${userId}/${userRole}`,
+        `http://localhost:5001/api/members/update-password/${team}/${userId}/${userRole}`,
         {
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,8 +11,10 @@ const LoginPage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const { login } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (location.state?.message) {
@@ -20,38 +22,43 @@ const LoginPage = () => {
       if (location.state.email) {
         setEmail(location.state.email);
       }
-      window.history.replaceState({}, document.title);
+      window.history.replaceState({}, document.title); // Clear state on reload
     }
   }, [location]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setGeneralError("");
+  const validateForm = () => {
+    let valid = true;
     setEmailError("");
     setPasswordError("");
-
-    let isValid = true;
+    setGeneralError("");
 
     if (!email.includes("@")) {
       setEmailError("Please enter a valid email address.");
-      isValid = false;
+      valid = false;
     }
-
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters.");
-      isValid = false;
+      valid = false;
     }
 
-    if (!isValid) return;
+    return valid;
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log("Form submitted");
+    if (!validateForm()) return;
 
     try {
       const result = await login(email, password, role);
       if (!result.success) {
-        console.log("error",result.error)
-        setGeneralError(result.error);
+        setGeneralError(result.error || "Login failed");
+      } else {
+        // Navigate to role-specific dashboard if needed
+        navigate(result.redirect || `/${role}/dashboard`);;
       }
     } catch (err) {
-      setGeneralError(err.message || "An error occurred during login");
+      setGeneralError(err.message || "An error occurred during login.");
     }
   };
 
@@ -64,12 +71,11 @@ const LoginPage = () => {
         </p>
 
         {generalError && <p className="text-red-600 text-sm text-center mb-4">{generalError}</p>}
-
         {success && <p className="text-status-success text-sm text-center mb-4">{success}</p>}
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-text-muted font-medium mb-2" htmlFor="email">
+            <label htmlFor="email" className="block text-text-muted font-medium mb-2">
               Email Address
             </label>
             <input
@@ -78,14 +84,16 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${emailError ? "border-status-error" : "border-border"} focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
+              className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${
+                emailError ? "border-status-error" : "border-border"
+              } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
               placeholder="Enter your email"
             />
             {emailError && <p className="text-status-error text-sm mt-1">{emailError}</p>}
           </div>
 
           <div>
-            <label className="block text-text-muted font-medium mb-2" htmlFor="password">
+            <label htmlFor="password" className="block text-text-muted font-medium mb-2">
               Password
             </label>
             <div className="relative">
@@ -95,13 +103,15 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${passwordError ? "border-status-error" : "border-border"} focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
+                className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${
+                  passwordError ? "border-status-error" : "border-border"
+                } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
                 placeholder="Enter your password"
               />
               <button
                 type="button"
                 className="absolute right-3 top-3 text-text-muted text-sm"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword((prev) => !prev)}
               >
                 {showPassword ? "Hide" : "Show"}
               </button>

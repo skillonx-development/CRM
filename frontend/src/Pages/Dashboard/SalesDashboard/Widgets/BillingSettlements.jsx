@@ -41,7 +41,7 @@ export default function BillingSettlements() {
     const fetchProposals = async () => {
       try {
         setLoadingProposals(true);
-        const response = await axios.get("https://crm-r11b.onrender.com/api/tech-proposals");
+        const response = await axios.get("http://localhost:5001/api/tech-proposals");
         const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted" && proposal.adminApproval===true);
         setProposals(acceptedProposals);
       } catch (err) {
@@ -54,7 +54,7 @@ export default function BillingSettlements() {
     const fetchInvoices = async () => {
       try {
         setLoadingInvoices(true);
-        const res = await axios.get("https://crm-r11b.onrender.com/api/invoice");
+        const res = await axios.get("http://localhost:5001/api/invoice");
         setInvoices(res.data);
       } catch (err) {
         console.error("Error fetching invoices:", err);
@@ -65,7 +65,7 @@ export default function BillingSettlements() {
 
     const fetchPayments = async () => {
       try {
-        const res = await axios.get("https://crm-r11b.onrender.com/api/invoice"); // Add your actual endpoint here
+        const res = await axios.get("http://localhost:5001/api/invoice"); // Add your actual endpoint here
         setPayments(res.data);
       } catch (err) {
         console.error("Error fetching payments:", err);
@@ -84,7 +84,7 @@ export default function BillingSettlements() {
     try {
       setSendingReminder(id); // Set loading state for this specific invoice
       
-      const response = await fetch("https://crm-r11b.onrender.com/api/invoice/sendReminder", {
+      const response = await fetch("http://localhost:5001/api/invoice/sendReminder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,23 +138,13 @@ export default function BillingSettlements() {
     });
   };
 
-  const handleEditClientSelect = (e) => {
-    const selectedTitle = e.target.value;
-    const selectedProposal = proposals.find((p) => p.institution === selectedTitle);
-    setEditInvoice({
-      ...editInvoice,
-      title: selectedTitle,
-      email: selectedProposal?.collegeEmail || ""
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newId = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(3, '0')}`;
     const invoiceToAdd = { id: newId, ...newInvoice };
 
     try {
-      const response = await axios.post("https://crm-r11b.onrender.com/api/invoice/create", invoiceToAdd);
+      const response = await axios.post("http://localhost:5001/api/invoice/create", invoiceToAdd);
       if (response.status === 201) {
         setInvoices([invoiceToAdd, ...invoices]);
         setNewInvoice({ title: "", email: "", amount: "", issued: "", due: "", status: "Awaiting Payment" });
@@ -175,7 +165,7 @@ export default function BillingSettlements() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`https://crm-r11b.onrender.com/api/invoice/update/${editInvoice._id}`, editInvoice);
+      const response = await axios.put(`http://localhost:5001/api/invoice/update/${editInvoice._id}`, editInvoice);
       if (response.status === 200) {
         const updatedList = invoices.map(inv => inv._id === editInvoice._id ? editInvoice : inv);
         setInvoices(updatedList);
@@ -191,7 +181,6 @@ export default function BillingSettlements() {
   const Modal = ({ isEdit = false }) => {
     const invoice = isEdit ? editInvoice : newInvoice;
     const onChange = (e) => handleInputChange(e, isEdit);
-    const onSelect = isEdit ? handleEditClientSelect : handleClientSelect;
     const onSubmit = isEdit ? handleUpdate : handleSubmit;
     const closeModal = () => isEdit ? setShowEditModal(false) : setShowModal(false);
 
@@ -208,24 +197,36 @@ export default function BillingSettlements() {
           <form onSubmit={onSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Client Name</label>
-              <select
-                name="title"
-                value={invoice.title}
-                onChange={onSelect}
-                className="w-full p-2 border rounded"
-                required
-              >
-                <option value="">Select client</option>
-                {loadingProposals ? (
-                  <option>Loading...</option>
-                ) : (
-                  proposals.map((proposal, index) => (
-                    <option key={index} value={proposal.institution}>
-                      {proposal.institution}
-                    </option>
-                  ))
-                )}
-              </select>
+              {isEdit ? (
+                // For edit mode: show a non-editable input field with client name
+                <input
+                  type="text"
+                  name="title"
+                  value={invoice.title}
+                  className="w-full p-2 border rounded"
+                  readOnly
+                />
+              ) : (
+                // For create mode: show the dropdown to select a client
+                <select
+                  name="title"
+                  value={invoice.title}
+                  onChange={handleClientSelect}
+                  className="w-full p-2 border rounded"
+                  required
+                >
+                  <option value="">Select client</option>
+                  {loadingProposals ? (
+                    <option>Loading...</option>
+                  ) : (
+                    proposals.map((proposal, index) => (
+                      <option key={index} value={proposal.institution}>
+                        {proposal.institution}
+                      </option>
+                    ))
+                  )}
+                </select>
+              )}
             </div>
 
             <div className="mb-4">

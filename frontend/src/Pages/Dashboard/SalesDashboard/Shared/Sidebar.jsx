@@ -44,7 +44,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     return;
                 }
 
-                const res = await fetch(`https://crm-r11b.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                 const data = await res.json();
 
                 setPermissions(data.permissions || {});
@@ -238,7 +238,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <div className="flex justify-end space-x-4">
                             <button
                                 onClick={() => setShowLogoutModal(false)}
-                                className="px-4 py-2 bg-gray-300 text-text-muted rounded-md hover:bg-gray-400 hover:text-black transition"
+                                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400 hover:text-black transition"
                             >
                                 Cancel
                             </button>
