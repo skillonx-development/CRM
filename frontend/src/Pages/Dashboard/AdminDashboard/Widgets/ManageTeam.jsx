@@ -18,7 +18,7 @@ const ManageTeam = () => {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const leadsRes = await axios.get(`https://crm-5qj0.onrender.com/api/members/getLeads/${activeTeam}`);
+        const leadsRes = await axios.get(`https://crm-4xul.onrender.com/api/members/getLeads/${activeTeam}`);
         const leadsData = leadsRes.data || [];
 
         // Initialize approval state based on fetched data
@@ -41,7 +41,7 @@ const ManageTeam = () => {
     const newApproval = !approvedLeads[leadId];
 
     try {
-      await axios.put(`https://crm-5qj0.onrender.com/api/members/updateLeadApproval/${leadId}`, {
+      await axios.put(`https://crm-4xul.onrender.com/api/members/updateLeadApproval/${leadId}`, {
         approve: newApproval,
       });
       setApprovedLeads((prev) => ({ ...prev, [leadId]: newApproval }));

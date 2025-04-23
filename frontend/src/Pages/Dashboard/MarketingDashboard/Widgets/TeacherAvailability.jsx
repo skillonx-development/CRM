@@ -14,7 +14,7 @@ export default function TeacherDashboard() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const res = await axios.get("https://crm-5qj0.onrender.com/api/teachers");
+        const res = await axios.get("https://crm-4xul.onrender.com/api/teachers");
         const teachers = res.data || [];
 
         // Prepare availability data

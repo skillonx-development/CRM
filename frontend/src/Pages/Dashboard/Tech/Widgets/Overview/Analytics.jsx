@@ -16,11 +16,11 @@ const Analytics = () => {
     const fetchData = async () => {
       try {
         // Fetch all proposals
-        const proposalsRes = await fetch("https://crm-5qj0.onrender.com/api/tech-proposals");
+        const proposalsRes = await fetch("https://crm-4xul.onrender.com/api/tech-proposals");
         const proposals = await proposalsRes.json();
 
         // Fetch all teachers
-        const teachersRes = await fetch("https://crm-5qj0.onrender.com/api/teachers");
+        const teachersRes = await fetch("https://crm-4xul.onrender.com/api/teachers");
         const teachers = await teachersRes.json();
 
         // Calculate metrics
