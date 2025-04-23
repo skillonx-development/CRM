@@ -22,7 +22,7 @@ export default function TeacherManagement() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5001/api/teachers/add", {
+      const response = await fetch("https://crm-5qj0.onrender.com/api/teachers/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

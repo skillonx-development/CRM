@@ -30,7 +30,7 @@ const ResourceManager = () => {
 
   const fetchResources = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/resources", {
+      const res = await axios.get("https://crm-5qj0.onrender.com/api/resources", {
         withCredentials: true,
       });
       const allResources = Array.isArray(res.data.resources) ? res.data.resources : [];
@@ -70,7 +70,7 @@ const ResourceManager = () => {
     }
 
     try {
-      await axios.post("http://localhost:5001/api/resources", formData, {
+      await axios.post("https://crm-5qj0.onrender.com/api/resources", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -98,7 +98,7 @@ const ResourceManager = () => {
 
     setDeletingId(id);
     try {
-      await axios.delete(`http://localhost:5001/api/resources/${id}`, {
+      await axios.delete(`https://crm-5qj0.onrender.com/api/resources/${id}`, {
         withCredentials: true,
       });
 
