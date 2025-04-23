@@ -66,10 +66,6 @@ const LoginPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md bg-background-card p-8 rounded-lg shadow-card">
         <h2 className="text-3xl font-bold text-text text-center mb-2">Welcome Back</h2>
-        <p className="text-text-muted text-center mb-6">
-          Sign in to access your dashboard and manage your resources efficiently.
-        </p>
-
         {generalError && <p className="text-red-600 text-sm text-center mb-4">{generalError}</p>}
         {success && <p className="text-status-success text-sm text-center mb-4">{success}</p>}
 

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthContext";
 import {
@@ -21,39 +21,9 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [currentRole, setCurrentRole] = useState(() => {
-        const cachedUser = JSON.parse(localStorage.getItem("user"));
-        return cachedUser?.userRole || null;
-    });
-
     const [permissions, setPermissions] = useState({});
-
-    useEffect(() => {
-        if (!loading && user && user.userRole) {
-            setCurrentRole(user.userRole);
-        } else if (!loading && !user) {
-            setCurrentRole(null);
-        }
-    }, [user, loading]);
-
-    useEffect(() => {
-        const fetchPermissions = async () => {
-            try {
-                const cachedUser = JSON.parse(localStorage.getItem("user"));
-                if (!cachedUser?._id) {
-                    return;
-                }
-
-                const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
-                const data = await res.json();
-
-                setPermissions(data.permissions || {});
-            } catch (err) {
-                console.error("Error fetching permissions:", err);
-            }
-        };
-        fetchPermissions();
-    }, []);
+    const [menuItems, setMenuItems] = useState([]);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     const baseMenuItems = [
         { id: "overview", icon: LayoutGrid, label: "Overview", path: "/sales", permissionKey: "overview" },
@@ -63,24 +33,80 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "team-management", icon: Users, label: "Team Management", path: "/sales/team", permissionKey: "team-management" },
     ];
 
-    const menuItems = useMemo(() => {
-        const filteredItems = currentRole === "lead" ? baseMenuItems : baseMenuItems.filter(item => item.id !== "team-management");
-        return filteredItems;
-    }, [currentRole]);
-
     const bottomMenuItems = [
         { id: "settings", icon: Settings, label: "Settings", path: "/sales/settings" },
         { id: "help", icon: HelpCircle, label: "Help", path: "/sales/help" },
         { id: "logout", icon: LogOut, label: "Logout" },
     ];
 
+    // Initialize sidebar with proper role-based menu items
     useEffect(() => {
-        const allItems = [...menuItems, ...bottomMenuItems];
-        const currentTab = allItems.find(item => item.path === location.pathname);
-        if (currentTab) {
-            setActiveTab(currentTab.id);
+        const initializeSidebar = async () => {
+            try {
+                // Get user data from localStorage
+                const cachedUser = JSON.parse(localStorage.getItem("user"));
+                if (!cachedUser) {
+                    // No cached user, show loading state
+                    return;
+                }
+
+                const userRole = cachedUser.userRole;
+                
+                // Set menu items based on role
+                // For non-lead users, filter out the team-management item
+                const filtered = userRole === "lead"
+                    ? baseMenuItems
+                    : baseMenuItems.filter(item => item.id !== "team-management");
+                
+                setMenuItems(filtered);
+                setIsInitialized(true);
+                
+                // Fetch permissions
+                if (cachedUser._id && cachedUser.team) {
+                    try {
+                        const res = await fetch(`https://crm-5qj0.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                        const data = await res.json();
+                        setPermissions(data.permissions || {});
+                    } catch (err) {
+                        console.error("Error fetching permissions:", err);
+                    }
+                }
+            } catch (error) {
+                console.error("Error initializing sidebar:", error);
+                // Show default menu items in case of error
+                setMenuItems(baseMenuItems.filter(item => item.id !== "team-management"));
+                setIsInitialized(true);
+            }
+        };
+
+        initializeSidebar();
+    }, []);
+
+    // Update from auth context when it's available
+    useEffect(() => {
+        if (!loading && user) {
+            const userRole = user.userRole;
+            
+            // Update menu items based on role from context
+            const filtered = userRole === "lead"
+                ? baseMenuItems
+                : baseMenuItems.filter(item => item.id !== "team-management");
+            
+            setMenuItems(filtered);
+            setIsInitialized(true);
         }
-    }, [location.pathname, menuItems, bottomMenuItems, setActiveTab]);
+    }, [user, loading]);
+
+    // Set active tab based on current location
+    useEffect(() => {
+        if (menuItems.length > 0) {
+            const allItems = [...menuItems, ...bottomMenuItems];
+            const currentTab = allItems.find(item => item.path === location.pathname);
+            if (currentTab) {
+                setActiveTab(currentTab.id);
+            }
+        }
+    }, [location.pathname, menuItems, setActiveTab]);
 
     const toggleSidebar = () => setCollapsed(!collapsed);
 
@@ -101,7 +127,8 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
 
     const handleLogout = () => logout();
 
-    if (loading && !currentRole) {
+    // Show loading state if not initialized yet
+    if (!isInitialized) {
         return (
             <motion.aside
                 className="fixed left-0 top-0 h-screen bg-background-sidebar border-r border-border-dark z-20 overflow-hidden"
@@ -162,17 +189,16 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
                         {menuItems.map((item) => {
                             const isDisabled = item.permissionKey !== "overview" && permissions[item.permissionKey] === false;
-
                             return (
                                 <li key={item.id}>
                                     <button
                                         onClick={() => !isDisabled && navigate(item.path)}
                                         disabled={isDisabled}
                                         className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
-                                                ? "bg-primary text-white"
-                                                : isDisabled
-                                                    ? "text-text-muted cursor-not-allowed"
-                                                    : "text-white hover:bg-background-hover"
+                                            ? "bg-primary text-white"
+                                            : isDisabled
+                                                ? "text-text-muted cursor-not-allowed"
+                                                : "text-white hover:bg-background-hover"
                                             }`}
                                         title={collapsed ? item.label : ""}
                                     >
@@ -204,8 +230,8 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                                 <button
                                     onClick={() => item.id === "logout" ? setShowLogoutModal(true) : navigate(item.path)}
                                     className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
-                                            ? "bg-primary text-white"
-                                            : "text-white hover:bg-background-hover"
+                                        ? "bg-primary text-white"
+                                        : "text-white hover:bg-background-hover"
                                         }`}
                                     title={collapsed ? item.label : ""}
                                 >

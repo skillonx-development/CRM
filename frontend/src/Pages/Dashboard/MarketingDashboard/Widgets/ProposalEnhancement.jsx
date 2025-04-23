@@ -16,7 +16,7 @@ export default function ProposalEnhancement() {
 
   const fetchWorkshops = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/tech-proposals");
+      const res = await axios.get("https://crm-5qj0.onrender.com/api/tech-proposals");
       setWorkshops(res.data);
     } catch (err) {
       console.error("Error fetching proposals:", err);
@@ -51,7 +51,7 @@ export default function ProposalEnhancement() {
 
     try {
       await axios.patch(
-        `http://localhost:5001/api/tech-proposals/send/${selectedWorkshop._id}`,
+        `https://crm-5qj0.onrender.com/api/tech-proposals/send/${selectedWorkshop._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -131,7 +131,7 @@ export default function ProposalEnhancement() {
               <p className="text-base text-text-muted mt-1">📅 {workshop.scheduledDate}</p>
               <p className="text-base text-text-muted">⏰ {workshop.scheduledTime}</p>
               {workshop.sent ? (
-                <p className="text-green-600 font-medium mt-3">✅ Sent to Sales</p>
+                <p className="text-green-600 font-medium mt-3">✅ Sales</p>
               ) : (
                 <div className="flex justify-end mt-4">
                   <button

@@ -12,7 +12,7 @@ const PendingApprovals = () => {
   const fetchApprovals = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:5001/api/tech-proposals/sent');
+      const response = await axios.get('https://crm-5qj0.onrender.com/api/tech-proposals/sent');
       const acceptedApprovals = response.data;
 
       const newBadgeStatus = { ...badgeStatus };
@@ -54,7 +54,7 @@ const PendingApprovals = () => {
 
     try {
       await axios.put(
-        `http://localhost:5001/api/tech-proposals/${selectedApproval._id}/admin-approval`,
+        `https://crm-5qj0.onrender.com/api/tech-proposals/${selectedApproval._id}/admin-approval`,
         { adminApproval: approved }
       );
 

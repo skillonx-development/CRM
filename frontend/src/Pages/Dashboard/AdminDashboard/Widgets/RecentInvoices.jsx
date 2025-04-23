@@ -12,7 +12,7 @@ const RecentInvoices = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/invoice');
+        const res = await axios.get('https://crm-5qj0.onrender.com/api/invoice');
         setInvoices(res.data);
       } catch (error) {
         console.error('Error fetching invoices:', error);
@@ -34,7 +34,7 @@ const RecentInvoices = () => {
 
     try {
       setSendingReminder(invoice._id);
-      const res = await axios.post('http://localhost:5001/api/invoice/sendReminder', {
+      const res = await axios.post('https://crm-5qj0.onrender.com/api/invoice/sendReminder', {
         email: invoice.email,
         subject: `Reminder: Invoice #${invoice._id} is pending`,
         message: `Dear ${invoice.title},<br/><br/>This is a friendly reminder that Invoice #${invoice._id} with client name ${invoice.title} for amount ₹${invoice.amount} is still pending. Please make the payment at your earliest convenience.<br/><br/>Thank you!`,

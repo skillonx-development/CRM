@@ -71,7 +71,7 @@ const RegistrationPage = () => {
         confirmPassword: '***hidden***'
       });
 
-      const response = await fetch(`http://localhost:5001/api/auth/register/${userType}`, {
+      const response = await fetch(`https://crm-5qj0.onrender.com/api/auth/register/${userType}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -228,7 +228,7 @@ const RegistrationPage = () => {
           >
             {isLoading ? "Registering..." : "Register"}
           </button>
-          <p className="mt-4">Already a member? <a className="text-primary" href="/login">Login in</a></p>
+          <p className="mt-4">Already a member? <a className="text-primary" href="/login">Login</a></p>
         </form>
       </div>
     </div>
