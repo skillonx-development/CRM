@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
-const API_URL ="https://crm-5qj0.onrender.com";
+const API_URL ="https://crm-4xul.onrender.com";
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
