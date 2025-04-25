@@ -46,7 +46,12 @@ export const AuthProvider = ({ children }) => {
       
           const response = await axios.post(`${API_URL}/api/auth/login`,
             { email, password, type },
-            { withCredentials: true }
+            {
+                withCredentials: true,
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              }
           );
       
           const { success, user, redirect, message } = response.data;
