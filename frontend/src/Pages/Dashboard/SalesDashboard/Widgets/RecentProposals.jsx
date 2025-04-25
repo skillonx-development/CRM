@@ -10,7 +10,7 @@ const RecentProposals = () => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await fetch("https://crm-4xul.onrender.com/api/tech-proposals");
+        const response = await fetch("https://crm-4772.onrender.com/api/tech-proposals");
         if (!response.ok) {
           throw new Error("Failed to fetch proposals");
         }

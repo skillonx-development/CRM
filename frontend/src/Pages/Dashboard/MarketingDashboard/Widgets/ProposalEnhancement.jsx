@@ -16,7 +16,7 @@ export default function ProposalEnhancement() {
 
   const fetchWorkshops = async () => {
     try {
-      const res = await axios.get("https://crm-4xul.onrender.com/api/tech-proposals");
+      const res = await axios.get("https://crm-4772.onrender.com/api/tech-proposals");
       setWorkshops(res.data);
     } catch (err) {
       console.error("Error fetching proposals:", err);
@@ -51,7 +51,7 @@ export default function ProposalEnhancement() {
 
     try {
       await axios.patch(
-        `https://crm-4xul.onrender.com/api/tech-proposals/send/${selectedWorkshop._id}`,
+        `https://crm-4772.onrender.com/api/tech-proposals/send/${selectedWorkshop._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

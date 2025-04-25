@@ -11,7 +11,7 @@ const WorkshopPerformance = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("https://crm-4xul.onrender.com/api/tech-proposals");
+        const res = await fetch("https://crm-4772.onrender.com/api/tech-proposals");
         const proposals = await res.json();
 
         // Group by month
