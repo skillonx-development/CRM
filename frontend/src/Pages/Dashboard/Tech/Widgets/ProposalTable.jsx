@@ -8,7 +8,7 @@ const ProposalsTable = ({ onSelect }) => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await axios.get("https://crm-4xul.onrender.com/api/proposals");
+        const response = await axios.get("https://crm-4772.onrender.com/api/proposals");
         setProposals(response.data.proposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);
