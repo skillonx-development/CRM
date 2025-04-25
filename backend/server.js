@@ -22,12 +22,14 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Fixed import for urlencoded
+app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
 
 // CORS
 app.use(cors({
-  origin: 'https://skillonxcrm.netlify.app',
+  origin: process.env.NODE_ENV === 'production' 
+  ? ['https://skillonxcrm.netlify.app', 'https://www.skillonxcrm.netlify.app'] 
+  : 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
