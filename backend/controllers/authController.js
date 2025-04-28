@@ -111,7 +111,7 @@ export async function register(req, res) {
 }
 
 
-// 🔐 Login
+
 // 🔐 Login
 export async function login(req, res) {
   try {
@@ -256,13 +256,19 @@ export async function login(req, res) {
 // 🚪 Logout
 export async function logout(req, res) {
   try {
-    res.clearCookie('jwt-crm');
+    res.clearCookie('jwt-crm', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/',
+    });
     res.status(200).json({ success: true, message: 'Logged out successfully' });
   } catch (error) {
     console.error('Error in logout:', error);
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 }
+
 
 // 🔐 Auth Check
 export async function checkAuth(req, res) {
