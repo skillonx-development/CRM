@@ -6,7 +6,7 @@ import axios from 'axios';
 const api = {
   fetchProposals: async () => {
     try {
-      const response = await axios.get('https://crm-4772.onrender.com/api/proposals');
+      const response = await axios.get('https://crm-383e.onrender.com/api/proposals');
       return response.data.proposals;
     } catch (error) {
       console.error("Error fetching proposals:", error);
@@ -15,7 +15,7 @@ const api = {
   },
   createProposal: async (proposal) => {
     try {
-      const response = await axios.post('https://crm-4772.onrender.com/api/proposals', proposal);
+      const response = await axios.post('https://crm-383e.onrender.com/api/proposals', proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error creating proposal:", error);
@@ -24,7 +24,7 @@ const api = {
   },
   updateProposal: async (id, proposal) => {
     try {
-      const response = await axios.put(`https://crm-4772.onrender.com/api/proposals/${id}`, proposal);
+      const response = await axios.put(`https://crm-383e.onrender.com/api/proposals/${id}`, proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error updating proposal:", error);
@@ -175,7 +175,7 @@ const ProposalTracking = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://crm-4772.onrender.com/api/proposals/${editProposal._id}`, {
+      const response = await fetch(`https://crm-383e.onrender.com/api/proposals/${editProposal._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
