@@ -39,8 +39,8 @@ export default function MarketingOverview() {
     const fetchStats = async () => {
       try {
         const [proposalsRes, teachersRes] = await Promise.all([
-          axios.get("https://crm-4772.onrender.com/api/tech-proposals"),
-          axios.get("https://crm-4772.onrender.com/api/teachers"),
+          axios.get("https://crm-383e.onrender.com/api/tech-proposals"),
+          axios.get("https://crm-383e.onrender.com/api/teachers"),
         ]);
 
         const proposals = proposalsRes.data || [];

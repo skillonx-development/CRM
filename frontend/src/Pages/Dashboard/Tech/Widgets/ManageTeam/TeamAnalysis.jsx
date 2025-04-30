@@ -33,8 +33,8 @@ const TeamAnalysis = () => {
     const fetchData = async () => {
       try {
         const [teamRes, invoiceRes] = await Promise.all([
-          fetch("https://crm-4772.onrender.com/api/members/getMembers/Tech"),
-          fetch("https://crm-4772.onrender.com/api/invoice"),
+          fetch("https://crm-383e.onrender.com/api/members/getMembers/Tech"),
+          fetch("https://crm-383e.onrender.com/api/invoice"),
         ]);
 
         const teamData = await teamRes.json();
