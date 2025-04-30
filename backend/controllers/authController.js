@@ -39,6 +39,22 @@ export async function register(req, res) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(name)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name can only contain letters and spaces'
+      });
+    }
+
+    const contactRegex = /^\d{10}$/;
+if (!contactRegex.test(contactNumber)) {
+  return res.status(400).json({
+    success: false,
+    message: 'Contact number must be a valid 10-digit number without special characters'
+  });
+}
+
     if (!isValidEmail(email)) {
       return res.status(400).json({ success: false, message: 'Please enter a valid email address' });
     }
@@ -112,6 +128,7 @@ export async function register(req, res) {
 
 
 
+
 // 🔐 Login
 export async function login(req, res) {
   try {
@@ -156,38 +173,8 @@ export async function login(req, res) {
     // Lead or Member
     if (type === 'lead') {
       user = await Lead.findOne({ email });
-      if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
-      }
-
-      const isMatch = await bcryptjs.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
-      }
-
-      // Check if lead is approved
-      if (!user.approve) {
-        return res.status(403).json({
-          success: false,
-          message: 'Lead must be approved before logging in'
-        });
-      }
-
-      generateTokenAndSetCookie(user._id, user.team, res);
-
-      let redirectPath = user.team?.toLowerCase() === 'tech' ? '/tech' : '/lead';
-      return res.status(200).json({
-        success: true,
-        redirect: redirectPath,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          team: user.team,
-          role: 'lead'
-        }
-      });
-    } else {
+    } else if (type === 'member') {
+      // Check all member models
       user = await TechMember.findOne({ email }) ||
         await SalesMember.findOne({ email }) ||
         await MarketingMember.findOne({ email });
@@ -202,35 +189,31 @@ export async function login(req, res) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // Check member approval
-    if (type === 'member' && !user.approve) {
-      return res.status(403).json({
-        success: false,
-        message: 'Needs to be approved by the team lead'
-      });
+    // Check approval status
+    if (!user.approve) {
+      if (type === 'lead') {
+        return res.status(403).json({
+          success: false,
+          message: 'Lead must be approved before logging in'
+        });
+      } else {
+        return res.status(403).json({
+          success: false,
+          message: 'Needs to be approved by the team lead'
+        });
+      }
     }
 
+    // Generate token and set cookie
     generateTokenAndSetCookie(user._id, user.team, res);
 
+    // Determine redirect path
     let redirectPath;
-    const team = user.team?.toLowerCase();
-    const isLead = type === 'lead';
-
-    switch (team) {
-      case 'tech':
-        redirectPath = isLead ? '/tech' : '/tech/team';
-        break;
-      case 'sales':
-        redirectPath = isLead ? '/sales' : '/sales/team';
-        break;
-      case 'marketing':
-        redirectPath = isLead ? '/marketing' : '/marketing/team';
-        break;
-      default:
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid or missing team assignment'
-        });
+    if (type === 'lead') {
+      redirectPath = user.team?.toLowerCase() === 'tech' ? '/tech' : '/lead';
+    } else {
+      // For members, redirect based on team
+      redirectPath = `/${user.team.toLowerCase()}`;
     }
 
     return res.status(200).json({
@@ -241,16 +224,19 @@ export async function login(req, res) {
         name: user.name,
         email: user.email,
         team: user.team,
-        role: user.role
+        role: type
       }
     });
 
   } catch (error) {
-    console.error('Error in login:', error);
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    console.error('Login failed:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Login failed',
+      error: error.message
+    });
   }
 }
-
 
 
 // 🚪 Logout
