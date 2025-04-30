@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";  // Import eye icons
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
   const location = useLocation();
@@ -47,18 +49,76 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Form submitted");
+    
+    // Clear previous error messages
+    setGeneralError("");
+    setEmailError("");
+    setPasswordError("");
+    
     if (!validateForm()) return;
 
+    setIsLoading(true);
+    
     try {
-      const result = await login(email, password, role);
-      if (!result.success) {
-        setGeneralError(result.error || "Login failed");
+      // Determine the correct API endpoint
+      const loginEndpoint = 'http://localhost:5001/api/auth/login';
+
+      // Make the request to the backend
+      const response = await fetch(loginEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, type: role }),
+      });
+
+      // Check if the response is empty or not valid JSON
+      let data = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          data = JSON.parse(responseText);
+        } else {
+          throw new Error("Empty response received from server");
+        }
+      } catch (parseError) {
+        console.error("Failed to parse response:", parseError);
+        setGeneralError("Server error. Please try again or contact support.");
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!response.ok) {
+        // Handle different error cases
+        if (response.status === 401) {
+          setGeneralError(data.message || "Invalid email or password");
+        } else if (response.status === 403) {
+          setGeneralError(data.message || "Account not approved yet");
+        } else {
+          setGeneralError(data.message || "Login failed. Please try again.");
+        }
+        return;
+      }
+      
+      // If successful, update auth context and redirect
+      if (data.success) {
+        console.log("Login successful:", data);
+        // Use the provided auth context login method
+        try {
+          await login(email, password, role); // Update auth context
+          navigate(data.redirect || `/${role}/dashboard`);
+        } catch (authError) {
+          console.error("Auth context error:", authError);
+          setGeneralError("Authentication error. Please try again.");
+        }
       } else {
-        // Navigate to role-specific dashboard if needed
-        navigate(result.redirect || `/${role}/dashboard`);;
+        setGeneralError(data.message || "Login failed");
       }
     } catch (err) {
-      setGeneralError(err.message || "An error occurred during login.");
+      console.error("Login error:", err);
+      setGeneralError("Network error. Please check your connection and try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,7 +140,7 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${
+              className={`w-full px-4 py-3 bg-gray-1200 text-text rounded-md border ${
                 emailError ? "border-status-error" : "border-border"
               } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
               placeholder="Enter your email"
@@ -99,17 +159,17 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`w-full px-4 py-3 bg-background-hover text-text rounded-md border ${
+                className={`w-full px-4 py-3 bg-gray-1200 text-text rounded-md border ${
                   passwordError ? "border-status-error" : "border-border"
                 } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
                 placeholder="Enter your password"
               />
               <button
                 type="button"
-                className="absolute right-3 top-3 text-text-muted text-sm"
+                className="absolute right-3 top-3 text-text-muted"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {passwordError && <p className="text-status-error text-sm mt-1">{passwordError}</p>}
@@ -136,9 +196,12 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md font-semibold transition duration-300"
+            disabled={isLoading}
+            className={`w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md font-semibold transition duration-300 ${
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
