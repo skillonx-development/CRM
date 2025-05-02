@@ -46,7 +46,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     return;
                 }
 
-                const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                const res = await fetch(`https://crm-383e.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                 const data = await res.json();
 
                 setPermissions(data.permissions || {});

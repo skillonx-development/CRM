@@ -10,35 +10,34 @@ const StatsWidget = () => {
   const [revenue, setRevenue] = useState(0);
 
   useEffect(() => {
-    setTimeout(() => setAnimate(true), 300);
+    // Trigger animation shortly after mount
+    const timer = setTimeout(() => setAnimate(true), 300);
 
-    const fetchMembers = async () => {
+    const fetchStats = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/members/getMembers/Tech");
-        const data = await res.json();
-        setMemberCount(data.length);
+        // Fetch members
+        const resMembers = await fetch("https://crm-383e.onrender.com/api/members/getMembers/Sales");
+        const membersData = await resMembers.json();
+        setMemberCount(membersData.length);
 
-        const activeMembers = data.filter((member) => member.status === "approved");
+        const activeMembers = membersData.filter(member => member.approve===true);
         setActiveCount(activeMembers.length);
-      } catch (err) {
-        console.error("Error fetching members:", err);
-      }
-    };
 
-    const fetchInvoices = async () => {
-      try {
-        const res = await fetch("http://localhost:5001/api/invoice");
-        const data = await res.json();
-        const paidInvoices = data.filter((invoice) => invoice.status === "Paid");
+        // Fetch invoices
+        const resInvoices = await fetch("https://crm-383e.onrender.com/api/invoice");
+        const invoicesData = await resInvoices.json();
+
+        const paidInvoices = invoicesData.filter(invoice => invoice.status === "Paid");
         const totalRevenue = paidInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
         setRevenue(totalRevenue);
-      } catch (err) {
-        console.error("Error fetching invoices:", err);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchMembers();
-    fetchInvoices();
+    fetchStats();
+
+    return () => clearTimeout(timer);
   }, []);
 
   const stats = [
@@ -56,8 +55,8 @@ const StatsWidget = () => {
       icon: <Users className="w-5 h-5 text-status-info" />,
       change: "+5%",
       subtext: "vs last month",
-      isPercentage: true,
       changeColor: "text-status-success",
+      isPercentage: true,
     },
     {
       title: "Total Revenue Generated",
@@ -65,13 +64,13 @@ const StatsWidget = () => {
       icon: <BarChart className="w-5 h-5 text-status-info" />,
       change: "+12%",
       subtext: "vs last quarter",
-      isMoney: true,
       changeColor: "text-status-success",
+      isMoney: true,
     },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {stats.map((stat, index) => (
         <motion.div
           key={index}
@@ -92,7 +91,6 @@ const StatsWidget = () => {
                   duration={2}
                   separator=","
                   prefix={stat.isMoney ? "₹" : ""}
-                  suffix={stat.isPercentage ? "%" : ""}
                 />
               )}
             </div>
