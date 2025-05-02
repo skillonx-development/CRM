@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react"; // Import eye icons
 
 const AccountSettings = () => {
   const [userData, setUserData] = useState({
@@ -11,6 +12,13 @@ const AccountSettings = () => {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+  });
+
+  // State for password visibility
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
   });
 
   const [userId, setUserId] = useState("");
@@ -38,10 +46,18 @@ const AccountSettings = () => {
     setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
+  // Toggle password visibility
+  const togglePasswordVisibility = (field) => {
+    setPasswordVisibility({
+      ...passwordVisibility,
+      [field]: !passwordVisibility[field],
+    });
+  };
+
   const handleUpdateProfile = async () => {
     try {
       const response = await axios.put(
-        `https://crm-383e.onrender.com/api/members/update-profile/${team}/${userId}/${userRole}`,
+        `http://localhost:5001/api/members/update-profile/${team}/${userId}/${userRole}`,
         {
           name: userData.name,
           email: userData.email,
@@ -50,6 +66,7 @@ const AccountSettings = () => {
 
       const updatedUser = response.data.user;
 
+      // Save updated user data in localStorage
       localStorage.setItem("user", JSON.stringify({ ...updatedUser, team, userRole }));
 
       alert(response.data.message || "Profile updated successfully");
@@ -66,7 +83,7 @@ const AccountSettings = () => {
 
     try {
       const response = await axios.put(
-        `https://crm-383e.onrender.com/api/members/update-password/${team}/${userId}/${userRole}`,
+        `http://localhost:5001/api/members/update-password/${team}/${userId}/${userRole}`,
         {
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
@@ -117,30 +134,74 @@ const AccountSettings = () => {
         <h3 className="text-lg font-semibold text-text-default">Password</h3>
         <p className="text-text-muted text-sm mb-4">Change your password.</p>
         <div className="space-y-4">
-          <input
-            type="password"
-            name="currentPassword"
-            placeholder="Current Password"
-            value={passwordData.currentPassword}
-            onChange={handlePasswordChange}
-            className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
-          />
-          <input
-            type="password"
-            name="newPassword"
-            placeholder="New Password"
-            value={passwordData.newPassword}
-            onChange={handlePasswordChange}
-            className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={passwordData.confirmPassword}
-            onChange={handlePasswordChange}
-            className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
-          />
+          {/* Current Password with eye icon */}
+          <div className="relative">
+            <input
+              type={passwordVisibility.currentPassword ? "text" : "password"}
+              name="currentPassword"
+              placeholder="Current Password"
+              value={passwordData.currentPassword}
+              onChange={handlePasswordChange}
+              className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
+            />
+            <button
+              type="button"
+              onClick={() => togglePasswordVisibility("currentPassword")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted"
+            >
+              {passwordVisibility.currentPassword ? (
+                <Eye size={18} />
+              ) : (
+                <EyeOff size={18} />
+              )}
+            </button>
+          </div>
+          
+          {/* New Password with eye icon */}
+          <div className="relative">
+            <input
+              type={passwordVisibility.newPassword ? "text" : "password"}
+              name="newPassword"
+              placeholder="New Password"
+              value={passwordData.newPassword}
+              onChange={handlePasswordChange}
+              className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
+            />
+            <button
+              type="button"
+              onClick={() => togglePasswordVisibility("newPassword")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted"
+            >
+              {passwordVisibility.newPassword ? (
+                <Eye size={18} />
+              ) : (
+                <EyeOff size={18} />
+              )}
+            </button>
+          </div>
+          
+          {/* Confirm Password with eye icon */}
+          <div className="relative">
+            <input
+              type={passwordVisibility.confirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={passwordData.confirmPassword}
+              onChange={handlePasswordChange}
+              className="w-full p-2 border border-border-dark rounded-lg bg-background-default text-text-default"
+            />
+            <button
+              type="button"
+              onClick={() => togglePasswordVisibility("confirmPassword")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted"
+            >
+              {passwordVisibility.confirmPassword ? (
+                <Eye size={18} />
+              ) : (
+                <EyeOff size={18} />
+              )}
+            </button>
+          </div>
         </div>
         <button
           onClick={handleUpdatePassword}
