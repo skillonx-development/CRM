@@ -18,12 +18,12 @@ import logo from "../Assets/logo.png";
 function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     const { logout, user, loading } = useAuth();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
-
     const [permissions, setPermissions] = useState({});
     const [menuItems, setMenuItems] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
+
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const baseMenuItems = [
         { id: "overview", icon: LayoutGrid, label: "Overview", path: "/sales", permissionKey: "overview" },
@@ -39,65 +39,49 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "logout", icon: LogOut, label: "Logout" },
     ];
 
-    // Initialize sidebar with proper role-based menu items
+    // Initial data loading from localStorage
     useEffect(() => {
         const initializeSidebar = async () => {
             try {
-                // Get user data from localStorage
                 const cachedUser = JSON.parse(localStorage.getItem("user"));
-                if (!cachedUser) {
-                    // No cached user, show loading state
-                    return;
-                }
+                if (!cachedUser) return;
 
                 const userRole = cachedUser.userRole;
-                
-                // Set menu items based on role
-                // For non-lead users, filter out the team-management item
                 const filtered = userRole === "lead"
                     ? baseMenuItems
                     : baseMenuItems.filter(item => item.id !== "team-management");
-                
+
                 setMenuItems(filtered);
                 setIsInitialized(true);
-                
-                // Fetch permissions
+
                 if (cachedUser._id && cachedUser.team) {
-                    try {
-                        const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
-                        const data = await res.json();
-                        setPermissions(data.permissions || {});
-                    } catch (err) {
-                        console.error("Error fetching permissions:", err);
-                    }
+                    const res = await fetch(`https://crm-383e.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                    const data = await res.json();
+                    setPermissions(data.permissions || {});
                 }
             } catch (error) {
                 console.error("Error initializing sidebar:", error);
-                // Show default menu items in case of error
                 setMenuItems(baseMenuItems.filter(item => item.id !== "team-management"));
                 setIsInitialized(true);
             }
         };
-
         initializeSidebar();
     }, []);
 
-    // Update from auth context when it's available
+    // On user state update
     useEffect(() => {
         if (!loading && user) {
             const userRole = user.userRole;
-            
-            // Update menu items based on role from context
             const filtered = userRole === "lead"
                 ? baseMenuItems
                 : baseMenuItems.filter(item => item.id !== "team-management");
-            
+
             setMenuItems(filtered);
             setIsInitialized(true);
         }
     }, [user, loading]);
 
-    // Set active tab based on current location
+    // Set active tab based on route
     useEffect(() => {
         if (menuItems.length > 0) {
             const allItems = [...menuItems, ...bottomMenuItems];
@@ -109,6 +93,12 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
     }, [location.pathname, menuItems, setActiveTab]);
 
     const toggleSidebar = () => setCollapsed(!collapsed);
+
+    const handleLogout = () => {
+        logout();
+        setActiveTab("logout");
+        navigate("/");
+    };
 
     const sidebarVariants = {
         expanded: { width: 256, transition: { duration: 0.3, type: "spring", stiffness: 100 } },
@@ -125,9 +115,6 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         collapsed: { rotate: 180, transition: { duration: 0.3 } },
     };
 
-    const handleLogout = () => logout();
-
-    // Show loading state if not initialized yet
     if (!isInitialized) {
         return (
             <motion.aside
@@ -159,6 +146,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                 animate={collapsed ? "collapsed" : "expanded"}
                 variants={sidebarVariants}
             >
+                {/* Logo & Toggle */}
                 <div className="p-4 flex items-center justify-between">
                     <div className={`flex items-center ${collapsed ? "justify-center w-full" : "space-x-3"}`}>
                         <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
@@ -185,6 +173,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     </motion.button>
                 </div>
 
+                {/* Menu Items */}
                 <nav className="mt-6">
                     <ul className={`space-y-2 ${collapsed ? "px-2" : "px-4"}`}>
                         {menuItems.map((item) => {
@@ -223,12 +212,20 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     </ul>
                 </nav>
 
+                {/* Bottom Menu */}
                 <div className={`absolute bottom-8 w-full ${collapsed ? "px-2" : "px-4"}`}>
                     <ul className="space-y-2">
                         {bottomMenuItems.map((item) => (
                             <li key={item.id}>
                                 <button
-                                    onClick={() => item.id === "logout" ? setShowLogoutModal(true) : navigate(item.path)}
+                                    onClick={() => {
+                                        if (item.id === "logout") {
+                                            setShowLogoutModal(true);
+                                        } else {
+                                            navigate(item.path);
+                                            setActiveTab(item.id);
+                                        }
+                                    }}
                                     className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
                                         ? "bg-primary text-white"
                                         : "text-white hover:bg-background-hover"
@@ -256,6 +253,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                 </div>
             </motion.aside>
 
+            {/* Logout Modal */}
             {showLogoutModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-background-card p-6 rounded-lg shadow-lg w-full max-w-sm">
@@ -264,7 +262,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                         <div className="flex justify-end space-x-4">
                             <button
                                 onClick={() => setShowLogoutModal(false)}
-                                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400 hover:text-black transition"
+                                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400 transition"
                             >
                                 Cancel
                             </button>

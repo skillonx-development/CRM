@@ -45,7 +45,7 @@ function TechSidebar({ setActiveTab, collapsed, setCollapsed }) {
                 const cachedUser = JSON.parse(localStorage.getItem("user"));
                 if (!cachedUser?._id) return;
 
-                const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                const res = await fetch(`https://crm-383e.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                 const data = await res.json();
                 setPermissions(data.permissions || {});
             } catch (err) {
