@@ -27,7 +27,7 @@ export default function OrderManagement() {
 
   const fetchSentProposals = async () => {
     try {
-      const res = await axios.get("https://crm-383e.onrender.com/api/tech-proposals/sent");
+      const res = await axios.get("http://localhost:5001/api/tech-proposals/sent");
       const mapped = res.data.map((p) => ({
         id: p._id,
         title: p.title,
@@ -57,7 +57,7 @@ export default function OrderManagement() {
 
   const saveChanges = async () => {
     try {
-      await axios.put(`https://crm-383e.onrender.com/api/tech-proposals/${editData.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${editData.id}`, {
         title: editData.title,
         status: editData.status,
         institution: editData.school,
@@ -77,7 +77,7 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       setIsSending(true);
-      await axios.put(`https://crm-383e.onrender.com/api/tech-proposals/${order.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
         institution: order.school,
@@ -86,7 +86,7 @@ export default function OrderManagement() {
         adminApproval: order.adminApproval
       });
 
-      await axios.post(`https://crm-383e.onrender.com/api/tech-proposals/send-email/${order.id}`);
+      await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);
@@ -124,35 +124,41 @@ export default function OrderManagement() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        {filteredOrders.map(order => (
-          <motion.div key={order.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="bg-card border border-border shadow-md p-5 rounded-2xl">
-              <div className="flex justify-between items-center mb-3">
-                <h2 className="text-lg font-semibold">{order.title}</h2>
-                <span className={`text-xs text-white px-3 py-1 rounded-full ${statusColors[order.status] || "bg-gray-400"}`}>
-                  {order.status}
-                </span>
+      {filteredOrders.length === 0 ? (
+        <div className="text-center text-muted-foreground text-lg py-10">
+          No {filter === "All" ? "" : filter.toLowerCase()} orders found.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          {filteredOrders.map(order => (
+            <motion.div key={order.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="bg-card border border-border shadow-md p-5 rounded-2xl">
+                <div className="flex justify-between items-center mb-3">
+                  <h2 className="text-lg font-semibold">{order.title}</h2>
+                  <span className={`text-xs text-white px-3 py-1 rounded-full ${statusColors[order.status] || "bg-gray-400"}`}>
+                    {order.status}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">{order.school}</p>
+                <p className="text-sm text-text-muted">{order.collegeEmail}</p>
+                <div className="mt-2 text-sm bg-muted p-2 rounded-xl">
+                  📅 <span className="text-foreground">{order.schedule}</span>
+                </div>
+                <p className="text-xl font-bold mt-4 text-primary">₹{order.price}</p>
+                {order.status === "Completed" && (
+                  <p className="text-xs mt-2 text-emerald-600 font-semibold">✅ This order is completed</p>
+                )}
+                <button
+                  className="w-full mt-4 bg-primary hover:bg-primary-dark px-4 py-2 rounded-xl text-white font-medium transition"
+                  onClick={() => handleManageOrder(order)}
+                >
+                  Manage Order
+                </button>
               </div>
-              <p className="text-sm text-muted-foreground">{order.school}</p>
-              <p className="text-sm text-text-muted">{order.collegeEmail}</p>
-              <div className="mt-2 text-sm bg-muted p-2 rounded-xl">
-                📅 <span className="text-foreground">{order.schedule}</span>
-              </div>
-              <p className="text-xl font-bold mt-4 text-primary">₹{order.price}</p>
-              {order.status === "Completed" && (
-                <p className="text-xs mt-2 text-emerald-600 font-semibold">✅ This order is completed</p>
-              )}
-              <button
-                className="w-full mt-4 bg-primary hover:bg-primary-dark px-4 py-2 rounded-xl text-white font-medium transition"
-                onClick={() => handleManageOrder(order)}
-              >
-                Manage Order
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Modal */}
       <AnimatePresence>
@@ -222,50 +228,49 @@ export default function OrderManagement() {
                   />
                 </div>
                 <div>
-  <label className="block text-sm font-medium">Admin Approval</label>
-  <input
-    type="text"
-    readOnly
-    value={editData.adminApproval ? "Approved" : "Not Approved"}
-    className="w-full p-2 mt-1 border rounded-xl bg-muted cursor-not-allowed text-muted-foreground"
-  />
-</div>
+                  <label className="block text-sm font-medium">Admin Approval</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={editData.adminApproval ? "Approved" : "Not Approved"}
+                    className="w-full p-2 mt-1 border rounded-xl bg-muted cursor-not-allowed text-muted-foreground"
+                  />
+                </div>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
-  <button
-    onClick={() => setIsModalOpen(false)}
-    className="bg-muted px-4 py-2 rounded-xl text-muted-foreground hover:bg-muted/70"
-  >
-    Cancel
-  </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-muted px-4 py-2 rounded-xl text-muted-foreground hover:bg-muted/70"
+                >
+                  Cancel
+                </button>
 
-  <button
-    onClick={() => sendEmail(editData)}
-    disabled={isSending || !editData.adminApproval}
-    className={`px-4 py-2 rounded-xl text-white transition ${
-      !editData.adminApproval
-        ? "bg-gray-400 cursor-not-allowed"
-        : isSending
-        ? "bg-green-400 cursor-not-allowed"
-        : "bg-green-600 hover:bg-green-700"
-    }`}
-  >
-    {!editData.adminApproval
-      ? "Admin Approval Required"
-      : isSending
-      ? "Sending..."
-      : "Send Email"}
-  </button>
+                <button
+                  onClick={() => sendEmail(editData)}
+                  disabled={isSending || !editData.adminApproval}
+                  className={`px-4 py-2 rounded-xl text-white transition ${
+                    !editData.adminApproval
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : isSending
+                      ? "bg-green-400 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  }`}
+                >
+                  {!editData.adminApproval
+                    ? "Admin Approval Required"
+                    : isSending
+                    ? "Sending..."
+                    : "Send Email"}
+                </button>
 
-  <button
-    onClick={saveChanges}
-    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl"
-  >
-    Save
-  </button>
-</div>
-
+                <button
+                  onClick={saveChanges}
+                  className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-xl"
+                >
+                  Save
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

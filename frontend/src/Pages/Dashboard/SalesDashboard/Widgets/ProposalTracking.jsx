@@ -6,7 +6,7 @@ import axios from 'axios';
 const api = {
   fetchProposals: async () => {
     try {
-      const response = await axios.get('https://crm-383e.onrender.com/api/proposals');
+      const response = await axios.get('http://localhost:5001/api/proposals');
       return response.data.proposals;
     } catch (error) {
       console.error("Error fetching proposals:", error);
@@ -15,7 +15,7 @@ const api = {
   },
   createProposal: async (proposal) => {
     try {
-      const response = await axios.post('https://crm-383e.onrender.com/api/proposals', proposal);
+      const response = await axios.post('http://localhost:5001/api/proposals', proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error creating proposal:", error);
@@ -24,7 +24,7 @@ const api = {
   },
   updateProposal: async (id, proposal) => {
     try {
-      const response = await axios.put(`https://crm-383e.onrender.com/api/proposals/${id}`, proposal);
+      const response = await axios.put(`http://localhost:5001/api/proposals/${id}`, proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error updating proposal:", error);
@@ -43,6 +43,7 @@ const ProposalTracking = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentProposal, setCurrentProposal] = useState(null);
+  const [minDate, setMinDate] = useState("");
 
   const [newProposal, setNewProposal] = useState({
     title: "",
@@ -51,7 +52,7 @@ const ProposalTracking = () => {
     statusColor: "bg-primary",
     institution: "",
     collegeEmail: "",
-    scheduleDate: "", 
+    scheduleDate: "",
     description: "",
   });
 
@@ -62,9 +63,16 @@ const ProposalTracking = () => {
     statusColor: "",
     institution: "",
     collegeEmail: "",
-    scheduleDate: "", 
+    scheduleDate: "",
     description: "",
   });
+
+  // Set minimum date as today
+  useEffect(() => {
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+    setMinDate(formattedToday);
+  }, []);
 
   useEffect(() => {
     const loadProposals = async () => {
@@ -160,31 +168,31 @@ const ProposalTracking = () => {
 
   const handleEdit = (proposal) => {
     setCurrentProposal(proposal);
-    
+
     // Format the date for the date input
     const dateObj = new Date(proposal.scheduleDate);
     const formattedDate = dateObj.toISOString().split('T')[0];
-    
+
     setEditProposal({
       ...proposal,
       scheduleDate: formattedDate
     });
-    
+
     setShowEditProposalForm(true);
   };
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://crm-383e.onrender.com/api/proposals/${editProposal._id}`, {
+      const response = await fetch(`http://localhost:5001/api/proposals/${editProposal._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(editProposal), // This should match the proposal structure
       });
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         alert("Proposal updated successfully!");
         // Optionally refetch proposals or update UI state
@@ -197,12 +205,12 @@ const ProposalTracking = () => {
       alert("An error occurred while updating proposal");
     }
   };
-  
+
   return (
     <div className="bg-background p-6 rounded-xl shadow-card border border-border w-full">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-text">Proposal Tracking</h1>
-        <button 
+        <button
           className="bg-primary text-text px-4 py-2 rounded-lg flex items-center gap-2 shadow-card"
           onClick={() => setShowNewProposalForm(true)}
         >
@@ -397,6 +405,7 @@ const ProposalTracking = () => {
                 <input
                   type="date"
                   name="scheduleDate"
+                  min={minDate}
                   value={newProposal.scheduleDate}
                   onChange={(e) => handleInputChange(e, 'new')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"
@@ -530,6 +539,7 @@ const ProposalTracking = () => {
                 <input
                   type="date"
                   name="scheduleDate"
+                  min={minDate}
                   value={editProposal.scheduleDate}
                   onChange={(e) => handleInputChange(e, 'edit')}
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background-card text-text shadow-sm"

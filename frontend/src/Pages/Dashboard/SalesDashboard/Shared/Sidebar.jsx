@@ -55,7 +55,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                 setIsInitialized(true);
 
                 if (cachedUser._id && cachedUser.team) {
-                    const res = await fetch(`https://crm-383e.onrender.com/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                    const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                     const data = await res.json();
                     setPermissions(data.permissions || {});
                 }
@@ -159,17 +159,23 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                 >
-                                    Flariex
+                                    Skillonx
                                 </motion.h1>
                             )}
                         </AnimatePresence>
                     </div>
                     <motion.button
                         onClick={toggleSidebar}
-                        className={`p-1 rounded-full hover:bg-background-hover transition-colors text-text-muted hover:text-white ${collapsed ? "absolute top-4 right-4" : ""}`}
+                        className={`
+                            p-2 rounded-full transition-colors text-text-muted hover:text-white
+                            ${collapsed 
+                                ? "absolute top-4 right-4 bg-black bg-opacity-90 shadow-md hover:bg-background-hover border border-border-dark" 
+                                : "hover:bg-background-hover"
+                            }
+                        `}
                         variants={toggleButtonVariants}
                     >
-                        <ChevronLeft size={20} />
+                        <ChevronLeft size={18} />
                     </motion.button>
                 </div>
 

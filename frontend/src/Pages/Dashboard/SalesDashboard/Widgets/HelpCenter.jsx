@@ -3,6 +3,36 @@ import { Search, MessageSquare, FileText, LifeBuoy } from "lucide-react";
 
 const HelpCenter = () => {
   const [activeTab, setActiveTab] = useState("FAQ");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const faqData = [
+    {
+      question: "How does the lead scoring system work?",
+      answer: "The lead scoring system assigns points to leads based on their interactions with your business, such as website visits, email opens, and form submissions. Higher scores indicate higher engagement."
+    },
+    {
+      question: "Can I customize the scoring criteria?",
+      answer: "Yes, you can customize the scoring criteria in the settings section of your dashboard. Adjust weights for different actions to match your sales strategy."
+    },
+    {
+      question: "How do I generate a new proposal?",
+      answer: "To generate a new proposal, navigate to the Proposal section, select 'Create New,' fill in the required details, and choose a template. Then, preview and send it to your client."
+    },
+    {
+      question: "What do the different lead statuses mean?",
+      answer: "Lead statuses help track the progress of a lead through your sales funnel. Common statuses include 'New,' 'Contacted,' 'Qualified,' 'Proposal Sent,' and 'Closed.' You can customize these in settings."
+    },
+    {
+      question: "How can I track my sales performance?",
+      answer: "You can track your sales performance using the Analytics & Reporting section. View key metrics such as conversion rates, revenue, and sales trends over time."
+    }
+  ];
+
+  // Filter the FAQs based on the search query
+  const filteredFAQs = faqData.filter(faq => 
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="bg-background text-text p-6">
@@ -15,6 +45,8 @@ const HelpCenter = () => {
           type="text" 
           placeholder="Search for help topics..." 
           className="w-full bg-background-card border border-border-dark rounded-lg pl-10 p-2 focus:outline-none"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} // Update the search query
         />
       </div>
       
@@ -35,26 +67,16 @@ const HelpCenter = () => {
           <h2 className="text-xl font-semibold mb-2">Frequently Asked Questions</h2>
           <p className="text-text-muted mb-4">Find answers to the most common questions about using the Sales Dashboard.</p>
           <div className="space-y-3">
-            <details className="border border-border-dark p-3 rounded-lg cursor-pointer">
-              <summary className="font-medium">How does the lead scoring system work?</summary>
-              <p className="text-text-muted mt-2">The lead scoring system assigns points to leads based on their interactions with your business, such as website visits, email opens, and form submissions. Higher scores indicate higher engagement.</p>
-            </details>
-            <details className="border border-border-dark p-3 rounded-lg cursor-pointer">
-              <summary className="font-medium">Can I customize the scoring criteria?</summary>
-              <p className="text-text-muted mt-2">Yes, you can customize the scoring criteria in the settings section of your dashboard. Adjust weights for different actions to match your sales strategy.</p>
-            </details>
-            <details className="border border-border-dark p-3 rounded-lg cursor-pointer">
-              <summary className="font-medium">How do I generate a new proposal?</summary>
-              <p className="text-text-muted mt-2">To generate a new proposal, navigate to the Proposal section, select "Create New," fill in the required details, and choose a template. Then, preview and send it to your client.</p>
-            </details>
-            <details className="border border-border-dark p-3 rounded-lg cursor-pointer">
-              <summary className="font-medium">What do the different lead statuses mean?</summary>
-              <p className="text-text-muted mt-2">Lead statuses help track the progress of a lead through your sales funnel. Common statuses include "New," "Contacted," "Qualified," "Proposal Sent," and "Closed." You can customize these in settings.</p>
-            </details>
-            <details className="border border-border-dark p-3 rounded-lg cursor-pointer">
-              <summary className="font-medium">How can I track my sales performance?</summary>
-              <p className="text-text-muted mt-2">You can track your sales performance using the Analytics & Reporting section. View key metrics such as conversion rates, revenue, and sales trends over time.</p>
-            </details>
+            {filteredFAQs.length > 0 ? (
+              filteredFAQs.map((faq, index) => (
+                <details key={index} className="border border-border-dark p-3 rounded-lg cursor-pointer">
+                  <summary className="font-medium">{faq.question}</summary>
+                  <p className="text-text-muted mt-2">{faq.answer}</p>
+                </details>
+              ))
+            ) : (
+              <p className="text-text-muted">No results found. Try a different search.</p>
+            )}
           </div>
         </div>
       )}
@@ -77,17 +99,9 @@ const HelpCenter = () => {
           <div className="bg-background-card p-4 rounded-lg shadow-card flex items-center gap-4">
             <MessageSquare className="text-primary" />
             <div>
-              <h3 className="font-semibold">Live Chat</h3>
-              <p className="text-text-muted">Chat with our support team in real-time.</p>
-              <button className="bg-primary text-white px-4 py-2 rounded-lg mt-2">Start Chat</button>
-            </div>
-          </div>
-          <div className="bg-background-card p-4 rounded-lg shadow-card flex items-center gap-4">
-            <LifeBuoy className="text-primary" />
-            <div>
-              <h3 className="font-semibold">Support Ticket</h3>
-              <p className="text-text-muted">Submit a ticket for technical issues.</p>
-              <button className="bg-primary text-white px-4 py-2 rounded-lg mt-2">Create Ticket</button>
+              <h3 className="font-semibold">For further support, contact admin</h3>
+              <p className="text-text-muted">admin@example.com</p>
+              <p className="text-text-muted">skillonx@example.com</p>
             </div>
           </div>
         </div>
