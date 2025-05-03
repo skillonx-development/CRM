@@ -13,7 +13,7 @@ const RevenueChart = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/api/invoice');
+                const response = await axios.get('https://crm-383e.onrender.com/api/invoice');
                 const invoiceData = response.data; // Assuming the data structure is an array of invoices
 
                 // Transform the data to monthly revenue format
