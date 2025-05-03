@@ -61,7 +61,7 @@ const LoginPage = () => {
     
     try {
       // Determine the correct API endpoint
-      const loginEndpoint = 'http://localhost:5001/api/auth/login';
+      const loginEndpoint = 'https://crm-383e.onrender.com/api/auth/login';
 
       // Make the request to the backend
       const response = await fetch(loginEndpoint, {

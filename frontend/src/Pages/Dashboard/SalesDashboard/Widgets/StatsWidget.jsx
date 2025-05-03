@@ -16,7 +16,7 @@ const StatsWidget = () => {
     const fetchStats = async () => {
       try {
         // Fetch members
-        const resMembers = await fetch("http://localhost:5001/api/members/getMembers/Sales");
+        const resMembers = await fetch("https://crm-383e.onrender.com/api/members/getMembers/Sales");
         const membersData = await resMembers.json();
         setMemberCount(membersData.length);
 
@@ -24,7 +24,7 @@ const StatsWidget = () => {
         setActiveCount(activeMembers.length);
 
         // Fetch invoices
-        const resInvoices = await fetch("http://localhost:5001/api/invoice");
+        const resInvoices = await fetch("https://crm-383e.onrender.com/api/invoice");
         const invoicesData = await resInvoices.json();
 
         const paidInvoices = invoicesData.filter(invoice => invoice.status === "Paid");
