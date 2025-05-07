@@ -1,13 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Star, Mail, Phone, ArrowLeft, FileText, Users, MessageSquare, Megaphone
+  Star, Mail, Phone, ArrowLeft, FileText, Users, MessageSquare, Megaphone, X
 } from "lucide-react";
+
+// =======================
+// Contact Modal Component
+// =======================
+const ContactModal = ({ isOpen, onClose, type, contact, memberName }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-gray-900 rounded-xl shadow-lg w-full max-w-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold text-white">
+            {type === "email" ? "Email Address" : "Phone Number"}
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="mb-6">
+          <p className="text-gray-400 mb-2">Contact information for {memberName}</p>
+          <div className="flex items-center p-4 bg-gray-800 rounded-lg border border-gray-700">
+            {type === "email" ? (
+              <Mail className="w-6 h-6 text-blue-400 mr-3" />
+            ) : (
+              <Phone className="w-6 h-6 text-green-400 mr-3" />
+            )}
+            <span className="text-white text-lg font-medium">{contact}</span>
+          </div>
+        </div>
+        
+        <button
+          onClick={onClose}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg w-full"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // =======================
 // Member Card Component
 // =======================
-const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
+const MemberCard = ({ member, index, onManage, onToggleApprove, onContactClick }) => (
   <motion.div
     key={member._id}
     initial={{ opacity: 0, y: 20 }}
@@ -29,8 +70,14 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
         </div>
       </div>
       <div className="flex space-x-3 text-gray-400">
-        <Mail className="w-5 h-5 cursor-pointer hover:text-blue-400" />
-        <Phone className="w-5 h-5 cursor-pointer hover:text-green-400" />
+        <Mail 
+          className="w-5 h-5 cursor-pointer hover:text-blue-400" 
+          onClick={() => onContactClick(member, "email")}
+        />
+        <Phone 
+          className="w-5 h-5 cursor-pointer hover:text-green-400" 
+          onClick={() => onContactClick(member, "phone")}
+        />
       </div>
     </div>
 
@@ -166,6 +213,12 @@ const TeamWidget = () => {
   const [error, setError] = useState("");
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [contactModal, setContactModal] = useState({
+    isOpen: false,
+    type: null, // "email" or "phone"
+    contact: "",
+    memberName: ""
+  });
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -216,6 +269,29 @@ const TeamWidget = () => {
     setSelectedMember(null);
   };
 
+  const handleContactClick = (member, type) => {
+    // Use the actual email and contactNumber fields from the member data
+    const contactInfo = type === "email" 
+      ? member.email 
+      : member.contactNumber;
+    
+    setContactModal({
+      isOpen: true,
+      type: type,
+      contact: contactInfo,
+      memberName: member.name
+    });
+  };
+
+  const closeContactModal = () => {
+    setContactModal({
+      isOpen: false,
+      type: null,
+      contact: "",
+      memberName: ""
+    });
+  };
+
   const handleSavePermissions = async (memberId, permissions, team) => {
     try {
       const response = await fetch(`https://crm-383e.onrender.com/api/members/updatePermissions/${memberId}`, {
@@ -246,6 +322,7 @@ const TeamWidget = () => {
             index={index}
             onManage={handleManageAccess}
             onToggleApprove={handleToggleApprove}
+            onContactClick={handleContactClick}
           />
         ))}
       </div>
@@ -255,6 +332,14 @@ const TeamWidget = () => {
         onClose={handleCloseModal}
         member={selectedMember}
         onSave={handleSavePermissions}
+      />
+
+      <ContactModal
+        isOpen={contactModal.isOpen}
+        onClose={closeContactModal}
+        type={contactModal.type}
+        contact={contactModal.contact}
+        memberName={contactModal.memberName}
       />
     </>
   );

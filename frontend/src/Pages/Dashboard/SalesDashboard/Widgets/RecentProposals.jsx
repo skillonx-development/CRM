@@ -47,7 +47,7 @@ const RecentProposals = () => {
     <div className="bg-background-card p-6 rounded-xl shadow-card border border-border ml-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-white">Recent Proposals</h2>
-        <a href="http://localhost:5173/sales/proposals" className="text-primary-light text-sm">
+        <a href="https://skillonxcrm/sales/proposals" className="text-primary-light text-sm">
           View all
         </a>
       </div>

@@ -61,7 +61,6 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "overview", icon: LayoutGrid, label: "Overview", path: "/marketing", permissionKey: "overview" },
         { id: "proposals", icon: Users, label: "Proposals", path: "/marketing/proposals", permissionKey: "proposals" },
         { id: "teachers", icon: FileText, label: "Teachers", path: "/marketing/teachers", permissionKey: "teachers" },
-        { id: "feedback", icon: Package, label: "Feedback", path: "/marketing/feedback", permissionKey: "feedback" },
         { id: "team-management", icon: Users, label: "Team Management", path: "/marketing/team", permissionKey: "team-management" },
     ];
 

@@ -7,6 +7,7 @@ import {
   CheckCircle,
   UserCheck,
   X,
+  Search
 } from "lucide-react";
 
 const filters = ["All Teachers", "Available", "Busy"];
@@ -18,6 +19,7 @@ export default function TeacherManagement() {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [proposals, setProposals] = useState([]);
   const [viewTeacher, setViewTeacher] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -65,10 +67,16 @@ export default function TeacherManagement() {
     fetchProposals();
   }, [selectedTeacher]);
 
-  const filteredTeachers = teachers.filter(
-    (teacher) =>
-      activeFilter === "All Teachers" || teacher.status === activeFilter
-  );
+  const filteredTeachers = teachers
+    .filter(
+      (teacher) =>
+        activeFilter === "All Teachers" || teacher.status === activeFilter
+    )
+    .filter(
+      (teacher) =>
+        teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        teacher.specialty.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   const handleAssignClick = (teacherName) => {
     setSelectedTeacher(teacherName);
@@ -108,6 +116,18 @@ export default function TeacherManagement() {
 
   return (
     <div className="p-6 bg-background rounded-2xl shadow-card">
+      {/* Search Bar */}
+      <div className="relative w-full mb-4">
+        <Search className="absolute left-3 top-3 text-text-muted" size={16} />
+        <input
+          type="text"
+          placeholder="Search teachers"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-blue-500 text-text bg-background-muted"
+        />
+      </div>
+
+      {/* Filter Tabs */}
       <div className="flex space-x-4 border-b border-border pb-4 mb-4">
         {filters.map((tab) => (
           <button
@@ -279,65 +299,48 @@ export default function TeacherManagement() {
                 className="w-full px-3 py-2 rounded-md border border-border bg-background"
                 value={viewTeacher.assignedWorkshop || "No workshop selected"}
                 onChange={(e) =>
-                  setViewTeacher((prev) => ({ ...prev, assignedWorkshop: e.target.value }))
+                  setViewTeacher((prev) => ({
+                    ...prev,
+                    assignedWorkshop: e.target.value,
+                  }))
                 }
               />
               <select
                 className="w-full px-3 py-2 rounded-md border border-border bg-background"
                 value={viewTeacher.status || ""}
                 onChange={(e) =>
-                  setViewTeacher((prev) => ({ ...prev, status: e.target.value }))
+                  setViewTeacher((prev) => ({
+                    ...prev,
+                    status: e.target.value,
+                  }))
                 }
               >
-                <option value="">Select Status</option>
                 <option value="Available">Available</option>
                 <option value="Busy">Busy</option>
               </select>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  className="bg-gray-300  text-black px-4 py-2 rounded-lg"
-                  onClick={() => setViewTeacher(null)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-primary hover:bg-purple-600 px-4 py-2 text-white rounded-lg"
-                >
-                  Save Changes
-                </button>
-                <button
-                  type="button"
-                  className="bg-red-500 hover:bg-red-700 px-4 py-2 text-white rounded-lg"
-                  onClick={async () => {
-                    try {
-                      const updatedTeacher = {
-                        ...viewTeacher,
-                        status: "Available",
-                        assignedWorkshop: "",
-                      };
-
-                      await axios.put(
-                        `https://crm-383e.onrender.com/api/teachers/${viewTeacher._id}`,
-                        updatedTeacher
-                      );
-
-                      setTeachers((prev) =>
-                        prev.map((t) =>
-                          t._id === viewTeacher._id ? updatedTeacher : t
-                        )
-                      );
-                      setViewTeacher(null);
-                    } catch (err) {
-                      console.error("Failed to unassign teacher", err);
-                    }
-                  }}
-                >
-                  Unassign
-                </button>
-              </div>
+              <button type="submit" className="w-full bg-primary py-2 rounded-md text-white">
+                Save Changes
+              </button>
             </form>
+
+            <button
+              onClick={async () => {
+                await axios.put(
+                  `https://crm-383e.onrender.com/api/teachers/unassign/${viewTeacher._id}`
+                );
+                setViewTeacher(null);
+                setTeachers((prev) =>
+                  prev.map((t) =>
+                    t._id === viewTeacher._id
+                      ? { ...t, assignedWorkshop: null, status: "Available" }
+                      : t
+                  )
+                );
+              }}
+              className="w-full bg-danger py-2 rounded-md text-white mt-4"
+            >
+              Unassign
+            </button>
           </div>
         </div>
       )}
