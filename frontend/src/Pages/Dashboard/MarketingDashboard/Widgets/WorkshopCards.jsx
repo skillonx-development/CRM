@@ -9,7 +9,7 @@ export default function WorkshopCards() {
     const fetchTechProposals = async () => {
       try {
         // Fetch data from the API
-        const response = await axios.get("http://localhost:5001/api/tech-proposals");
+        const response = await axios.get("https://crm-383e.onrender.com/api/tech-proposals");
         setTechProposals(response.data); // Store the fetched data in state
       } catch (error) {
         console.error("Error fetching tech proposals:", error);

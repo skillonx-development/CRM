@@ -32,7 +32,7 @@ const handleInputChange = (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5001/api/teachers/add", {
+      const response = await fetch("https://crm-383e.onrender.com/api/teachers/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
