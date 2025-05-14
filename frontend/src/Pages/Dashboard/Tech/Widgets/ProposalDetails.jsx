@@ -124,11 +124,12 @@ const ProposalDetails = ({ proposal }) => {
             <FaCalendarAlt /> Schedule Date:
           </label>
           <input
-            type="date"
-            className="w-full p-3 border border-border-dark rounded bg-background-hover text-text-default"
-            value={scheduledDate}
-            onChange={(e) => setScheduledDate(e.target.value)}
-          />
+  type="date"
+  className="w-full p-3 border border-border-dark rounded bg-background-hover text-text-default"
+  value={scheduledDate}
+  min={new Date().toISOString().split("T")[0]}  // Disable past dates
+  onChange={(e) => setScheduledDate(e.target.value)}
+/>
         </div>
         <div>
           <label className="block text-text-muted mb-1 flex items-center gap-2">
@@ -195,12 +196,14 @@ const ProposalDetails = ({ proposal }) => {
               value={item.step}
               onChange={(e) => handleTimelineChange(index, "step", e.target.value)}
             />
-            <input
-              type="date"
-              className="w-full p-2 mb-2 border border-border-dark rounded bg-background-hover text-text-default"
-              value={item.date}
-              onChange={(e) => handleTimelineChange(index, "date", e.target.value)}
-            />
+           <input
+  type="date"
+  className="w-full p-2 mb-2 border border-border-dark rounded bg-background-hover text-text-default"
+  value={item.date}
+  min={new Date().toISOString().split("T")[0]}  // Disable past dates
+  onChange={(e) => handleTimelineChange(index, "date", e.target.value)}
+/>
+
             <textarea
               placeholder="Description"
               className="w-full p-2 border border-border-dark rounded bg-background-hover text-text-default"
@@ -231,9 +234,6 @@ const ProposalDetails = ({ proposal }) => {
       />
 
       <div className="flex gap-3 mt-4">
-        <button className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-md">
-          <FaSave /> Save Draft
-        </button>
         <button
           className="flex items-center gap-2 bg-status-info text-white px-5 py-2 rounded-md"
           onClick={handleSubmit}

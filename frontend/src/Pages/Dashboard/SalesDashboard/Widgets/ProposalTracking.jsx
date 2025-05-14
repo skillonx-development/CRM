@@ -120,6 +120,19 @@ const ProposalTracking = () => {
     const updateFunction = formType === 'new' ? setNewProposal : setEditProposal;
     const currentForm = formType === 'new' ? newProposal : editProposal;
 
+    //restricting speical characters for workshop and institution name
+    if ((name === "title" || name === "institution") && /[^a-zA-Z\s]/.test(value)) {
+      alert("Only alphabets and spaces are allowed in the Workshop Title and Institution Name.");
+      return;
+    }
+    
+    //restricting special characters for price
+    if (name === "price" && /[^0-9]/.test(value)) {
+      alert("Only numeric values are allowed for the price.");
+      return;
+    }
+
+    
     if (name === "status") {
       let statusColor = "bg-primary";
       if (value === "Proposal Sent") statusColor = "bg-status-info";

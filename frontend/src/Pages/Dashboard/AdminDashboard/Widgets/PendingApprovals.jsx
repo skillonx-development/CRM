@@ -17,20 +17,13 @@ const PendingApprovals = () => {
 
       const newBadgeStatus = { ...badgeStatus };
       acceptedApprovals.forEach((item) => {
-        if (!newBadgeStatus[item._id]) {
-          if (item.adminApproved === true) {
-            newBadgeStatus[item._id] = 'Approved';
-          } else if (item.adminApproved === false) {
-            newBadgeStatus[item._id] = 'Disapproved';
-          } else {
-            newBadgeStatus[item._id] = 'Pending';
-          }
-        }
-
-        if (item.adminApproved === true && newBadgeStatus[item._id] !== 'Approved') {
+        // Use adminApproval field instead of adminApproved
+        if (item.adminApproval === true) {
           newBadgeStatus[item._id] = 'Approved';
-        } else if (item.adminApproved === false && newBadgeStatus[item._id] !== 'Disapproved') {
+        } else if (item.adminApproval === false) {
           newBadgeStatus[item._id] = 'Disapproved';
+        } else {
+          newBadgeStatus[item._id] = 'Pending';
         }
       });
 
@@ -66,7 +59,7 @@ const PendingApprovals = () => {
       setApprovals((prevApprovals) =>
         prevApprovals.map((approval) =>
           approval._id === selectedApproval._id
-            ? { ...approval, adminApproved: approved }
+            ? { ...approval, adminApproval: approved } // Update adminApproval instead of adminApproved
             : approval
         )
       );

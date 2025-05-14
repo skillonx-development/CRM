@@ -88,7 +88,15 @@ const HelpCenter = () => {
               <FileText className="text-primary mb-2" />
               <h3 className="font-semibold text-lg">{guide.title}</h3>
               <p className="text-text-muted mb-2">{guide.desc}</p>
-              <button className="text-primary">Read Guide</button>
+              <a
+  href="https://drive.google.com/file/d/1uiYRc36UfoLatSGl_ORhE62euRwhtaCm/view?usp=drive_link"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-primary underline"
+>
+              <button className="text-primary">
+                Read Guide</button>
+                </a>
             </div>
           ))}
         </div>

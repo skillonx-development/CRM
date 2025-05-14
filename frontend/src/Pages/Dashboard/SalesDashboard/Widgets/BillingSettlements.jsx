@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaDownload, FaSearch, FaPlus, FaEdit } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
@@ -36,6 +36,12 @@ export default function BillingSettlements() {
     status: "Awaiting Payment"
   });
   const [editInvoice, setEditInvoice] = useState(null);
+  
+  // Add a ref for the amount input
+  const amountInputRef = useRef(null);
+
+  // Get today's date in YYYY-MM-DD format for date inputs
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     const fetchProposals = async () => {
@@ -119,29 +125,61 @@ export default function BillingSettlements() {
     payment.title.toLowerCase().includes(searchPayments.toLowerCase())
   );
 
+  // Complete rewrite of the handleInputChange function
   const handleInputChange = (e, isEdit = false) => {
     const { name, value } = e.target;
-    const update = (prev) => ({
-      ...prev,
-      [name]: name === "amount" ? parseFloat(value) || "" : value
-    });
-    isEdit ? setEditInvoice(update) : setNewInvoice(update);
+    
+    // For amount field, only update if it's a valid number or empty
+    if (name === "amount") {
+      // Skip validation if empty or matches number pattern
+      if (value === "" || /^\d*\.?\d*$/.test(value)) {
+        if (isEdit) {
+          setEditInvoice(prev => ({
+            ...prev,
+            [name]: value
+          }));
+        } else {
+          setNewInvoice(prev => ({
+            ...prev,
+            [name]: value
+          }));
+        }
+      }
+    } else {
+      // For non-amount fields, update normally
+      if (isEdit) {
+        setEditInvoice(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      } else {
+        setNewInvoice(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    }
   };
 
   const handleClientSelect = (e) => {
     const selectedTitle = e.target.value;
     const selectedProposal = proposals.find((p) => p.institution === selectedTitle);
-    setNewInvoice({
-      ...newInvoice,
+    setNewInvoice(prev => ({
+      ...prev,
       title: selectedTitle,
       email: selectedProposal?.collegeEmail || ""
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newId = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(3, '0')}`;
-    const invoiceToAdd = { id: newId, ...newInvoice };
+    // Convert amount to number right before submission
+    const invoiceToAdd = { 
+      id: newId, 
+      ...newInvoice,
+      amount: parseFloat(newInvoice.amount) || 0 
+    };
 
     try {
       const response = await axios.post("https://crm-383e.onrender.com/api/invoice/create", invoiceToAdd);
@@ -158,16 +196,22 @@ export default function BillingSettlements() {
   };
 
   const handleEdit = (invoice) => {
-    setEditInvoice(invoice);
+    setEditInvoice({...invoice});
     setShowEditModal(true);
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`https://crm-383e.onrender.com/api/invoice/update/${editInvoice._id}`, editInvoice);
+      // Convert amount to number right before submission
+      const updatedInvoice = {
+        ...editInvoice,
+        amount: parseFloat(editInvoice.amount) || 0
+      };
+      
+      const response = await axios.put(`https://crm-383e.onrender.com/api/invoice/update/${editInvoice._id}`, updatedInvoice);
       if (response.status === 200) {
-        const updatedList = invoices.map(inv => inv._id === editInvoice._id ? editInvoice : inv);
+        const updatedList = invoices.map(inv => inv._id === editInvoice._id ? updatedInvoice : inv);
         setInvoices(updatedList);
         setShowEditModal(false);
         alert('Invoice updated successfully!');
@@ -180,9 +224,22 @@ export default function BillingSettlements() {
 
   const Modal = ({ isEdit = false }) => {
     const invoice = isEdit ? editInvoice : newInvoice;
-    const onChange = (e) => handleInputChange(e, isEdit);
     const onSubmit = isEdit ? handleUpdate : handleSubmit;
     const closeModal = () => isEdit ? setShowEditModal(false) : setShowModal(false);
+
+    // Create a controlled input for the amount field with validation
+    const handleAmountChange = (e) => {
+      const value = e.target.value;
+      
+      // Allow empty string or valid decimal numbers
+      if (value === "" || /^\d*\.?\d*$/.test(value)) {
+        if (isEdit) {
+          setEditInvoice(prev => ({ ...prev, amount: value }));
+        } else {
+          setNewInvoice(prev => ({ ...prev, amount: value }));
+        }
+      }
+    };
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -202,7 +259,7 @@ export default function BillingSettlements() {
                 <input
                   type="text"
                   name="title"
-                  value={invoice.title}
+                  value={invoice.title || ''}
                   className="w-full p-2 border rounded"
                   readOnly
                 />
@@ -210,7 +267,7 @@ export default function BillingSettlements() {
                 // For create mode: show the dropdown to select a client
                 <select
                   name="title"
-                  value={invoice.title}
+                  value={invoice.title || ''}
                   onChange={handleClientSelect}
                   className="w-full p-2 border rounded"
                   required
@@ -234,7 +291,7 @@ export default function BillingSettlements() {
               <input
                 type="text"
                 name="email"
-                value={invoice.email}
+                value={invoice.email || ''}
                 className="w-full p-2 border rounded"
                 placeholder="Auto-filled"
                 readOnly
@@ -244,23 +301,24 @@ export default function BillingSettlements() {
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Amount (₹)</label>
               <input
+                type="text"
                 name="amount"
-                value={invoice.amount}
-                onChange={onChange}
-                className="w-full p-2 border rounded"
+                value={invoice.amount || ''}
+                onChange={handleAmountChange}
+                className="w-full p-2 border rounded" 
                 placeholder="0.00"
-                step="0.01"
-                min="0"
                 required
+                inputMode="decimal"
+                ref={amountInputRef}
               />
             </div>
 
-            <div>
+            <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Status</label>
               <select
                 name="status"
-                value={invoice.status}
-                onChange={onChange}
+                value={invoice.status || 'Awaiting Payment'}
+                onChange={(e) => handleInputChange(e, isEdit)}
                 className="w-full p-2 border rounded"
                 required
               >
@@ -275,9 +333,10 @@ export default function BillingSettlements() {
                 <input
                   type="date"
                   name="issued"
-                  value={invoice.issued}
-                  onChange={onChange}
+                  value={invoice.issued || ''}
+                  onChange={(e) => handleInputChange(e, isEdit)}
                   className="w-full p-2 border rounded"
+                  max={today}
                   required
                 />
               </div>
@@ -286,9 +345,10 @@ export default function BillingSettlements() {
                 <input
                   type="date"
                   name="due"
-                  value={invoice.due}
-                  onChange={onChange}
+                  value={invoice.due || ''}
+                  onChange={(e) => handleInputChange(e, isEdit)}
                   className="w-full p-2 border rounded"
+                  min={today}
                   required
                 />
               </div>
@@ -342,12 +402,12 @@ export default function BillingSettlements() {
             />
           </div>
           {filteredPayments.map(payment => (
-            <div key={payment.id} className="p-4 border-b border-border-dark">
+            <div key={payment.id || payment._id} className="p-4 border-b border-border-dark">
               <div className="flex justify-between">
                 <span>{payment.title}</span>
                 <span className="font-bold">₹{payment.amount}</span>
               </div>
-              <p className="text-text-muted text-sm">Paid on {payment.paidOn}</p>
+              <p className="text-text-muted text-sm">Paid on {payment.paidOn || payment.due}</p>
               <p className={`text-sm ${statusColors[payment.status]}`}>{payment.status}</p>
             </div>
           ))}
@@ -367,7 +427,7 @@ export default function BillingSettlements() {
             />
           </div>
           {filteredInvoices.map(invoice => (
-            <div key={invoice.id} className="p-4 border-b border-border-dark">
+            <div key={invoice.id || invoice._id} className="p-4 border-b border-border-dark">
               <div className="flex justify-between">
                 <span>{invoice.title}</span>
                 <span className="font-bold">₹{invoice.amount}</span>

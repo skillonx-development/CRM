@@ -13,10 +13,20 @@ export default function TeacherManagement() {
     rating: "",
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTeacherData({ ...teacherData, [name]: value });
-  };
+ // Updated handleInputChange function
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  // Validation for name: Only alphabets, spaces, and basic punctuation
+  if (name === "name" && /[^a-zA-Z\s'.,-]/.test(value)) return;
+
+  // Validation for workshops: Only positive integers
+  if (name === "workshops" && (!/^\d*$/.test(value) || parseInt(value, 10) < 0)) return;
+
+  // Update the teacher data
+  setTeacherData({ ...teacherData, [name]: value });
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,28 +97,7 @@ export default function TeacherManagement() {
 
       {/* Search & Filters */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-3 text-text-muted" size={16} />
-          <input
-            type="text"
-            placeholder="Search teachers..."
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-blue-500 text-text bg-background-muted"
-          />
-        </div>
-
-        <motion.div
-          className="relative"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <select className="px-4 py-2 text-sm font-medium border border-border rounded-lg bg-background-card text-text hover:bg-background-hover">
-            <option>Select</option>
-            <option>Data Science & Machine Learning</option>
-            <option>Cloud Computing & DevOps</option>
-            <option>Artificial Intelligence</option>
-          </select>
-        </motion.div>
+       
       </div>
 
       {/* Add Teacher Modal */}
@@ -122,15 +111,15 @@ export default function TeacherManagement() {
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                name="name"
-                value={teacherData.name}
-                onChange={handleInputChange}
-                placeholder="Full Name"
-                className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+            <input
+  type="text"
+  name="name"
+  value={teacherData.name}
+  onChange={handleInputChange}
+  placeholder="Full Name"
+  className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
+  required
+/>
               <select
                 name="specialty"
                 value={teacherData.specialty}
@@ -157,13 +146,14 @@ export default function TeacherManagement() {
                 <option value="Tentative">Tentative</option>
               </select>
               <input
-                type="number"
-                name="workshops"
-                value={teacherData.workshops}
-                onChange={handleInputChange}
-                placeholder="Workshops Conducted"
-                className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+  type="number"
+  name="workshops"
+  value={teacherData.workshops}
+  onChange={handleInputChange}
+  placeholder="Workshops Conducted"
+  className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
+  min="0"
+/>
               <input
                 type="number"
                 step="0.1"
@@ -172,6 +162,8 @@ export default function TeacherManagement() {
                 onChange={handleInputChange}
                 placeholder="Rating (Optional)"
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
+                max="5"
+                min="0"
               />
               <button
                 type="submit"

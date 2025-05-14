@@ -1,4 +1,4 @@
-import Header from './Header'
+import Header from '../../AdminDashboard/Shared/Header'
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 import { motion } from 'framer-motion'

@@ -2,13 +2,54 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Star, Mail, Phone, ArrowLeft,
-  FileText, Users, MessageSquare
+  FileText, Users, MessageSquare, Target, X
 } from "lucide-react";
+
+// =======================
+// Contact Modal Component
+// =======================
+const ContactModal = ({ isOpen, onClose, type, contact, memberName }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-gray-900 rounded-xl shadow-lg w-full max-w-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold text-white">
+            {type === "email" ? "Email Address" : "Phone Number"}
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="mb-6">
+          <p className="text-gray-400 mb-2">Contact information for {memberName}</p>
+          <div className="flex items-center p-4 bg-gray-800 rounded-lg border border-gray-700">
+            {type === "email" ? (
+              <Mail className="w-6 h-6 text-blue-400 mr-3" />
+            ) : (
+              <Phone className="w-6 h-6 text-green-400 mr-3" />
+            )}
+            <span className="text-white text-lg font-medium">{contact}</span>
+          </div>
+        </div>
+        
+        <button
+          onClick={onClose}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg w-full"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // =======================
 // Member Card Component
 // =======================
-const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
+const MemberCard = ({ member, index, onManage, onToggleApprove, onContactClick }) => (
   <motion.div
     key={member._id}
     initial={{ opacity: 0, y: 20 }}
@@ -18,7 +59,7 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">
-        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-lg">
+        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-600 text-white font-bold text-lg">
           {member.name.split(" ").map(word => word[0]).join("").toUpperCase()}
         </div>
         <div>
@@ -30,8 +71,14 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
         </div>
       </div>
       <div className="flex space-x-3 text-gray-400">
-        <Mail className="w-5 h-5 cursor-pointer hover:text-blue-400" />
-        <Phone className="w-5 h-5 cursor-pointer hover:text-green-400" />
+        <Mail 
+          className="w-5 h-5 cursor-pointer hover:text-blue-400" 
+          onClick={() => onContactClick(member, "email")}
+        />
+        <Phone 
+          className="w-5 h-5 cursor-pointer hover:text-green-400" 
+          onClick={() => onContactClick(member, "phone")}
+        />
       </div>
     </div>
 
@@ -51,7 +98,7 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
 
       <button
         onClick={() => onManage(member)}
-        className={`px-4 py-1 rounded-lg text-sm font-medium ${member.approve ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-600 text-gray-400 cursor-not-allowed"}`}
+        className={`px-4 py-1 rounded-lg text-sm font-medium ${member.approve ? "bg-purple-600 text-white hover:bg-purple-700" : "bg-gray-600 text-gray-400 cursor-not-allowed"}`}
         disabled={!member.approve}
       >
         Manage Access
@@ -60,13 +107,11 @@ const MemberCard = ({ member, index, onManage, onToggleApprove }) => (
   </motion.div>
 );
 
-// ===========================
-// Permission Toggle Modal
-// ===========================
+
 const permissionOptions = [
-  { key: "proposals", label: "Proposals", description: "Create and manage sales proposals", icon: FileText },
-  { key: "resources", label: "Resources", description: "Provide and add resources", icon: Users },
-  { key: "curriculum", label: "Curriculum", description: "Review and manage curriculum", icon: MessageSquare },
+  { key: "proposals", label: "Proposals", description: "Create and manage tech proposals", icon: FileText },
+  { key: "orders", label: "Orders", description: "Manage orders", icon: Users },
+  { key: "billing", label: "Billing", description: "Review billing and manage bills", icon: MessageSquare },
 ];
 
 const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
@@ -76,8 +121,8 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
     if (member) {
       setPermissions({
         proposals: member.permissions?.proposals || false,
-        resources: member.permissions?.resources || false,
-        curriculum: member.permissions?.curriculum || false,
+        orders: member.permissions?.orders || false,
+        billing: member.permissions?.billing || false,
       });
     }
   }, [member]);
@@ -102,7 +147,7 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
           </button>
 
           <div className="flex items-center mb-6">
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold mr-3">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-purple-600 text-white font-bold mr-3">
               {member.name.split(" ").map(word => word[0]).join("").toUpperCase()}
             </div>
             <div>
@@ -115,14 +160,14 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
           </div>
 
           <h3 className="text-white font-semibold mb-2">Manage Dashboard Access</h3>
-          <p className="text-gray-400 text-sm mb-6">Select which dashboard modules this team member can access.</p>
+          <p className="text-gray-400 text-sm mb-6">Set which modules this tech team member can access.</p>
 
           <div className="space-y-4 mb-6">
             {permissionOptions.map(({ key, label, description, icon: Icon }) => (
               <div key={key} className="flex items-center justify-between p-3 border border-gray-700 rounded-lg">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-900 rounded flex items-center justify-center mr-3">
-                    <Icon className="w-4 h-4 text-blue-400" />
+                  <div className="w-8 h-8 bg-purple-900 rounded flex items-center justify-center mr-3">
+                    <Icon className="w-4 h-4 text-purple-400" />
                   </div>
                   <div>
                     <h4 className="font-medium text-white">{label}</h4>
@@ -134,7 +179,7 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
                     {permissions[key] ? '✓ Granted' : '✕ No access'}
                   </span>
                   <div
-                    className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions[key] ? 'bg-blue-600' : 'bg-gray-700'}`}
+                    className={`w-12 h-6 rounded-full p-1 cursor-pointer ${permissions[key] ? 'bg-purple-600' : 'bg-gray-700'}`}
                     onClick={() => handleTogglePermission(key)}
                   >
                     <div className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${permissions[key] ? 'translate-x-6' : 'translate-x-0'}`} />
@@ -159,12 +204,18 @@ const ManageMemberModal = ({ isOpen, onClose, member, onSave }) => {
 // ====================
 // Main TeamWidget
 // ====================
-const TeamWidget = () => {
+const SalesTeamWidget = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [contactModal, setContactModal] = useState({
+    isOpen: false,
+    type: null, // "email" or "phone"
+    contact: "",
+    memberName: ""
+  });
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -215,6 +266,29 @@ const TeamWidget = () => {
     setSelectedMember(null);
   };
 
+  const handleContactClick = (member, type) => {
+    // Use the actual email and contactNumber fields from the member data
+    const contactInfo = type === "email" 
+      ? member.email 
+      : member.contactNumber;
+    
+    setContactModal({
+      isOpen: true,
+      type: type,
+      contact: contactInfo,
+      memberName: member.name
+    });
+  };
+
+  const closeContactModal = () => {
+    setContactModal({
+      isOpen: false,
+      type: null,
+      contact: "",
+      memberName: ""
+    });
+  };
+
   const handleSavePermissions = async (memberId, permissions, team) => {
     try {
       const response = await fetch(`https://crm-383e.onrender.com/api/members/updatePermissions/${memberId}`, {
@@ -232,7 +306,7 @@ const TeamWidget = () => {
     }
   };
 
-  if (loading) return <div className="text-white">Loading members...</div>;
+  if (loading) return <div className="text-white">Loading Tech team members...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
@@ -245,6 +319,7 @@ const TeamWidget = () => {
             index={index}
             onManage={handleManageAccess}
             onToggleApprove={handleToggleApprove}
+            onContactClick={handleContactClick}
           />
         ))}
       </div>
@@ -255,8 +330,16 @@ const TeamWidget = () => {
         member={selectedMember}
         onSave={handleSavePermissions}
       />
+
+      <ContactModal
+        isOpen={contactModal.isOpen}
+        onClose={closeContactModal}
+        type={contactModal.type}
+        contact={contactModal.contact}
+        memberName={contactModal.memberName}
+      />
     </>
   );
 };
 
-export default TeamWidget;
+export default SalesTeamWidget;
