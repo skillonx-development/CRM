@@ -9,7 +9,7 @@ const ActiveOrders = () => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await fetch("https://crm-383e.onrender.com/api/tech-proposals");
+        const response = await fetch("http://localhost:5001/api/tech-proposals");
         const data = await response.json();
 
         const activeOrders = data.filter(order => order.status !== "Completed" && order.status!=="Rejected");
@@ -44,7 +44,7 @@ const ActiveOrders = () => {
     <div className="bg-background-card p-6 rounded-xl shadow-card border border-border">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-white">Active Orders</h2>
-        <a href="https://skillonxcrm/sales/orders" className="text-primary-light text-sm">
+        <a href="https://skillonxcrm.netlify.app/sales/orders" className="text-primary-light text-sm">
           View all
         </a>
       </div>

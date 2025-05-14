@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertCircle, ExternalLink, Send, X } from 'lucide-react';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ const RecentInvoices = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await axios.get('https://crm-383e.onrender.com/api/invoice');
+        const res = await axios.get('http://localhost:5001/api/invoice');
         setInvoices(res.data);
       } catch (error) {
         console.error('Error fetching invoices:', error);
@@ -22,6 +22,19 @@ const RecentInvoices = () => {
     };
     fetchInvoices();
   }, []);
+
+  useEffect(() => {
+    // Prevent body scrolling when modal is open
+    if (selectedInvoice) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [selectedInvoice]);
 
   const handleSendReminder = async (invoice) => {
     const confirmed = window.confirm('Are you sure you want to send a reminder email?');
@@ -34,7 +47,7 @@ const RecentInvoices = () => {
 
     try {
       setSendingReminder(invoice._id);
-      const res = await axios.post('https://crm-383e.onrender.com/api/invoice/sendReminder', {
+      const res = await axios.post('http://localhost:5001/api/invoice/sendReminder', {
         email: invoice.email,
         subject: `Reminder: Invoice #${invoice._id} is pending`,
         message: `Dear ${invoice.title},<br/><br/>This is a friendly reminder that Invoice #${invoice._id} with client name ${invoice.title} for amount ₹${invoice.amount} is still pending. Please make the payment at your earliest convenience.<br/><br/>Thank you!`,
@@ -84,7 +97,7 @@ const RecentInvoices = () => {
                       {invoice.status}
                     </div>
                   ) : (
-                    <div className="bg-red-900/30 text-red-500 text-xs font-medium px-2 py-1 rounded-full flex items-center">
+                    <div className="bg-blue-600 text-white-500 text-xs font-medium px-2 py-1 rounded-full flex items-center">
                       <AlertCircle size={12} className="mr-1" />
                       {invoice.status}
                     </div>
@@ -133,33 +146,44 @@ const RecentInvoices = () => {
       </motion.div>
 
       {/* Modal */}
-      {selectedInvoice && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <motion.div
-            className="bg-background-card p-6 rounded-xl w-[90%] max-w-md shadow-lg relative"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
+      <AnimatePresence>
+        {selectedInvoice && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+            onClick={(e) => {
+              // Close modal when clicking on backdrop
+              if (e.target === e.currentTarget) {
+                setSelectedInvoice(null);
+              }
+            }}
           >
-            <button
-              onClick={() => setSelectedInvoice(null)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-white"
+            <motion.div
+              className="bg-background-card p-6 rounded-xl w-[90%] max-w-md shadow-lg relative mx-4"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ type: "spring", damping: 25, stiffness: 400 }}
             >
-              <X size={20} />
-            </button>
-            <h4 className="text-white text-lg font-semibold mb-2">{selectedInvoice.title}</h4>
-            <p className="text-gray-400 text-sm mb-4">Invoice #{selectedInvoice._id}</p>
+              <button
+                onClick={() => setSelectedInvoice(null)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 rounded-full p-1"
+              >
+                <X size={20} />
+              </button>
+              <h4 className="text-white text-lg font-semibold mb-2">{selectedInvoice.title}</h4>
+              <p className="text-gray-400 text-sm mb-4">Invoice #{selectedInvoice._id}</p>
 
-            <div className="space-y-2 text-gray-300">
-              <p><span className="text-gray-400">Client:</span> {selectedInvoice.title}</p>
-              <p><span className="text-gray-400">Amount:</span> ₹{selectedInvoice.amount?.toLocaleString()}</p>
-              <p><span className="text-gray-400">Due Date:</span> {selectedInvoice.due}</p>
-              <p><span className="text-gray-400">Status:</span> {selectedInvoice.status}</p>
-              {selectedInvoice.notes && <p><span className="text-gray-400">Notes:</span> {selectedInvoice.notes}</p>}
-            </div>
-          </motion.div>
-        </div>
-      )}
+              <div className="space-y-2 text-gray-300">
+                <p><span className="text-gray-400">Client:</span> {selectedInvoice.title}</p>
+                <p><span className="text-gray-400">Amount:</span> ₹{selectedInvoice.amount?.toLocaleString()}</p>
+                <p><span className="text-gray-400">Due Date:</span> {selectedInvoice.due}</p>
+                <p><span className="text-gray-400">Status:</span> {selectedInvoice.status}</p>
+                {selectedInvoice.notes && <p><span className="text-gray-400">Notes:</span> {selectedInvoice.notes}</p>}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

@@ -27,7 +27,7 @@ export default function OrderManagement() {
 
   const fetchSentProposals = async () => {
     try {
-      const res = await axios.get("https://crm-383e.onrender.com/api/tech-proposals/sent");
+      const res = await axios.get("http://localhost:5001/api/tech-proposals/sent");
       const mapped = res.data.map((p) => ({
         id: p._id,
         title: p.title,
@@ -57,7 +57,7 @@ export default function OrderManagement() {
 
   const saveChanges = async () => {
     try {
-      await axios.put(`https://crm-383e.onrender.com/api/tech-proposals/${editData.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${editData.id}`, {
         title: editData.title,
         status: editData.status,
         institution: editData.school,
@@ -77,7 +77,7 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       setIsSending(true);
-      await axios.put(`https://crm-383e.onrender.com/api/tech-proposals/${order.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
         institution: order.school,
@@ -86,7 +86,7 @@ export default function OrderManagement() {
         adminApproval: order.adminApproval
       });
 
-      await axios.post(`https://crm-383e.onrender.com/api/tech-proposals/send-email/${order.id}`);
+      await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);

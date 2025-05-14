@@ -12,25 +12,18 @@ const PendingApprovals = () => {
   const fetchApprovals = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('https://crm-383e.onrender.com/api/tech-proposals/sent');
+      const response = await axios.get('http://localhost:5001/api/tech-proposals/sent');
       const acceptedApprovals = response.data;
 
       const newBadgeStatus = { ...badgeStatus };
       acceptedApprovals.forEach((item) => {
-        if (!newBadgeStatus[item._id]) {
-          if (item.adminApproved === true) {
-            newBadgeStatus[item._id] = 'Approved';
-          } else if (item.adminApproved === false) {
-            newBadgeStatus[item._id] = 'Disapproved';
-          } else {
-            newBadgeStatus[item._id] = 'Pending';
-          }
-        }
-
-        if (item.adminApproved === true && newBadgeStatus[item._id] !== 'Approved') {
+        // Use adminApproval field instead of adminApproved
+        if (item.adminApproval === true) {
           newBadgeStatus[item._id] = 'Approved';
-        } else if (item.adminApproved === false && newBadgeStatus[item._id] !== 'Disapproved') {
+        } else if (item.adminApproval === false) {
           newBadgeStatus[item._id] = 'Disapproved';
+        } else {
+          newBadgeStatus[item._id] = 'Pending';
         }
       });
 
@@ -54,7 +47,7 @@ const PendingApprovals = () => {
 
     try {
       await axios.put(
-        `https://crm-383e.onrender.com/api/tech-proposals/${selectedApproval._id}/admin-approval`,
+        `http://localhost:5001/api/tech-proposals/${selectedApproval._id}/admin-approval`,
         { adminApproval: approved }
       );
 
@@ -66,7 +59,7 @@ const PendingApprovals = () => {
       setApprovals((prevApprovals) =>
         prevApprovals.map((approval) =>
           approval._id === selectedApproval._id
-            ? { ...approval, adminApproved: approved }
+            ? { ...approval, adminApproval: approved } // Update adminApproval instead of adminApproved
             : approval
         )
       );
