@@ -9,7 +9,7 @@ export default function WorkshopCards() {
     const fetchTechProposals = async () => {
       try {
         // Fetch data from the API
-        const response = await axios.get("https://crm-383e.onrender.com/api/tech-proposals");
+        const response = await axios.get("http://localhost:5001/api/tech-proposals");
         setTechProposals(response.data); // Store the fetched data in state
       } catch (error) {
         console.error("Error fetching tech proposals:", error);
@@ -23,7 +23,7 @@ export default function WorkshopCards() {
     <div className="flex flex-col gap-6">
       {/* Heading for Recent Proposals */}
       <h2 className="text-2xl font-bold text-text-muted">Recent Proposals</h2>
-      
+
       {/* Render the first 4 proposals */}
       <div className="flex gap-4 flex-wrap">
         {techProposals.slice(0, 4).map((proposal) => (
@@ -45,13 +45,13 @@ export default function WorkshopCards() {
               </motion.span>
             </div>
             <p className="text-sm text-text-muted flex items-center mt-1">📍 {proposal.institution}</p>
-            
+
             <p className="text-sm text-text-muted flex items-center">💰 {proposal.price}</p>
-            <p  className="text-sm text-text-muted flex items-center">📆 {proposal.scheduledDate}</p>
+            <p className="text-sm text-text-muted flex items-center">📆 {proposal.scheduledDate}</p>
 
             <div className="flex justify-between mt-4">
-              
-            
+
+
             </div>
           </motion.div>
         ))}

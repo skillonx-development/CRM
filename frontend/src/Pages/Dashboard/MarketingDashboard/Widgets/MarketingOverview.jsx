@@ -39,8 +39,8 @@ export default function MarketingOverview() {
     const fetchStats = async () => {
       try {
         const [proposalsRes, teachersRes] = await Promise.all([
-          axios.get("https://crm-383e.onrender.com/api/tech-proposals"),
-          axios.get("https://crm-383e.onrender.com/api/teachers"),
+          axios.get("http://localhost:5001/api/tech-proposals"),
+          axios.get("http://localhost:5001/api/teachers"),
         ]);
 
         const proposals = proposalsRes.data || [];
@@ -50,7 +50,7 @@ export default function MarketingOverview() {
         const acceptedProposals = proposals.filter(p => p.sent === true).length;
         const acceptanceRate = totalProposals > 0 ? Math.round((acceptedProposals / totalProposals) * 100) : 0;
 
-        const activeTeachers = teachers.filter(t => t.status === "active" || t.status ==="Available").length;
+        const activeTeachers = teachers.filter(t => t.status === "active" || t.status === "Available").length;
 
         setStats([
           {

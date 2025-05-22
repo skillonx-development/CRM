@@ -36,7 +36,7 @@ export default function BillingSettlements() {
     status: "Awaiting Payment"
   });
   const [editInvoice, setEditInvoice] = useState(null);
-  
+
   // Add a ref for the amount input
   const amountInputRef = useRef(null);
 
@@ -47,8 +47,8 @@ export default function BillingSettlements() {
     const fetchProposals = async () => {
       try {
         setLoadingProposals(true);
-        const response = await axios.get("https://crm-383e.onrender.com/api/tech-proposals");
-        const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted" && proposal.adminApproval===true);
+        const response = await axios.get("http://localhost:5001/api/tech-proposals");
+        const acceptedProposals = response.data.filter((proposal) => proposal.status === "Accepted" && proposal.adminApproval === true);
         setProposals(acceptedProposals);
       } catch (err) {
         console.error("Error fetching proposals:", err);
@@ -60,7 +60,7 @@ export default function BillingSettlements() {
     const fetchInvoices = async () => {
       try {
         setLoadingInvoices(true);
-        const res = await axios.get("https://crm-383e.onrender.com/api/invoice");
+        const res = await axios.get("http://localhost:5001/api/invoice");
         setInvoices(res.data);
       } catch (err) {
         console.error("Error fetching invoices:", err);
@@ -71,7 +71,7 @@ export default function BillingSettlements() {
 
     const fetchPayments = async () => {
       try {
-        const res = await axios.get("https://crm-383e.onrender.com/api/invoice"); // Add your actual endpoint here
+        const res = await axios.get("http://localhost:5001/api/invoice"); // Add your actual endpoint here
         setPayments(res.data);
       } catch (err) {
         console.error("Error fetching payments:", err);
@@ -86,11 +86,11 @@ export default function BillingSettlements() {
   const handleSendReminder = async (id, invoice) => {
     const confirmed = window.confirm("Are you sure you want to send a reminder email?");
     if (!confirmed) return;
-  
+
     try {
       setSendingReminder(id); // Set loading state for this specific invoice
-      
-      const response = await fetch("https://crm-383e.onrender.com/api/invoice/sendReminder", {
+
+      const response = await fetch("http://localhost:5001/api/invoice/sendReminder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,9 +101,9 @@ export default function BillingSettlements() {
           message: `Dear ${invoice.clientName},<br/><br/>This is a friendly reminder that Invoice #${invoice._id} with client name ${invoice.title} for amount ₹${invoice.amount} is still pending. Please make the payment at your earliest convenience.<br/><br/>Thank you!`,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         alert("Reminder email sent successfully!");
       } else {
@@ -128,7 +128,7 @@ export default function BillingSettlements() {
   // Complete rewrite of the handleInputChange function
   const handleInputChange = (e, isEdit = false) => {
     const { name, value } = e.target;
-    
+
     // For amount field, only update if it's a valid number or empty
     if (name === "amount") {
       // Skip validation if empty or matches number pattern
@@ -175,14 +175,14 @@ export default function BillingSettlements() {
     e.preventDefault();
     const newId = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(3, '0')}`;
     // Convert amount to number right before submission
-    const invoiceToAdd = { 
-      id: newId, 
+    const invoiceToAdd = {
+      id: newId,
       ...newInvoice,
-      amount: parseFloat(newInvoice.amount) || 0 
+      amount: parseFloat(newInvoice.amount) || 0
     };
 
     try {
-      const response = await axios.post("https://crm-383e.onrender.com/api/invoice/create", invoiceToAdd);
+      const response = await axios.post("http://localhost:5001/api/invoice/create", invoiceToAdd);
       if (response.status === 201) {
         setInvoices([invoiceToAdd, ...invoices]);
         setNewInvoice({ title: "", email: "", amount: "", issued: "", due: "", status: "Awaiting Payment" });
@@ -196,7 +196,7 @@ export default function BillingSettlements() {
   };
 
   const handleEdit = (invoice) => {
-    setEditInvoice({...invoice});
+    setEditInvoice({ ...invoice });
     setShowEditModal(true);
   };
 
@@ -208,8 +208,8 @@ export default function BillingSettlements() {
         ...editInvoice,
         amount: parseFloat(editInvoice.amount) || 0
       };
-      
-      const response = await axios.put(`https://crm-383e.onrender.com/api/invoice/update/${editInvoice._id}`, updatedInvoice);
+
+      const response = await axios.put(`http://localhost:5001/api/invoice/update/${editInvoice._id}`, updatedInvoice);
       if (response.status === 200) {
         const updatedList = invoices.map(inv => inv._id === editInvoice._id ? updatedInvoice : inv);
         setInvoices(updatedList);
@@ -230,7 +230,7 @@ export default function BillingSettlements() {
     // Create a controlled input for the amount field with validation
     const handleAmountChange = (e) => {
       const value = e.target.value;
-      
+
       // Allow empty string or valid decimal numbers
       if (value === "" || /^\d*\.?\d*$/.test(value)) {
         if (isEdit) {
@@ -305,7 +305,7 @@ export default function BillingSettlements() {
                 name="amount"
                 value={invoice.amount || ''}
                 onChange={handleAmountChange}
-                className="w-full p-2 border rounded" 
+                className="w-full p-2 border rounded"
                 placeholder="0.00"
                 required
                 inputMode="decimal"

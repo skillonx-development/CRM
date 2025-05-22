@@ -49,19 +49,19 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Form submitted");
-    
+
     // Clear previous error messages
     setGeneralError("");
     setEmailError("");
     setPasswordError("");
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
-    
+
     try {
       // Determine the correct API endpoint
-      const loginEndpoint = 'https://crm-383e.onrender.com/api/auth/login';
+      const loginEndpoint = 'http://localhost:5001/api/auth/login';
 
       // Make the request to the backend
       const response = await fetch(loginEndpoint, {
@@ -87,7 +87,7 @@ const LoginPage = () => {
         setIsLoading(false);
         return;
       }
-      
+
       if (!response.ok) {
         // Handle different error cases
         if (response.status === 401) {
@@ -99,7 +99,7 @@ const LoginPage = () => {
         }
         return;
       }
-      
+
       // If successful, update auth context and redirect
       if (data.success) {
         console.log("Login successful:", data);
@@ -140,9 +140,8 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`w-full px-4 py-3 bg-gray-1200 text-text rounded-md border ${
-                emailError ? "border-status-error" : "border-border"
-              } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
+              className={`w-full px-4 py-3 bg-gray-1200 text-text rounded-md border ${emailError ? "border-status-error" : "border-border"
+                } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
               placeholder="Enter your email"
             />
             {emailError && <p className="text-status-error text-sm mt-1">{emailError}</p>}
@@ -159,9 +158,8 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`w-full px-4 py-3 bg-gray-1200 text-text rounded-md border ${
-                  passwordError ? "border-status-error" : "border-border"
-                } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
+                className={`w-full px-4 py-3 bg-gray-1200 text-text rounded-md border ${passwordError ? "border-status-error" : "border-border"
+                  } focus:border-primary focus:ring-2 focus:ring-primary-dark outline-none transition`}
                 placeholder="Enter your password"
               />
               <button
@@ -197,9 +195,8 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md font-semibold transition duration-300 ${
-              isLoading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className={`w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-md font-semibold transition duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
           >
             {isLoading ? "Signing In..." : "Sign In"}
           </button>

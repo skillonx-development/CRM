@@ -3,16 +3,14 @@ import {
   FaCalendarAlt,
   FaClock,
   FaUpload,
-  FaSave,
   FaPaperPlane,
   FaPlus,
   FaTrash,
+  FaTimes,
 } from "react-icons/fa";
 
-
-const ProposalDetails = ({ proposal }) => {
+const ProposalDetails = ({ proposal, onClose }) => {
   const [draft, setDraft] = useState("");
-  const [selectedTeacher, setSelectedTeacher] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [selectedVideo, setSelectedVideo] = useState("");
@@ -24,7 +22,7 @@ const ProposalDetails = ({ proposal }) => {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const response = await fetch("https://crm-383e.onrender.com/api/resources");
+        const response = await fetch("http://localhost:5001/api/resources");
         if (!response.ok) throw new Error("Failed to fetch resources");
         const data = await response.json();
         const resourceArray = Array.isArray(data) ? data : data.resources || [];
@@ -33,7 +31,6 @@ const ProposalDetails = ({ proposal }) => {
         console.error("Error fetching resources:", error);
       }
     };
-
     fetchResources();
   }, []);
 
@@ -41,7 +38,6 @@ const ProposalDetails = ({ proposal }) => {
     if (proposal) {
       setScheduledDate(proposal.scheduledDate || "");
       setScheduledTime(proposal.scheduledTime || "");
-      setSelectedTeacher(proposal.selectedTeacher || "");
       setSelectedVideo(proposal.selectedVideo || "");
       setSelectedPDF(proposal.selectedPDF || "");
       setDraft(proposal.draft || "");
@@ -74,7 +70,6 @@ const ProposalDetails = ({ proposal }) => {
     formData.append("price", proposal.price);
     formData.append("collegeEmail", proposal.collegeEmail);
     formData.append("draft", draft);
-    formData.append("selectedTeacher", selectedTeacher);
     formData.append("scheduledDate", scheduledDate);
     formData.append("scheduledTime", scheduledTime);
     formData.append("selectedVideo", selectedVideo);
@@ -83,17 +78,15 @@ const ProposalDetails = ({ proposal }) => {
     if (file) formData.append("file", file);
 
     try {
-      const response = await fetch("https://crm-383e.onrender.com/api/tech-proposals/create", {
+      const response = await fetch("http://localhost:5001/api/tech-proposals/create", {
         method: "POST",
         body: formData,
       });
-
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
       }
-
-      await response.json(); // Remove data assignment since it's not used
+      await response.json();
       alert("Proposal submitted successfully!");
     } catch (error) {
       console.error("Error submitting proposal:", error);
@@ -104,35 +97,38 @@ const ProposalDetails = ({ proposal }) => {
   const videoOptions = resources.filter((res) => res.type === "Video");
   const pdfOptions = resources.filter((res) => res.type === "PDF");
 
-  if (!proposal) {
-    return <p className="text-text-muted text-center py-4">Select a proposal to view details</p>;
-  }
-
   return (
-    <div className="bg-background-card p-6 shadow-card rounded-lg text-text-default">
+    <div className="bg-background-card p-6 shadow-card rounded-lg text-text-default relative">
+      {onClose && (
+        <button
+          className="absolute top-3 right-3 text-2xl text-text-muted hover:text-status-error focus:outline-none"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <FaTimes />
+        </button>
+      )}
       <h2 className="text-2xl font-semibold mb-4 text-primary">Proposal Details</h2>
-
       <div className="space-y-2">
         <p><strong>Client:</strong> {proposal.institution}</p>
         <p><strong>Type:</strong> {proposal.title}</p>
-        <p><strong>Budget:</strong> ${proposal.price?.toLocaleString()}</p>
+        <p><strong>Budget:</strong> ₹{proposal.price?.toLocaleString()}</p>
       </div>
-
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-text-muted mb-1 flex items-center gap-2">
+          <label className="text-text-muted mb-1 flex items-center gap-2">
             <FaCalendarAlt /> Schedule Date:
           </label>
           <input
-  type="date"
-  className="w-full p-3 border border-border-dark rounded bg-background-hover text-text-default"
-  value={scheduledDate}
-  min={new Date().toISOString().split("T")[0]}  // Disable past dates
-  onChange={(e) => setScheduledDate(e.target.value)}
-/>
+            type="date"
+            className="w-full p-3 border border-border-dark rounded bg-background-hover text-text-default"
+            value={scheduledDate}
+            min={new Date().toISOString().split("T")[0]}
+            onChange={(e) => setScheduledDate(e.target.value)}
+          />
         </div>
         <div>
-          <label className="block text-text-muted mb-1 flex items-center gap-2">
+          <label className="text-text-muted mb-1 flex items-center gap-2">
             <FaClock /> Schedule Time:
           </label>
           <input
@@ -143,7 +139,6 @@ const ProposalDetails = ({ proposal }) => {
           />
         </div>
       </div>
-
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-text-muted mb-1">Select Video Resource:</label>
@@ -172,9 +167,8 @@ const ProposalDetails = ({ proposal }) => {
           </select>
         </div>
       </div>
-
       <div className="mt-6">
-        <label className="block text-text-muted mb-1 flex items-center gap-2">
+        <label className="text-text-muted mb-1 flex items-center gap-2">
           <FaUpload /> Upload Additional Resource:
         </label>
         <input
@@ -184,7 +178,6 @@ const ProposalDetails = ({ proposal }) => {
         />
         {file && <p className="mt-2 text-status-success">Uploaded: {file.name}</p>}
       </div>
-
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-primary">Proposal Timeline</h3>
         {timeline.map((item, index) => (
@@ -196,14 +189,13 @@ const ProposalDetails = ({ proposal }) => {
               value={item.step}
               onChange={(e) => handleTimelineChange(index, "step", e.target.value)}
             />
-           <input
-  type="date"
-  className="w-full p-2 mb-2 border border-border-dark rounded bg-background-hover text-text-default"
-  value={item.date}
-  min={new Date().toISOString().split("T")[0]}  // Disable past dates
-  onChange={(e) => handleTimelineChange(index, "date", e.target.value)}
-/>
-
+            <input
+              type="date"
+              className="w-full p-2 mb-2 border border-border-dark rounded bg-background-hover text-text-default"
+              value={item.date}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => handleTimelineChange(index, "date", e.target.value)}
+            />
             <textarea
               placeholder="Description"
               className="w-full p-2 border border-border-dark rounded bg-background-hover text-text-default"
@@ -225,14 +217,12 @@ const ProposalDetails = ({ proposal }) => {
           <FaPlus /> Add Timeline Step
         </button>
       </div>
-
       <textarea
         className="w-full p-3 border border-border-dark mt-4 rounded bg-background-hover text-text-default"
         placeholder="Draft your plan here..."
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
       />
-
       <div className="flex gap-3 mt-4">
         <button
           className="flex items-center gap-2 bg-status-info text-white px-5 py-2 rounded-md"

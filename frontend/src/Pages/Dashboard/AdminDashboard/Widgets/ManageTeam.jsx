@@ -18,7 +18,7 @@ const ManageTeam = () => {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const leadsRes = await axios.get(`https://crm-383e.onrender.com/api/members/getLeads/${activeTeam}`);
+        const leadsRes = await axios.get(`http://localhost:5001/api/members/getLeads/${activeTeam}`);
         const leadsData = leadsRes.data || [];
 
         // Initialize approval state based on fetched data
@@ -41,7 +41,7 @@ const ManageTeam = () => {
     const newApproval = !approvedLeads[leadId];
 
     try {
-      await axios.put(`https://crm-383e.onrender.com/api/members/updateLeadApproval/${leadId}`, {
+      await axios.put(`http://localhost:5001/api/members/updateLeadApproval/${leadId}`, {
         approve: newApproval,
       });
       setApprovedLeads((prev) => ({ ...prev, [leadId]: newApproval }));
@@ -101,12 +101,10 @@ const ManageTeam = () => {
                 checked={approvedLeads[lead._id] || false}
                 onChange={() => handleToggle(lead._id)}
               />
-              <div className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-                approvedLeads[lead._id] ? "bg-blue-600" : "bg-gray-600"
-              }`}>
-                <span className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform duration-300 ${
-                  approvedLeads[lead._id] ? "translate-x-7" : "translate-x-1"
-                }`}></span>
+              <div className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${approvedLeads[lead._id] ? "bg-blue-600" : "bg-gray-600"
+                }`}>
+                <span className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform duration-300 ${approvedLeads[lead._id] ? "translate-x-7" : "translate-x-1"
+                  }`}></span>
               </div>
               <span className="ml-2 text-sm text-white">
                 {approvedLeads[lead._id] ? "Approved" : "Approve"}

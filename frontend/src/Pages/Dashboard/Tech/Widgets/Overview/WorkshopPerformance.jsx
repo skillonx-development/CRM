@@ -11,7 +11,7 @@ const WorkshopPerformance = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("https://crm-383e.onrender.com/api/tech-proposals");
+        const res = await fetch("http://localhost:5001/api/tech-proposals");
         const proposals = await res.json();
 
         // Group by month
@@ -63,7 +63,7 @@ const WorkshopPerformance = () => {
           <h2 className="text-xl font-bold text-text">Workshop Performance</h2>
           <p className="text-text-muted">Number of proposals and executed workshops</p>
         </div>
-       
+
       </div>
 
       <div className="flex items-center mb-4 space-x-6">

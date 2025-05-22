@@ -9,10 +9,10 @@ const ActiveOrders = () => {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await fetch("https://crm-383e.onrender.com/api/tech-proposals");
+        const response = await fetch("http://localhost:5001/api/tech-proposals");
         const data = await response.json();
 
-        const activeOrders = data.filter(order => order.status !== "Completed" && order.status!=="Rejected");
+        const activeOrders = data.filter(order => order.status !== "Completed" && order.status !== "Rejected");
 
         const formattedOrders = activeOrders.map(order => ({
           title: order.title,
@@ -25,10 +25,10 @@ const ActiveOrders = () => {
             order.status === "Accepted"
               ? "bg-status-success text-white"
               : order.status === "Pending"
-              ? "bg-status-warning text-white"
-               : order.status === "Rejected"
-              ? "bg-red-600 text-white"
-              : "bg-blue-600 text-white",
+                ? "bg-status-warning text-white"
+                : order.status === "Rejected"
+                  ? "bg-red-600 text-white"
+                  : "bg-blue-600 text-white",
         }));
 
         setOrders(formattedOrders);

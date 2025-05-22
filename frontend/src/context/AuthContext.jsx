@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
-const API_URL ="https://crm-383e.onrender.com";
+const API_URL = "http://localhost:5001";
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,48 +42,48 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password, type) => {
         try {
-          setLoading(true);
-      
-          const response = await axios.post(`${API_URL}/api/auth/login`,
-            { email, password, type },
-            {
-                withCredentials: true,
-                headers: {
-                  'Content-Type': 'application/json'
+            setLoading(true);
+
+            const response = await axios.post(`${API_URL}/api/auth/login`,
+                { email, password, type },
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 }
-              }
-          );
-      
-          const { success, user, redirect, message } = response.data;
-      
-          if (success) {
-            setIsAuthenticated(true);
-            setUser(user);
-            localStorage.setItem("user", JSON.stringify(user));
-      
-            // if (redirect) {
-            //   navigate(redirect);
-            // }
-      
-            return { success: true };
-          } else {
-            return {
-              success: false,
-              error: message || "Login failed"
-            };
-          }
-      
+            );
+
+            const { success, user, redirect, message } = response.data;
+
+            if (success) {
+                setIsAuthenticated(true);
+                setUser(user);
+                localStorage.setItem("user", JSON.stringify(user));
+
+                // if (redirect) {
+                //   navigate(redirect);
+                // }
+
+                return { success: true };
+            } else {
+                return {
+                    success: false,
+                    error: message || "Login failed"
+                };
+            }
+
         } catch (error) {
-          console.error("Login error:", error);
-          return {
-            success: false,
-            error: error.response?.data?.message || error.message || "Invalid credentials"
-          };
+            console.error("Login error:", error);
+            return {
+                success: false,
+                error: error.response?.data?.message || error.message || "Invalid credentials"
+            };
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
-      
+    };
+
 
     const logout = async () => {
         try {
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
             }}
         >
             {children}
-        </AuthContext.Provider> 
+        </AuthContext.Provider>
     );
 };
 

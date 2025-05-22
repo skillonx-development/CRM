@@ -16,11 +16,11 @@ const Analytics = () => {
     const fetchData = async () => {
       try {
         // Fetch all proposals
-        const proposalsRes = await fetch("https://crm-383e.onrender.com/api/tech-proposals");
+        const proposalsRes = await fetch("http://localhost:5001/api/tech-proposals");
         const proposals = await proposalsRes.json();
 
         // Fetch all teachers
-        const teachersRes = await fetch("https://crm-383e.onrender.com/api/teachers");
+        const teachersRes = await fetch("http://localhost:5001/api/teachers");
         const teachers = await teachersRes.json();
 
         // Calculate metrics
@@ -96,9 +96,8 @@ const Analytics = () => {
               </div>
               <div className="flex items-center gap-2 mt-2">
                 <span
-                  className={`text-xs font-medium px-2 py-1 rounded-md ${
-                    widget.positive ? "text-status-success" : "text-status-error"
-                  }`}
+                  className={`text-xs font-medium px-2 py-1 rounded-md ${widget.positive ? "text-status-success" : "text-status-error"
+                    }`}
                 >
                   {widget.positive ? "↑" : "↓"} {widget.change}
                 </span>

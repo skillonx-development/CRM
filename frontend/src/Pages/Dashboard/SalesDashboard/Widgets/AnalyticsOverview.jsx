@@ -16,8 +16,8 @@ const AnalyticsOverview = () => {
   const fetchAnalyticsData = async () => {
     try {
       const [invoiceRes, proposalsRes] = await Promise.all([
-        axios.get("https://crm-383e.onrender.com/api/invoice"),
-        axios.get("https://crm-383e.onrender.com/api/tech-proposals"),
+        axios.get("http://localhost:5001/api/invoice"),
+        axios.get("http://localhost:5001/api/tech-proposals"),
       ]);
 
       const invoices = invoiceRes.data || [];
@@ -95,9 +95,8 @@ const AnalyticsOverview = () => {
                 )}
               </div>
               <div
-                className={`text-xs mt-2 font-medium ${
-                  widget.positive ? "text-green-600" : "text-red-600"
-                }`}
+                className={`text-xs mt-2 font-medium ${widget.positive ? "text-green-600" : "text-red-600"
+                  }`}
               >
                 {widget.positive ? "↑" : "↓"} {widget.change}
               </div>

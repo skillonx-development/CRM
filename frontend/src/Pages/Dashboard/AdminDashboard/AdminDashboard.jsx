@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch invoice data
-        const invoiceRes = await axios.get("https://crm-383e.onrender.com/api/invoice");
+        const invoiceRes = await axios.get("http://localhost:5001/api/invoice");
         const totalRevenue = invoiceRes.data?.reduce(
           (sum, inv) => sum + (inv.amount || 0),
           0
@@ -26,7 +26,7 @@ const AdminDashboard = () => {
         setRevenue(totalRevenue);
 
         // Fetch tech proposals
-        const proposalsRes = await axios.get("https://crm-383e.onrender.com/api/tech-proposals");
+        const proposalsRes = await axios.get("http://localhost:5001/api/tech-proposals");
         const proposals = proposalsRes.data || [];
 
         const completed = proposals.filter(p => p.status === "Completed").length;
