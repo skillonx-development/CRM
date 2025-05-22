@@ -9,7 +9,7 @@ import {
 // =======================
 const ContactModal = ({ isOpen, onClose, type, contact, memberName }) => {
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-xl shadow-lg w-full max-w-md p-6">
@@ -21,7 +21,7 @@ const ContactModal = ({ isOpen, onClose, type, contact, memberName }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <div className="mb-6">
           <p className="text-gray-400 mb-2">Contact information for {memberName}</p>
           <div className="flex items-center p-4 bg-gray-800 rounded-lg border border-gray-700">
@@ -33,7 +33,7 @@ const ContactModal = ({ isOpen, onClose, type, contact, memberName }) => {
             <span className="text-white text-lg font-medium">{contact}</span>
           </div>
         </div>
-        
+
         <button
           onClick={onClose}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg w-full"
@@ -70,12 +70,12 @@ const MemberCard = ({ member, index, onManage, onToggleApprove, onContactClick }
         </div>
       </div>
       <div className="flex space-x-3 text-gray-400">
-        <Mail 
-          className="w-5 h-5 cursor-pointer hover:text-blue-400" 
+        <Mail
+          className="w-5 h-5 cursor-pointer hover:text-blue-400"
           onClick={() => onContactClick(member, "email")}
         />
-        <Phone 
-          className="w-5 h-5 cursor-pointer hover:text-green-400" 
+        <Phone
+          className="w-5 h-5 cursor-pointer hover:text-green-400"
           onClick={() => onContactClick(member, "phone")}
         />
       </div>
@@ -223,7 +223,7 @@ const TeamWidget = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch("https://crm-383e.onrender.com/api/members/getMembers/Marketing");
+        const response = await fetch("http://localhost:5001/api/members/getMembers/Marketing");
         if (!response.ok) throw new Error("Failed to fetch members");
         const data = await response.json();
         setMembers(data.filter(member => member.team === "Marketing"));
@@ -241,7 +241,7 @@ const TeamWidget = () => {
       const memberToUpdate = members.find(member => member._id === id);
       const updatedApproveStatus = !memberToUpdate.approve;
 
-      const response = await fetch(`https://crm-383e.onrender.com/api/members/updateApproval/Marketing/${id}`, {
+      const response = await fetch(`http://localhost:5001/api/members/updateApproval/Marketing/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ approve: updatedApproveStatus }),
@@ -271,10 +271,10 @@ const TeamWidget = () => {
 
   const handleContactClick = (member, type) => {
     // Use the actual email and contactNumber fields from the member data
-    const contactInfo = type === "email" 
-      ? member.email 
+    const contactInfo = type === "email"
+      ? member.email
       : member.contactNumber;
-    
+
     setContactModal({
       isOpen: true,
       type: type,
@@ -294,7 +294,7 @@ const TeamWidget = () => {
 
   const handleSavePermissions = async (memberId, permissions, team) => {
     try {
-      const response = await fetch(`https://crm-383e.onrender.com/api/members/updatePermissions/${memberId}`, {
+      const response = await fetch(`http://localhost:5001/api/members/updatePermissions/${memberId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ permissions, team }),

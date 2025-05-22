@@ -24,7 +24,7 @@ export default function TeacherManagement() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const res = await axios.get("https://crm-383e.onrender.com/api/teachers");
+        const res = await axios.get("http://localhost:5001/api/teachers");
         const fetchedTeachers = Array.isArray(res.data)
           ? res.data
           : res.data.teachers || [];
@@ -49,21 +49,21 @@ export default function TeacherManagement() {
     const fetchProposals = async () => {
       if (!selectedTeacher) return;
       try {
-        const res = await axios.get("https://crm-383e.onrender.com/api/tech-proposals");
+        const res = await axios.get("http://localhost:5001/api/tech-proposals");
         const allProposals = Array.isArray(res.data) ? res.data : res.data.proposals || [];
-  
+
         // Filter only accepted proposals
         const acceptedProposals = allProposals.filter(
           (proposal) => proposal.status === "Accepted"
         );
-  
+
         setProposals(acceptedProposals);
       } catch (err) {
         console.error("Failed to fetch proposals:", err);
         setProposals([]);
       }
     };
-  
+
     fetchProposals();
   }, [selectedTeacher]);
 
@@ -86,7 +86,7 @@ export default function TeacherManagement() {
     try {
       // Sending the assignment request to the backend
       await axios.post(
-        `https://crm-383e.onrender.com/api/teachers/assign/${selectedTeacher}`,
+        `http://localhost:5001/api/teachers/assign/${selectedTeacher}`,
         {
           workshopTitle: proposal.title,
           status: "Busy",
@@ -132,11 +132,10 @@ export default function TeacherManagement() {
         {filters.map((tab) => (
           <button
             key={tab}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
-              activeFilter === tab
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition ${activeFilter === tab
                 ? "bg-primary text-text shadow-md"
                 : "bg-background-hover text-text-muted hover:bg-background"
-            }`}
+              }`}
             onClick={() => setActiveFilter(tab)}
           >
             {tab}
@@ -201,11 +200,10 @@ export default function TeacherManagement() {
                 View Profile
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium rounded-lg shadow-md transition flex items-center gap-2 ${
-                  teacher.status === "Busy"
+                className={`px-4 py-2 text-sm font-medium rounded-lg shadow-md transition flex items-center gap-2 ${teacher.status === "Busy"
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-primary hover:bg-primary-dark"
-                }`}
+                  }`}
                 onClick={() => handleAssignClick(teacher.name)}
                 disabled={teacher.status === "Busy"}
               >
@@ -269,7 +267,7 @@ export default function TeacherManagement() {
                 e.preventDefault();
                 try {
                   await axios.put(
-                    `https://crm-383e.onrender.com/api/teachers/${viewTeacher._id}`,
+                    `http://localhost:5001/api/teachers/${viewTeacher._id}`,
                     viewTeacher
                   );
                   setTeachers((prev) =>
@@ -326,7 +324,7 @@ export default function TeacherManagement() {
             <button
               onClick={async () => {
                 await axios.put(
-                  `https://crm-383e.onrender.com/api/teachers/unassign/${viewTeacher._id}`
+                  `http://localhost:5001/api/teachers/unassign/${viewTeacher._id}`
                 );
                 setViewTeacher(null);
                 setTeachers((prev) =>

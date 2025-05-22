@@ -27,7 +27,7 @@ export default function OrderManagement() {
 
   const fetchSentProposals = async () => {
     try {
-      const res = await axios.get("https://crm-383e.onrender.com/api/tech-proposals/sent");
+      const res = await axios.get("http://localhost:5001/api/tech-proposals/sent");
       const mapped = res.data.map((p) => ({
         id: p._id,
         title: p.title,
@@ -57,7 +57,7 @@ export default function OrderManagement() {
 
   const saveChanges = async () => {
     try {
-      await axios.put(`https://crm-383e.onrender.com/api/tech-proposals/${editData.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${editData.id}`, {
         title: editData.title,
         status: editData.status,
         institution: editData.school,
@@ -77,7 +77,7 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       setIsSending(true);
-      await axios.put(`https://crm-383e.onrender.com/api/tech-proposals/${order.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
         institution: order.school,
@@ -86,7 +86,7 @@ export default function OrderManagement() {
         adminApproval: order.adminApproval
       });
 
-      await axios.post(`https://crm-383e.onrender.com/api/tech-proposals/send-email/${order.id}`);
+      await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
       alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
       fetchSentProposals();
       setIsModalOpen(false);
@@ -113,11 +113,10 @@ export default function OrderManagement() {
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-xl border shadow-sm text-sm transition ${
-              filter === status
+            className={`px-4 py-2 rounded-xl border shadow-sm text-sm transition ${filter === status
                 ? "bg-primary text-white"
                 : "bg-muted text-muted-foreground hover:bg-muted/70"
-            }`}
+              }`}
           >
             {status}
           </button>
@@ -249,19 +248,18 @@ export default function OrderManagement() {
                 <button
                   onClick={() => sendEmail(editData)}
                   disabled={isSending || !editData.adminApproval}
-                  className={`px-4 py-2 rounded-xl text-white transition ${
-                    !editData.adminApproval
+                  className={`px-4 py-2 rounded-xl text-white transition ${!editData.adminApproval
                       ? "bg-gray-400 cursor-not-allowed"
                       : isSending
-                      ? "bg-green-400 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  }`}
+                        ? "bg-green-400 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
                 >
                   {!editData.adminApproval
                     ? "Admin Approval Required"
                     : isSending
-                    ? "Sending..."
-                    : "Send Email"}
+                      ? "Sending..."
+                      : "Send Email"}
                 </button>
 
                 <button

@@ -13,26 +13,26 @@ export default function TeacherManagement() {
     rating: "",
   });
 
- // Updated handleInputChange function
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
+  // Updated handleInputChange function
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
-  // Validation for name: Only alphabets, spaces, and basic punctuation
-  if (name === "name" && /[^a-zA-Z\s'.,-]/.test(value)) return;
+    // Validation for name: Only alphabets, spaces, and basic punctuation
+    if (name === "name" && /[^a-zA-Z\s'.,-]/.test(value)) return;
 
-  // Validation for workshops: Only positive integers
-  if (name === "workshops" && (!/^\d*$/.test(value) || parseInt(value, 10) < 0)) return;
+    // Validation for workshops: Only positive integers
+    if (name === "workshops" && (!/^\d*$/.test(value) || parseInt(value, 10) < 0)) return;
 
-  // Update the teacher data
-  setTeacherData({ ...teacherData, [name]: value });
-};
+    // Update the teacher data
+    setTeacherData({ ...teacherData, [name]: value });
+  };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://crm-383e.onrender.com/api/teachers/add", {
+      const response = await fetch("http://localhost:5001/api/teachers/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const handleInputChange = (e) => {
 
       {/* Search & Filters */}
       <div className="flex items-center gap-2 mb-4">
-       
+
       </div>
 
       {/* Add Teacher Modal */}
@@ -111,15 +111,15 @@ const handleInputChange = (e) => {
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-  type="text"
-  name="name"
-  value={teacherData.name}
-  onChange={handleInputChange}
-  placeholder="Full Name"
-  className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
-  required
-/>
+              <input
+                type="text"
+                name="name"
+                value={teacherData.name}
+                onChange={handleInputChange}
+                placeholder="Full Name"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
               <select
                 name="specialty"
                 value={teacherData.specialty}
@@ -146,14 +146,14 @@ const handleInputChange = (e) => {
                 <option value="Tentative">Tentative</option>
               </select>
               <input
-  type="number"
-  name="workshops"
-  value={teacherData.workshops}
-  onChange={handleInputChange}
-  placeholder="Workshops Conducted"
-  className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
-  min="0"
-/>
+                type="number"
+                name="workshops"
+                value={teacherData.workshops}
+                onChange={handleInputChange}
+                placeholder="Workshops Conducted"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background-muted focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="0"
+              />
               <input
                 type="number"
                 step="0.1"

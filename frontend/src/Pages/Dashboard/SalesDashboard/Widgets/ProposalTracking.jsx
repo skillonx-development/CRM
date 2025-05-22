@@ -6,7 +6,7 @@ import axios from 'axios';
 const api = {
   fetchProposals: async () => {
     try {
-      const response = await axios.get('https://crm-383e.onrender.com/api/proposals');
+      const response = await axios.get('http://localhost:5001/api/proposals');
       return response.data.proposals;
     } catch (error) {
       console.error("Error fetching proposals:", error);
@@ -15,7 +15,7 @@ const api = {
   },
   createProposal: async (proposal) => {
     try {
-      const response = await axios.post('https://crm-383e.onrender.com/api/proposals', proposal);
+      const response = await axios.post('http://localhost:5001/api/proposals', proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error creating proposal:", error);
@@ -24,7 +24,7 @@ const api = {
   },
   updateProposal: async (id, proposal) => {
     try {
-      const response = await axios.put(`https://crm-383e.onrender.com/api/proposals/${id}`, proposal);
+      const response = await axios.put(`http://localhost:5001/api/proposals/${id}`, proposal);
       return response.data.proposal;
     } catch (error) {
       console.error("Error updating proposal:", error);
@@ -105,7 +105,7 @@ const ProposalTracking = () => {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(item => 
+      results = results.filter(item =>
         item.title.toLowerCase().includes(query) ||
         item.institution.toLowerCase().includes(query) ||
         item.description.toLowerCase().includes(query)
@@ -125,14 +125,14 @@ const ProposalTracking = () => {
       alert("Only alphabets and spaces are allowed in the Workshop Title and Institution Name.");
       return;
     }
-    
+
     //restricting special characters for price
     if (name === "price" && /[^0-9]/.test(value)) {
       alert("Only numeric values are allowed for the price.");
       return;
     }
 
-    
+
     if (name === "status") {
       let statusColor = "bg-primary";
       if (value === "Proposal Sent") statusColor = "bg-status-info";
@@ -196,7 +196,7 @@ const ProposalTracking = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://crm-383e.onrender.com/api/proposals/${editProposal._id}`, {
+      const response = await fetch(`http://localhost:5001/api/proposals/${editProposal._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -239,14 +239,13 @@ const ProposalTracking = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex gap-2">
             {['All', 'Leads', 'Sent', 'Accepted', 'Rejected'].map((tab) => (
-              <button 
-                key={tab} 
+              <button
+                key={tab}
                 onClick={() => setActiveFilter(tab)}
-                className={`px-3 py-1 rounded-lg text-sm font-semibold ${
-                  activeFilter === tab 
-                    ? 'bg-primary text-text' 
+                className={`px-3 py-1 rounded-lg text-sm font-semibold ${activeFilter === tab
+                    ? 'bg-primary text-text'
                     : 'bg-background-hover text-text-muted hover:bg-background-sidebar'
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -262,7 +261,7 @@ const ProposalTracking = () => {
               className="border border-border rounded-lg pl-3 pr-8 py-1 text-sm bg-background text-text shadow-sm"
             />
             {searchQuery ? (
-              <button 
+              <button
                 onClick={() => setSearchQuery("")}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text"
               >
@@ -280,8 +279,8 @@ const ProposalTracking = () => {
           <div className="p-8 text-center text-status-error">{error}</div>
         ) : filteredProposals.length === 0 ? (
           <div className="p-8 text-center text-text-muted">
-            {searchQuery || activeFilter !== "All" 
-              ? "No matching proposals found." 
+            {searchQuery || activeFilter !== "All"
+              ? "No matching proposals found."
               : "No proposals yet. Create your first proposal!"}
           </div>
         ) : (
@@ -305,13 +304,13 @@ const ProposalTracking = () => {
                 </div>
                 <p className="text-text-muted text-sm">{proposal.institution}</p>
                 <div className="flex items-center text-text-muted text-sm mt-2">
-                  <Calendar size={16} className="mr-1" /> 
+                  <Calendar size={16} className="mr-1" />
                   {new Date(proposal.scheduleDate).toLocaleDateString('en-US', {
                     year: 'numeric', month: 'short', day: 'numeric'
                   })}
                 </div>
                 <div className="flex justify-between items-center text-text mt-3">
-                  <button 
+                  <button
                     className="text-sm flex items-center gap-2 text-text-muted hover:text-text"
                     onClick={() => handleEdit(proposal)}
                   >
@@ -327,14 +326,14 @@ const ProposalTracking = () => {
       {/* Create New Proposal Modal */}
       {showNewProposalForm && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-background p-6 rounded-xl shadow-card border border-border w-full max-w-md"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-text">Create New Proposal</h2>
-              <button 
+              <button
                 onClick={() => setShowNewProposalForm(false)}
                 className="text-text-muted hover:text-text"
               >
@@ -461,14 +460,14 @@ const ProposalTracking = () => {
       {/* Edit Proposal Modal */}
       {showEditProposalForm && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-background p-6 rounded-xl shadow-card border border-border w-full max-w-md"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-text">Edit Proposal</h2>
-              <button 
+              <button
                 onClick={() => setShowEditProposalForm(false)}
                 className="text-text-muted hover:text-text"
               >

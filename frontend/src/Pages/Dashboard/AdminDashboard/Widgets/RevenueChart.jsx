@@ -13,24 +13,24 @@ const RevenueChart = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://crm-383e.onrender.com/api/invoice');
+                const response = await axios.get('http://localhost:5001/api/invoice');
                 const invoiceData = response.data; // Assuming the data structure is an array of invoices
 
                 // Transform the data to monthly revenue format
                 const monthlyRevenue = invoiceData.reduce((acc, invoice) => {
                     const month = new Date(invoice.createdAt).toLocaleString('default', { month: 'short' });
                     const revenue = invoice.amount;
-                
+
                     // Group by month and accumulate revenue
                     if (acc[month]) {
                         acc[month] += revenue;
                     } else {
                         acc[month] = revenue;
                     }
-                
+
                     return acc;
                 }, {});
-                
+
 
                 // Prepare data for the chart
                 const chartData = Object.keys(monthlyRevenue).map((month) => ({

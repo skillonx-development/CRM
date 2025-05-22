@@ -33,8 +33,8 @@ const TeamAnalysis = () => {
     const fetchData = async () => {
       try {
         const [teamRes, invoiceRes] = await Promise.all([
-          fetch("https://crm-383e.onrender.com/api/members/getMembers/Tech"),
-          fetch("https://crm-383e.onrender.com/api/invoice"),
+          fetch("http://localhost:5001/api/members/getMembers/Tech"),
+          fetch("http://localhost:5001/api/invoice"),
         ]);
 
         const teamData = await teamRes.json();
@@ -46,7 +46,7 @@ const TeamAnalysis = () => {
         // Sum up invoice amounts, filtering out "Paid" status
         const totalRevenue = invoiceData.reduce((sum, inv) => {
           if (inv.status !== "Paid") {
-           const amount = typeof inv.amount === "number" ? inv.amount : 0;
+            const amount = typeof inv.amount === "number" ? inv.amount : 0;
             return sum + amount;
           }
           return sum;
@@ -94,9 +94,8 @@ const TeamAnalysis = () => {
               <div className="text-2xl font-semibold text-chart-blue">{widget.value}</div>
               <div className="flex items-center gap-2 mt-2">
                 <span
-                  className={`text-xs font-medium px-2 py-1 rounded-md ${
-                    widget.positive ? "text-status-success" : "text-status-error"
-                  }`}
+                  className={`text-xs font-medium px-2 py-1 rounded-md ${widget.positive ? "text-status-success" : "text-status-error"
+                    }`}
                 >
                   {widget.positive ? "↑" : "↓"} {widget.change}
                 </span>
