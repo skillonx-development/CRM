@@ -54,16 +54,12 @@ export const AuthProvider = ({ children }) => {
                 }
             );
 
-            const { success, user, redirect, message } = response.data;
+            const { success, user, message } = response.data;
 
             if (success) {
                 setIsAuthenticated(true);
                 setUser(user);
                 localStorage.setItem("user", JSON.stringify(user));
-
-                // if (redirect) {
-                //   navigate(redirect);
-                // }
 
                 return { success: true };
             } else {
