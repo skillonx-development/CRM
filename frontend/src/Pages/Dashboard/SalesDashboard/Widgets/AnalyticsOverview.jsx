@@ -16,8 +16,8 @@ const AnalyticsOverview = () => {
   const fetchAnalyticsData = async () => {
     try {
       const [invoiceRes, proposalsRes] = await Promise.all([
-        axios.get("http://localhost:5001/api/invoice"),
-        axios.get("http://localhost:5001/api/tech-proposals"),
+        axios.get("/api/invoice"),
+        axios.get("/api/tech-proposals"),
       ]);
 
       const invoices = invoiceRes.data || [];

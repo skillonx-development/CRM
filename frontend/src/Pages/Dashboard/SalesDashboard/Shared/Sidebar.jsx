@@ -30,6 +30,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
         { id: "proposals", icon: FileText, label: "Proposals", path: "/sales/proposals", permissionKey: "proposals" },
         { id: "order", icon: Package, label: "Orders", path: "/sales/orders", permissionKey: "orders" },
         { id: "billing", icon: CreditCard, label: "Billing", path: "/sales/billing", permissionKey: "billing" },
+        { id: "manageData", icon: FileText, label: "Manage Data", path: "/sales/manage-data", permissionKey: "manage-data" },
         { id: "team-management", icon: Users, label: "Team Management", path: "/sales/team", permissionKey: "team-management" },
     ];
 
@@ -55,7 +56,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                 setIsInitialized(true);
 
                 if (cachedUser._id && cachedUser.team) {
-                    const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                    const res = await fetch(`/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                     const data = await res.json();
                     setPermissions(data.permissions || {});
                 }

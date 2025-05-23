@@ -12,7 +12,7 @@ const PendingApprovals = () => {
   const fetchApprovals = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:5001/api/tech-proposals/sent');
+      const response = await axios.get('/api/tech-proposals/sent');
       const acceptedApprovals = response.data;
 
       const newBadgeStatus = { ...badgeStatus };
@@ -47,7 +47,7 @@ const PendingApprovals = () => {
 
     try {
       await axios.put(
-        `http://localhost:5001/api/tech-proposals/${selectedApproval._id}/admin-approval`,
+        `/api/tech-proposals/${selectedApproval._id}/admin-approval`,
         { adminApproval: approved }
       );
 
@@ -149,10 +149,10 @@ const PendingApprovals = () => {
                       </div>
                       <div
                         className={`text-xs font-medium px-2 py-1 rounded-full flex items-center ${badgeStatusText === 'Approved'
-                            ? 'bg-blue-900/30 text-blue-400'
-                            : badgeStatusText === 'Disapproved'
-                              ? 'bg-red-900/30 text-red-400'
-                              : 'bg-yellow-900/30 text-yellow-400'
+                          ? 'bg-blue-900/30 text-blue-400'
+                          : badgeStatusText === 'Disapproved'
+                            ? 'bg-red-900/30 text-red-400'
+                            : 'bg-yellow-900/30 text-yellow-400'
                           }`}
                       >
                         {badgeStatusText === 'Approved' ? (
@@ -253,10 +253,10 @@ const PendingApprovals = () => {
                   <p className="text-gray-400 text-sm mr-2">Admin Status:</p>
                   <div
                     className={`text-xs font-medium px-2 py-1 rounded-full inline-flex items-center ${badgeStatus[selectedApproval._id] === 'Approved'
-                        ? 'bg-blue-900/30 text-blue-400'
-                        : badgeStatus[selectedApproval._id] === 'Disapproved'
-                          ? 'bg-red-900/30 text-red-400'
-                          : 'bg-yellow-900/30 text-yellow-400'
+                      ? 'bg-blue-900/30 text-blue-400'
+                      : badgeStatus[selectedApproval._id] === 'Disapproved'
+                        ? 'bg-red-900/30 text-red-400'
+                        : 'bg-yellow-900/30 text-yellow-400'
                       }`}
                   >
                     {badgeStatus[selectedApproval._id] === 'Approved' ? (

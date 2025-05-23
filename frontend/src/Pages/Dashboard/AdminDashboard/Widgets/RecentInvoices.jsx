@@ -12,7 +12,7 @@ const RecentInvoices = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/invoice');
+        const res = await axios.get('/api/invoice');
         setInvoices(res.data);
       } catch (error) {
         console.error('Error fetching invoices:', error);
@@ -47,7 +47,7 @@ const RecentInvoices = () => {
 
     try {
       setSendingReminder(invoice._id);
-      const res = await axios.post('http://localhost:5001/api/invoice/sendReminder', {
+      const res = await axios.post('/api/invoice/sendReminder', {
         email: invoice.email,
         subject: `Reminder: Invoice #${invoice._id} is pending`,
         message: `Dear ${invoice.title},<br/><br/>This is a friendly reminder that Invoice #${invoice._id} with client name ${invoice.title} for amount ₹${invoice.amount} is still pending. Please make the payment at your earliest convenience.<br/><br/>Thank you!`,
@@ -126,8 +126,8 @@ const RecentInvoices = () => {
                   </motion.button>
                   <motion.button
                     className={`flex-1 py-2 rounded-md flex items-center justify-center ${sendingReminder === invoice._id
-                        ? 'bg-purple-500/10 text-purple-300 cursor-not-allowed'
-                        : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400'
+                      ? 'bg-purple-500/10 text-purple-300 cursor-not-allowed'
+                      : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400'
                       }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}

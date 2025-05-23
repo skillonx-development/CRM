@@ -46,7 +46,7 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                     return;
                 }
 
-                const res = await fetch(`http://localhost:5001/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
+                const res = await fetch(`/api/members/getPermissions/${cachedUser.team}/${cachedUser._id}`);
                 const data = await res.json();
 
                 setPermissions(data.permissions || {});
@@ -170,10 +170,10 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                                         onClick={() => !isDisabled && navigate(item.path)}
                                         disabled={isDisabled}
                                         className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
-                                                ? "bg-primary text-white"
-                                                : isDisabled
-                                                    ? "text-text-muted cursor-not-allowed"
-                                                    : "text-white hover:bg-background-hover"
+                                            ? "bg-primary text-white"
+                                            : isDisabled
+                                                ? "text-text-muted cursor-not-allowed"
+                                                : "text-white hover:bg-background-hover"
                                             }`}
                                         title={collapsed ? item.label : ""}
                                     >
@@ -205,8 +205,8 @@ function Sidebar({ setActiveTab, collapsed, setCollapsed }) {
                                 <button
                                     onClick={() => item.id === "logout" ? setShowLogoutModal(true) : navigate(item.path)}
                                     className={`flex items-center w-full ${collapsed ? "justify-center" : ""} px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
-                                            ? "bg-primary text-white"
-                                            : "text-white hover:bg-background-hover"
+                                        ? "bg-primary text-white"
+                                        : "text-white hover:bg-background-hover"
                                         }`}
                                     title={collapsed ? item.label : ""}
                                 >
