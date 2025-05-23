@@ -8,6 +8,7 @@ import SalesBilling from '../../Pages/Dashboard/SalesDashboard/SalesBilling';
 import SalesTeam from '../../Pages/Dashboard/SalesDashboard/SalesTeam';
 import SalesSettings from '../../Pages/Dashboard/SalesDashboard/SalesSettings';
 import SalesHelp from '../../Pages/Dashboard/SalesDashboard/SalesHelp';
+import ManageData from '../../Pages/Dashboard/SalesDashboard/ManageData';
 
 export const SalesRoutes = (
     <Route path={ROUTES.SALES + '/*'}>
@@ -18,5 +19,6 @@ export const SalesRoutes = (
         <Route path={ROUTES.NESTED.TEAM} element={<SalesTeam />} />
         <Route path={ROUTES.NESTED.SETTINGS} element={<SalesSettings />} />
         <Route path={ROUTES.NESTED.HELP} element={<SalesHelp />} />
+        <Route path="manage-data" element={<ManageData />} />
     </Route>
 );
