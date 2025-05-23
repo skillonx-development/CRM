@@ -3,12 +3,6 @@ import { FaDownload, FaSearch, FaPlus, FaEdit } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 
-const paymentsData = [
-  { id: "ORD-2023-001", title: "Tech Institute", amount: 8750, status: "Payment Received", paidOn: "Apr 15, 2023" },
-  { id: "ORD-2023-003", title: "Creative College", amount: 6800, status: "Payment Received", paidOn: "May 1, 2023" },
-  { id: "ORD-2023-004", title: "ABC University", amount: 7500, status: "Pending", paidOn: "May 10, 2023" }
-];
-
 const statusColors = {
   "Paid": "text-status-success",
   "Payment Received": "text-status-success",
@@ -42,6 +36,12 @@ export default function BillingSettlements() {
 
   // Get today's date in YYYY-MM-DD format for date inputs
   const today = new Date().toISOString().split('T')[0];
+
+  const [lastReminders, setLastReminders] = useState(() => {
+    // Load from localStorage on initial render
+    const stored = localStorage.getItem('lastReminders');
+    return stored ? JSON.parse(stored) : {};
+  });
 
   useEffect(() => {
     const fetchProposals = async () => {
@@ -83,6 +83,14 @@ export default function BillingSettlements() {
     fetchPayments();  // Fetch payments data here
   }, []);
 
+  useEffect(() => {
+    // Keep lastReminders in sync with localStorage if invoices change (e.g., after refresh)
+    const stored = localStorage.getItem('lastReminders');
+    if (stored) {
+      setLastReminders(JSON.parse(stored));
+    }
+  }, [invoices]);
+
   const handleSendReminder = async (id, invoice) => {
     const confirmed = window.confirm("Are you sure you want to send a reminder email?");
     if (!confirmed) return;
@@ -105,6 +113,14 @@ export default function BillingSettlements() {
       const data = await response.json();
 
       if (response.ok) {
+        // Save last reminder date in localStorage and state
+        const now = new Date();
+        const dateStr = now.toLocaleDateString();
+        // Use invoice._id if available, else fallback to id
+        const reminderKey = invoice._id || id;
+        const updated = { ...lastReminders, [reminderKey]: dateStr };
+        setLastReminders(updated);
+        localStorage.setItem('lastReminders', JSON.stringify(updated));
         alert("Reminder email sent successfully!");
       } else {
         alert(`Failed to send reminder: ${data.message}`);
@@ -426,39 +442,47 @@ export default function BillingSettlements() {
               onChange={(e) => setSearchInvoices(e.target.value)}
             />
           </div>
-          {filteredInvoices.map(invoice => (
-            <div key={invoice.id || invoice._id} className="p-4 border-b border-border-dark">
-              <div className="flex justify-between">
-                <span>{invoice.title}</span>
-                <span className="font-bold">₹{invoice.amount}</span>
-              </div>
-              <p className="text-text-muted text-sm">Due on {invoice.due}</p>
-              <p className={`text-sm ${statusColors[invoice.status]}`}>{invoice.status}</p>
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => handleEdit(invoice)}
-                  className="bg-primary text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
-                >
-                  <FaEdit /> Edit
-                </button>
-                {sendingReminder === invoice._id ? (
-                  <button
-                    disabled
-                    className="bg-secondary text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
-                  >
-                    <span className="animate-pulse">Sending...</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleSendReminder(invoice._id, invoice)}
-                    className="bg-secondary text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
-                  >
-                    <FaDownload /> Reminder
-                  </button>
+          {filteredInvoices.map(invoice => {
+            const reminderKey = invoice._id || invoice.id;
+            return (
+              <div key={reminderKey} className="p-4 border-b border-border-dark">
+                <div className="flex justify-between">
+                  <span>{invoice.title}</span>
+                  <span className="font-bold">₹{invoice.amount}</span>
+                </div>
+                <p className="text-text-muted text-sm">Due on {invoice.due}</p>
+                {invoice.status === 'Awaiting Payment' && lastReminders[reminderKey] && (
+                  <p className="text-text-muted text-xs">Last reminder sent: {lastReminders[reminderKey]}</p>
                 )}
+                <p className={`text-sm ${statusColors[invoice.status]}`}>{invoice.status}</p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => handleEdit(invoice)}
+                    className="bg-primary text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
+                  >
+                    <FaEdit /> Edit
+                  </button>
+                  {invoice.status === "Paid" ? null : (
+                    sendingReminder === invoice._id ? (
+                      <button
+                        disabled
+                        className="bg-secondary text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
+                      >
+                        <span className="animate-pulse">Sending...</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleSendReminder(invoice._id, invoice)}
+                        className="bg-secondary text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
+                      >
+                        <FaDownload /> Reminder
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
