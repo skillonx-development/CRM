@@ -22,7 +22,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS
@@ -62,6 +62,8 @@ app.use('/api/tech-proposals', techProposalsRoutes);
 app.use('/api/teachers', teachersRoute);
 app.use('/api/invoice', invoiceRoutes)
 
+import cowinProxyRoutes from './routes/cowinProxyRoutes.js'
+app.use('/api', cowinProxyRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5001;
