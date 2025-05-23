@@ -48,9 +48,6 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Form submitted");
-
-    // Clear previous error messages
     setGeneralError("");
     setEmailError("");
     setPasswordError("");
@@ -58,64 +55,23 @@ const LoginPage = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
-
     try {
-      // Determine the correct API endpoint
-      const loginEndpoint = '/api/auth/login';
-
-      // Make the request to the backend
-      const response = await fetch(loginEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, type: role }),
-      });
-
-      // Check if the response is empty or not valid JSON
-      let data = {};
-      try {
-        const responseText = await response.text();
-        if (responseText) {
-          data = JSON.parse(responseText);
+      // Use the provided auth context login method only
+      const result = await login(email, password, role);
+      if (result.success) {
+        // Get user from localStorage (set by context)
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser?.team) {
+          navigate(`/${storedUser.team.toLowerCase()}`);
+        } else if (storedUser?.role === 'admin') {
+          navigate('/admin');
         } else {
-          throw new Error("Empty response received from server");
-        }
-      } catch (parseError) {
-        console.error("Failed to parse response:", parseError);
-        setGeneralError("Server error. Please try again or contact support.");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!response.ok) {
-        // Handle different error cases
-        if (response.status === 401) {
-          setGeneralError(data.message || "Invalid email or password");
-        } else if (response.status === 403) {
-          setGeneralError(data.message || "Account not approved yet");
-        } else {
-          setGeneralError(data.message || "Login failed. Please try again.");
-        }
-        return;
-      }
-
-      // If successful, update auth context and redirect
-      if (data.success) {
-        console.log("Login successful:", data);
-        // Use the provided auth context login method
-        try {
-          await login(email, password, role); // Update auth context
-          navigate(data.redirect || `/${role}/dashboard`);
-        } catch (authError) {
-          console.error("Auth context error:", authError);
-          setGeneralError("Authentication error. Please try again.");
+          navigate('/');
         }
       } else {
-        setGeneralError(data.message || "Login failed");
+        setGeneralError(result.error || "Login failed");
       }
-    } catch (err) {
-      console.error("Login error:", err);
+    } catch {
       setGeneralError("Network error. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
