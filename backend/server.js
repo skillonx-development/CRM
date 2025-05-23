@@ -9,6 +9,7 @@ import proposalRoutes from './routes/proposalRoutes.js';
 import memberRoutes from './routes/memberRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
 import techProposalsRoutes from './routes/techProposalsRoutes.js';
+import cowinProxyRoutes from './routes/cowinProxyRoutes.js'
 import teachersRoute from './routes/teachersRoutes.js';
 import invoiceRoutes from './routes/invoiceRoutes.js';
 import cors from 'cors';
@@ -62,7 +63,7 @@ app.use('/api/tech-proposals', techProposalsRoutes);
 app.use('/api/teachers', teachersRoute);
 app.use('/api/invoice', invoiceRoutes)
 
-import cowinProxyRoutes from './routes/cowinProxyRoutes.js'
+
 app.use('/api', cowinProxyRoutes);
 
 // Start server
