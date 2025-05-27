@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { CheckCircle, AlertCircle, X } from "react-feather"; // Make sure to install react-feather
 
 const statusColors = {
   Accepted: "bg-green-500",
@@ -13,6 +14,49 @@ const statusColors = {
 const statusOptions = ["Pending", "Sent", "Accepted", "Rejected", "Completed"];
 const filters = ["All", ...statusOptions];
 
+const Toast = ({ message, type, onClose }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -50, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -50, scale: 0.9 }}
+      className={`fixed top-4 right-4 z-[9999] px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-md ${
+        type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+      }`}
+    >
+      {type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+      <span className="flex-1">{message}</span>
+      <button
+        onClick={onClose}
+        className="text-white hover:text-gray-200 transition-colors"
+      >
+        <X size={16} />
+      </button>
+    </motion.div>
+  );
+};
+
+const useToast = () => {
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = (message, type = "success") => {
+    const id = Date.now();
+    const toast = { id, message, type };
+
+    setToasts((prev) => [...prev, toast]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
+  };
+
+  const removeToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  return { toasts, showToast, removeToast };
+};
+
 export default function OrderManagement() {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("All");
@@ -20,6 +64,9 @@ export default function OrderManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState({});
   const [isSending, setIsSending] = useState(false);
+
+  // Toast Hook usage
+  const { toasts, showToast, removeToast } = useToast();
 
   useEffect(() => {
     fetchSentProposals();
@@ -37,11 +84,12 @@ export default function OrderManagement() {
         schedule: p.scheduledDate || "N/A",
         price: p.price || 0,
         participants: p.expectedParticipants || 0,
-        adminApproval: p.adminApproval || false
+        adminApproval: p.adminApproval || false,
       }));
       setOrders(mapped);
     } catch (err) {
       console.error("Error fetching sent proposals:", err);
+      showToast("Failed to fetch proposals", "error");
     }
   };
 
@@ -63,14 +111,14 @@ export default function OrderManagement() {
         institution: editData.school,
         scheduledDate: editData.schedule,
         price: editData.price,
-        adminApproval: editData.adminApproval
+        adminApproval: editData.adminApproval,
       });
       setIsModalOpen(false);
       fetchSentProposals();
-      alert("Proposal updated successfully.");
+      showToast("Proposal updated successfully.", "success");
     } catch (err) {
       console.error("Failed to update proposal:", err);
-      alert("Failed to update proposal.");
+      showToast("Failed to update proposal.", "error");
     }
   };
 
@@ -83,22 +131,22 @@ export default function OrderManagement() {
         institution: order.school,
         scheduledDate: order.schedule,
         price: order.price,
-        adminApproval: order.adminApproval
+        adminApproval: order.adminApproval,
       });
 
       await axios.post(`/api/tech-proposals/send-email/${order.id}`);
-      alert(`Email sent and status updated to 'Sent' for: ${order.title}`);
+      showToast(`Email sent and status updated to 'Sent' for: ${order.title}`, "success");
       fetchSentProposals();
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to send email:", error);
-      alert("Failed to send email.");
+      showToast("Failed to send email.", "error");
     } finally {
       setIsSending(false);
     }
   };
 
-  const filteredOrders = orders.filter(order =>
+  const filteredOrders = orders.filter((order) =>
     filter === "All" ? true : order.status === filter
   );
 
@@ -113,10 +161,11 @@ export default function OrderManagement() {
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-xl border shadow-sm text-sm transition ${filter === status
-              ? "bg-primary text-white"
-              : "bg-muted text-muted-foreground hover:bg-muted/70"
-              }`}
+            className={`px-4 py-2 rounded-xl border shadow-sm text-sm transition ${
+              filter === status
+                ? "bg-primary text-white"
+                : "bg-muted text-muted-foreground hover:bg-muted/70"
+            }`}
           >
             {status}
           </button>
@@ -129,12 +178,20 @@ export default function OrderManagement() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {filteredOrders.map(order => (
-            <motion.div key={order.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          {filteredOrders.map((order) => (
+            <motion.div
+              key={order.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <div className="bg-card border border-border shadow-md p-5 rounded-2xl">
                 <div className="flex justify-between items-center mb-3">
                   <h2 className="text-lg font-semibold">{order.title}</h2>
-                  <span className={`text-xs text-white px-3 py-1 rounded-full ${statusColors[order.status] || "bg-gray-400"}`}>
+                  <span
+                    className={`text-xs text-white px-3 py-1 rounded-full ${
+                      statusColors[order.status] || "bg-gray-400"
+                    }`}
+                  >
                     {order.status}
                   </span>
                 </div>
@@ -145,7 +202,9 @@ export default function OrderManagement() {
                 </div>
                 <p className="text-xl font-bold mt-4 text-primary">₹{order.price}</p>
                 {order.status === "Completed" && (
-                  <p className="text-xs mt-2 text-emerald-600 font-semibold">✅ This order is completed</p>
+                  <p className="text-xs mt-2 text-emerald-600 font-semibold">
+                    ✅ This order is completed
+                  </p>
                 )}
                 <button
                   className="w-full mt-4 bg-primary hover:bg-primary-dark px-4 py-2 rounded-xl text-white font-medium transition"
@@ -248,18 +307,19 @@ export default function OrderManagement() {
                 <button
                   onClick={() => sendEmail(editData)}
                   disabled={isSending || !editData.adminApproval}
-                  className={`px-4 py-2 rounded-xl text-white transition ${!editData.adminApproval
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : isSending
+                  className={`px-4 py-2 rounded-xl text-white transition ${
+                    !editData.adminApproval
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : isSending
                       ? "bg-green-400 cursor-not-allowed"
                       : "bg-green-600 hover:bg-green-700"
-                    }`}
+                  }`}
                 >
                   {!editData.adminApproval
                     ? "Admin Approval Required"
                     : isSending
-                      ? "Sending..."
-                      : "Send Email"}
+                    ? "Sending..."
+                    : "Send Email"}
                 </button>
 
                 <button
@@ -272,6 +332,18 @@ export default function OrderManagement() {
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* Toast container */}
+      <AnimatePresence>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
       </AnimatePresence>
     </div>
   );
