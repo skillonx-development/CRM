@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { CheckCircle, AlertCircle, X } from "react-feather"; // Make sure to install react-feather
+import { CheckCircle, AlertCircle, X } from "react-feather"; 
 
 const statusColors = {
   Accepted: "bg-green-500",
@@ -74,7 +74,7 @@ export default function OrderManagement() {
 
   const fetchSentProposals = async () => {
     try {
-      const res = await axios.get("/api/tech-proposals/sent");
+      const res = await axios.get("https://crm-r5rr.onrender.com/api/tech-proposals/sent");
       const mapped = res.data.map((p) => ({
         id: p._id,
         title: p.title,
@@ -105,7 +105,7 @@ export default function OrderManagement() {
 
   const saveChanges = async () => {
     try {
-      await axios.put(`/api/tech-proposals/${editData.id}`, {
+      await axios.put(`https://crm-r5rr.onrender.com/api/tech-proposals/${editData.id}`, {
         title: editData.title,
         status: editData.status,
         institution: editData.school,
@@ -125,7 +125,7 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       setIsSending(true);
-      await axios.put(`/api/tech-proposals/${order.id}`, {
+      await axios.put(`https://crm-r5rr.onrender.com/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
         institution: order.school,
@@ -134,7 +134,7 @@ export default function OrderManagement() {
         adminApproval: order.adminApproval,
       });
 
-      await axios.post(`/api/tech-proposals/send-email/${order.id}`);
+      await axios.post(`https://crm-r5rr.onrender.com/api/tech-proposals/send-email/${order.id}`);
       showToast(`Email sent and status updated to 'Sent' for: ${order.title}`, "success");
       fetchSentProposals();
       setIsModalOpen(false);

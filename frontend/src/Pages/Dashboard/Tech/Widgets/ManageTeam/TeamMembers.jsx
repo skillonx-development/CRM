@@ -220,7 +220,7 @@ const SalesTeamWidget = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch("/api/members/getMembers/Tech");
+        const response = await fetch("https://crm-r5rr.onrender.com/api/members/getMembers/Tech");
         if (!response.ok) throw new Error("Failed to fetch members");
         const data = await response.json();
         setMembers(data.filter(member => member.team === "Tech"));
@@ -238,7 +238,7 @@ const SalesTeamWidget = () => {
       const memberToUpdate = members.find(member => member._id === id);
       const updatedApproveStatus = !memberToUpdate.approve;
 
-      const response = await fetch(`/api/members/updateApproval/Tech/${id}`, {
+      const response = await fetch(`https://crm-r5rr.onrender.com/api/members/updateApproval/Tech/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ approve: updatedApproveStatus }),
@@ -291,7 +291,7 @@ const SalesTeamWidget = () => {
 
   const handleSavePermissions = async (memberId, permissions, team) => {
     try {
-      const response = await fetch(`/api/members/updatePermissions/${memberId}`, {
+      const response = await fetch(`https://crm-r5rr.onrender.com/api/members/updatePermissions/${memberId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ permissions, team }),

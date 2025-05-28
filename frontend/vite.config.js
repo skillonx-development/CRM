@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        target: "https://crm-383e.onrender.com",
+      'https://crm-r5rr.onrender.com': {
+        target: "",
         changeOrigin: true,
       }
     }

@@ -64,9 +64,7 @@ app.use('/api/tech-proposals', techProposalsRoutes);
 app.use('/api/teachers', teachersRoute);
 app.use('/api/invoice', invoiceRoutes)
 app.use("/api/institution", institutionRoutes);
-
-
-app.use('/api', cowinProxyRoutes);
+app.use('/api/cowin', cowinProxyRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5001;
