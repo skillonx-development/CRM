@@ -134,7 +134,7 @@ const ManageData = () => {
     const fetchDistricts = async () => {
       if (selectedState) {
         try {
-          const res = await fetch(`http://localhost:5001/api/cowin/districts/${selectedState}`);
+          const res = await fetch(`https://crm-r5rr.onrender.com/api/cowin/districts/${selectedState}`);
           const data = await res.json();
           const normalizedDistricts = (data.districts || []).map((d) => ({
             ...d,
