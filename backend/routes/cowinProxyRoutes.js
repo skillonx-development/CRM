@@ -4,9 +4,15 @@ import fetch from 'node-fetch';
 
 const router = express.Router();
 
+//test route
+router.get('/test', (req, res) => {
+  res.json({ message: 'Cowin route works!' });
+});
+
 // Proxy route for districts
 router.get('/districts/:stateId', async (req, res) => {
     const { stateId } = req.params;
+    console.log(`Fetching districts for state ID: ${stateId}`);
     try {
         const response = await fetch(`https://cdn-api.co-vin.in/api/v2/admin/location/districts/${stateId}`, {
             headers: {
@@ -19,6 +25,11 @@ router.get('/districts/:stateId', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch districts' });
     }
+});
+
+// Add a catch-all route to help debug invalid route errors
+router.use((req, res, next) => {
+    res.status(404).json({ error: 'Route not found', path: req.originalUrl });
 });
 
 export default router;

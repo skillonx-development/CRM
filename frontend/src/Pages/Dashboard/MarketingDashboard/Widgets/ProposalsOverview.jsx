@@ -9,7 +9,7 @@ export default function ProposalsOverview() {
   useEffect(() => {
     const fetchProposalStats = async () => {
       try {
-        const res = await axios.get("/api/tech-proposals");
+        const res = await axios.get("https://crm-r5rr.onrender.com/api/tech-proposals");
         const proposals = res.data || [];
 
         // Group by month

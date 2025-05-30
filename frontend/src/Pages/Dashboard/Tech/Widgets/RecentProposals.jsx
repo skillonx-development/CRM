@@ -10,7 +10,7 @@ export default function RecentProposals() {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await axios.get("/api/proposals"); // Update the endpoint if needed
+        const response = await axios.get("https://crm-r5rr.onrender.com/api/proposals"); // Update the endpoint if needed
         setProposals(response.data.proposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);

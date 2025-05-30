@@ -12,6 +12,7 @@ import techProposalsRoutes from './routes/techProposalsRoutes.js';
 import cowinProxyRoutes from './routes/cowinProxyRoutes.js'
 import teachersRoute from './routes/teachersRoutes.js';
 import invoiceRoutes from './routes/invoiceRoutes.js';
+import institutionRoutes from "./routes/institutionRoutes.js"
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -62,9 +63,8 @@ app.use('/tech/resources', resourceRoutes);
 app.use('/api/tech-proposals', techProposalsRoutes);
 app.use('/api/teachers', teachersRoute);
 app.use('/api/invoice', invoiceRoutes)
-
-
-app.use('/api', cowinProxyRoutes);
+app.use("/api/institution", institutionRoutes);
+app.use('/api/cowin', cowinProxyRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5001;
