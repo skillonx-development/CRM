@@ -15,11 +15,10 @@ const Toast = ({ message, type, onClose }) => {
       initial={{ opacity: 0, y: -50, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -50, scale: 0.9 }}
-      className={`fixed top-4 right-4 z-[9999] px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-md ${
-        type === 'success' 
-          ? 'bg-green-600 text-white' 
-          : 'bg-red-600 text-white'
-      }`}
+      className={`fixed top-4 right-4 z-[9999] px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-md ${type === 'success'
+        ? 'bg-green-600 text-white'
+        : 'bg-red-600 text-white'
+        }`}
     >
       {type === 'success' ? (
         <CheckCircle size={20} />
@@ -44,9 +43,9 @@ const useToast = () => {
   const showToast = (message, type = 'success') => {
     const id = Date.now();
     const toast = { id, message, type };
-    
+
     setToasts(prev => [...prev, toast]);
-    
+
     // Auto remove after 4 seconds
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
@@ -107,7 +106,7 @@ const ManageData = () => {
 
   const fetchColleges = async () => {
     try {
-      const { data } = await axios.get("https://crm-r5rr.onrender.com/api/institution");
+      const { data } = await axios.get("http://localhost:5001/api/institution");
       setColleges(data.data.colleges || []);
     } catch (error) {
       console.error("Error fetching colleges:", error);
@@ -117,7 +116,7 @@ const ManageData = () => {
 
   const fetchSchools = async () => {
     try {
-      const { data } = await axios.get("https://crm-r5rr.onrender.com/api/institution");
+      const { data } = await axios.get("http://localhost:5001/api/institution");
       setSchools(data.data.schools || []);
     } catch (error) {
       console.error("Error fetching schools:", error);
@@ -134,7 +133,7 @@ const ManageData = () => {
     const fetchDistricts = async () => {
       if (selectedState) {
         try {
-          const res = await fetch(`https://crm-r5rr.onrender.com/api/cowin/districts/${selectedState}`);
+          const res = await fetch(`http://localhost:5001/api/cowin/districts/${selectedState}`);
           const data = await res.json();
           const normalizedDistricts = (data.districts || []).map((d) => ({
             ...d,
@@ -157,18 +156,18 @@ const ManageData = () => {
     return items.filter((item) => {
       // Name search
       const matchesName = item.name.toLowerCase().includes(search.toLowerCase());
-      
+
       // Place search (state, district, address)
-      const matchesPlace = placeSearch === "" || 
+      const matchesPlace = placeSearch === "" ||
         (item.stateName && item.stateName.toLowerCase().includes(placeSearch.toLowerCase())) ||
         (item.district && item.district.toLowerCase().includes(placeSearch.toLowerCase())) ||
         (item.address && item.address.toLowerCase().includes(placeSearch.toLowerCase()));
-      
+
       // Tier filter (only for colleges)
-      const matchesTier = tierFilter === "" || 
+      const matchesTier = tierFilter === "" ||
         (activeTab === "college" && item.tier === tierFilter) ||
         activeTab === "school"; // Always pass for schools
-      
+
       return matchesName && matchesPlace && matchesTier;
     });
   };
@@ -279,7 +278,7 @@ const ManageData = () => {
   const handleDelete = async (id, type) => {
     if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
       try {
-        await axios.delete(`https://crm-r5rr.onrender.com/api/institution/${id}?type=${type}`);
+        await axios.delete(`http://localhost:5001/api/institution/${id}?type=${type}`);
 
         showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`, "success");
 
@@ -298,7 +297,7 @@ const ManageData = () => {
       if (category === "college") {
         const cleanedContacts = institution.contact.filter((c) => c.trim() !== "");
         const cleanedBranches = institution.branches.filter((b) => b.trim() !== "");
-        
+
         if (!institution.name.trim()) {
           showToast("Please enter the college name", "error");
           return;
@@ -311,25 +310,25 @@ const ManageData = () => {
           showToast("Please enter the email address", "error");
           return;
         }
-        
+
         const newCollege = {
           ...institution,
           type: collegeType,
           contact: cleanedContacts,
           branches: cleanedBranches,
-          stateName: selectedState,
-          stateId: states.find((s) => s.name === selectedState)?.id || "",
+          stateId: selectedState,
+          stateName: states.find((s) => s.state_id === selectedState)?.state_name || "",
           district: selectedDistrict,
         };
 
         if (institution._id) {
-          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${institution._id}`, {
+          await axios.put(`http://localhost:5001/api/institution/${institution._id}`, {
             category: "college",
             data: newCollege,
           });
           showToast(`College "${institution.name}" updated successfully!`, "success");
         } else {
-          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
+          await axios.post("http://localhost:5001/api/institution/create", {
             category: "college",
             data: newCollege,
           });
@@ -339,7 +338,7 @@ const ManageData = () => {
         await fetchColleges();
       } else {
         const cleanedContacts = school.contact.filter((c) => c.trim() !== "");
-        
+
         if (!school.name.trim()) {
           showToast("Please enter the school name", "error");
           return;
@@ -352,23 +351,23 @@ const ManageData = () => {
           showToast("Please enter the email address", "error");
           return;
         }
-        
+
         const newSchool = {
           ...school,
           contact: cleanedContacts,
-          stateName: selectedState,
-          stateId: states.find((s) => s.name === selectedState)?.id || "",
+          stateId: selectedState,
+          stateName: states.find((s) => s.state_id === selectedState)?.state_name || "",
           district: selectedDistrict,
         };
 
         if (school._id) {
-          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${school._id}`, {
+          await axios.put(`http://localhost:5001/api/institution/${school._id}`, {
             category: "school",
             data: newSchool,
           });
           showToast(`School "${school.name}" updated successfully!`, "success");
         } else {
-          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
+          await axios.post("http://localhost:5001/api/institution/create", {
             category: "school",
             data: newSchool,
           });
@@ -527,11 +526,10 @@ const ManageData = () => {
         {/* Tab Navigation */}
         <div className="flex gap-4 mb-4">
           <button
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              activeTab === "college"
-                ? "bg-primary text-white"
-                : "bg-background-card text-text-muted hover:bg-background-hover"
-            }`}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${activeTab === "college"
+              ? "bg-primary text-white"
+              : "bg-background-card text-text-muted hover:bg-background-hover"
+              }`}
             onClick={() => {
               setActiveTab("college");
               if (tierFilter && activeTab === "school") {
@@ -542,11 +540,10 @@ const ManageData = () => {
             Colleges ({filteredColleges.length})
           </button>
           <button
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              activeTab === "school"
-                ? "bg-primary text-white"
-                : "bg-background-card text-text-muted hover:bg-background-hover"
-            }`}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${activeTab === "school"
+              ? "bg-primary text-white"
+              : "bg-background-card text-text-muted hover:bg-background-hover"
+              }`}
             onClick={() => {
               setActiveTab("school");
               // Clear tier filter when switching to schools since it doesn't apply
@@ -563,8 +560,8 @@ const ManageData = () => {
               {filteredColleges.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-text-muted text-lg mb-2">
-                    {hasActiveFilters 
-                      ? "No colleges match your search criteria" 
+                    {hasActiveFilters
+                      ? "No colleges match your search criteria"
                       : "No colleges found"
                     }
                   </div>
@@ -578,8 +575,8 @@ const ManageData = () => {
                   )}
                 </div>
               ) : (
-                <CollegeList 
-                  colleges={filteredColleges} 
+                <CollegeList
+                  colleges={filteredColleges}
                   onEdit={(college) => handleEdit(college, "college")}
                   onDelete={(id) => handleDelete(id, "college")}
                 />
@@ -590,8 +587,8 @@ const ManageData = () => {
               {filteredSchools.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-text-muted text-lg mb-2">
-                    {hasActiveFilters 
-                      ? "No schools match your search criteria" 
+                    {hasActiveFilters
+                      ? "No schools match your search criteria"
                       : "No schools found"
                     }
                   </div>
@@ -605,8 +602,8 @@ const ManageData = () => {
                   )}
                 </div>
               ) : (
-                <SchoolList 
-                  schools={filteredSchools} 
+                <SchoolList
+                  schools={filteredSchools}
                   onEdit={(school) => handleEdit(school, "school")}
                   onDelete={(id) => handleDelete(id, "school")}
                 />
