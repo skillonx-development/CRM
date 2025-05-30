@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { CheckCircle, AlertCircle, X } from "react-feather"; 
+import { CheckCircle, AlertCircle, X } from "react-feather";
 
 const statusColors = {
   Accepted: "bg-green-500",
@@ -20,9 +20,8 @@ const Toast = ({ message, type, onClose }) => {
       initial={{ opacity: 0, y: -50, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -50, scale: 0.9 }}
-      className={`fixed top-4 right-4 z-[9999] px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-md ${
-        type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
-      }`}
+      className={`fixed top-4 right-4 z-[9999] px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-md ${type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+        }`}
     >
       {type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
       <span className="flex-1">{message}</span>
@@ -74,7 +73,7 @@ export default function OrderManagement() {
 
   const fetchSentProposals = async () => {
     try {
-      const res = await axios.get("https://crm-r5rr.onrender.com/api/tech-proposals/sent");
+      const res = await axios.get("http://localhost:5001/api/tech-proposals/sent");
       const mapped = res.data.map((p) => ({
         id: p._id,
         title: p.title,
@@ -105,7 +104,7 @@ export default function OrderManagement() {
 
   const saveChanges = async () => {
     try {
-      await axios.put(`https://crm-r5rr.onrender.com/api/tech-proposals/${editData.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${editData.id}`, {
         title: editData.title,
         status: editData.status,
         institution: editData.school,
@@ -125,7 +124,7 @@ export default function OrderManagement() {
   const sendEmail = async (order) => {
     try {
       setIsSending(true);
-      await axios.put(`https://crm-r5rr.onrender.com/api/tech-proposals/${order.id}`, {
+      await axios.put(`http://localhost:5001/api/tech-proposals/${order.id}`, {
         title: order.title,
         status: "Sent",
         institution: order.school,
@@ -134,7 +133,7 @@ export default function OrderManagement() {
         adminApproval: order.adminApproval,
       });
 
-      await axios.post(`https://crm-r5rr.onrender.com/api/tech-proposals/send-email/${order.id}`);
+      await axios.post(`http://localhost:5001/api/tech-proposals/send-email/${order.id}`);
       showToast(`Email sent and status updated to 'Sent' for: ${order.title}`, "success");
       fetchSentProposals();
       setIsModalOpen(false);
@@ -161,11 +160,10 @@ export default function OrderManagement() {
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-xl border shadow-sm text-sm transition ${
-              filter === status
-                ? "bg-primary text-white"
-                : "bg-muted text-muted-foreground hover:bg-muted/70"
-            }`}
+            className={`px-4 py-2 rounded-xl border shadow-sm text-sm transition ${filter === status
+              ? "bg-primary text-white"
+              : "bg-muted text-muted-foreground hover:bg-muted/70"
+              }`}
           >
             {status}
           </button>
@@ -188,9 +186,8 @@ export default function OrderManagement() {
                 <div className="flex justify-between items-center mb-3">
                   <h2 className="text-lg font-semibold">{order.title}</h2>
                   <span
-                    className={`text-xs text-white px-3 py-1 rounded-full ${
-                      statusColors[order.status] || "bg-gray-400"
-                    }`}
+                    className={`text-xs text-white px-3 py-1 rounded-full ${statusColors[order.status] || "bg-gray-400"
+                      }`}
                   >
                     {order.status}
                   </span>
@@ -307,19 +304,18 @@ export default function OrderManagement() {
                 <button
                   onClick={() => sendEmail(editData)}
                   disabled={isSending || !editData.adminApproval}
-                  className={`px-4 py-2 rounded-xl text-white transition ${
-                    !editData.adminApproval
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : isSending
+                  className={`px-4 py-2 rounded-xl text-white transition ${!editData.adminApproval
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : isSending
                       ? "bg-green-400 cursor-not-allowed"
                       : "bg-green-600 hover:bg-green-700"
-                  }`}
+                    }`}
                 >
                   {!editData.adminApproval
                     ? "Admin Approval Required"
                     : isSending
-                    ? "Sending..."
-                    : "Send Email"}
+                      ? "Sending..."
+                      : "Send Email"}
                 </button>
 
                 <button

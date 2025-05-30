@@ -12,7 +12,6 @@ router.get('/test', (req, res) => {
 // Proxy route for districts
 router.get('/districts/:stateId', async (req, res) => {
     const { stateId } = req.params;
-    console.log(`Fetching districts for state ID: ${stateId}`);
     try {
         const response = await fetch(`https://cdn-api.co-vin.in/api/v2/admin/location/districts/${stateId}`, {
             headers: {

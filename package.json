@@ -7,6 +7,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "node-fetch": "^2.7.0",
+    "react-feather": "^2.0.10",
     "react-toastify": "^11.0.5"
   }
 }
