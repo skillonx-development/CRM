@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Plus, CheckCircle, AlertCircle, X, Search, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -39,7 +39,7 @@ const Toast = ({ message, type, onClose }) => {
 const useToast = () => {
   const [toasts, setToasts] = useState([]);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = useCallback((message, type = 'success') => {
     const id = Date.now();
     const toast = { id, message, type };
 
@@ -49,11 +49,11 @@ const useToast = () => {
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4000);
-  };
+  }, []);
 
-  const removeToast = (id) => {
+  const removeToast = useCallback((id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
-  };
+  }, []);
 
   return { toasts, showToast, removeToast };
 };
@@ -126,7 +126,7 @@ const ManageData = () => {
   useEffect(() => {
     fetchColleges();
     fetchSchools();
-  }, []);
+  }, [fetchColleges, fetchSchools]);
 
   // Fetch states from backend
   useEffect(() => {
