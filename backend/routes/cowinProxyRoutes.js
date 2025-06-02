@@ -22,7 +22,7 @@ router.get('/districts/:stateId', async (req, res) => {
         const data = await response.json();
         res.json(data);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch districts' });
+        res.status(500).json({ error: 'Failed to fetch districts',err });
     }
 });
 
