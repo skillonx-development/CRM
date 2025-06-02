@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Plus, CheckCircle, AlertCircle, X, Search, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,7 +7,7 @@ import Sidebar from "./Shared/Sidebar";
 import CollegeList from "./CollegeList";
 import SchoolList from "./SchoolList";
 import InstitutionModal from "./InstitutionModal";
-import { indianStates } from "../../../data/indianStates.js";
+import { indianStates } from "../../../../../backend/data/indianStates"
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
