@@ -6,7 +6,7 @@ import Sidebar from "./Shared/Sidebar";
 import CollegeList from "./CollegeList";
 import SchoolList from "./SchoolList";
 import InstitutionModal from "./InstitutionModal";
-import { indianStates } from "../../../data/indianStates.js";
+
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
