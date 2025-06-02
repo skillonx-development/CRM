@@ -99,38 +99,35 @@ const ManageData = () => {
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [loadingInstitutions, setLoadingInstitutions] = useState(false);
 
   // Toast hook
   const { toasts, showToast, removeToast } = useToast();
 
-  const fetchColleges = async () => {
+  const fetchInstitutions = useCallback(async () => {
+    setLoadingInstitutions(true);
     try {
-      const { data } = await axios.get("http://localhost:5001/api/institution");
-      setColleges(data.data.colleges || []);
+      const [collegesRes, schoolsRes] = await Promise.all([
+        axios.get("http://localhost:5001/api/institution"),
+        axios.get("http://localhost:5001/api/institution")
+      ]);
+      setColleges(collegesRes.data.data.colleges || []);
+      setSchools(schoolsRes.data.data.schools || []);
     } catch (error) {
-      console.error("Error fetching colleges:", error);
-      showToast("Failed to fetch colleges", "error");
+      showToast("Failed to fetch institutions", "error");
+    } finally {
+      setLoadingInstitutions(false);
     }
-  };
-
-  const fetchSchools = async () => {
-    try {
-      const { data } = await axios.get("http://localhost:5001/api/institution");
-      setSchools(data.data.schools || []);
-    } catch (error) {
-      console.error("Error fetching schools:", error);
-      showToast("Failed to fetch schools", "error");
-    }
-  };
+  }, [showToast]);
 
   useEffect(() => {
-    fetchColleges();
-    fetchSchools();
-  }, [fetchColleges, fetchSchools]);
+    fetchInstitutions();
+  }, [fetchInstitutions]);
 
   // Fetch states from backend
   useEffect(() => {
     const fetchStates = async () => {
+      setLoadingInstitutions(true);
       try {
         const res = await fetch('http://localhost:5001/api/location/states');
         const data = await res.json();
@@ -138,6 +135,8 @@ const ManageData = () => {
       } catch {
         showToast('Failed to fetch states', 'error');
         setStates([]);
+      } finally {
+        setLoadingInstitutions(false);
       }
     };
     fetchStates();
@@ -146,6 +145,7 @@ const ManageData = () => {
   // Fetch districts when state changes
   useEffect(() => {
     const fetchDistricts = async () => {
+      setLoadingInstitutions(true);
       if (selectedState) {
         try {
           const res = await fetch(`http://localhost:5001/api/location/districts/${selectedState}`);
@@ -154,9 +154,12 @@ const ManageData = () => {
         } catch {
           showToast('Failed to fetch districts', 'error');
           setDistricts([]);
+        } finally {
+          setLoadingInstitutions(false);
         }
       } else {
         setDistricts([]);
+        setLoadingInstitutions(false);
       }
     };
     fetchDistricts();
@@ -294,9 +297,8 @@ const ManageData = () => {
 
         showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`, "success");
 
-        type === "college" ? await fetchColleges() : await fetchSchools();
-      } catch (error) {
-        console.error(`Error deleting ${type}:`, error);
+        await fetchInstitutions();
+      } catch {
         showToast(`Failed to delete ${type}. Please try again.`, "error");
       }
     }
@@ -347,7 +349,7 @@ const ManageData = () => {
           showToast(`College "${institution.name}" created successfully!`, "success");
         }
 
-        await fetchColleges();
+        await fetchInstitutions();
       } else {
         const cleanedContacts = school.contact.filter((c) => c.trim() !== "");
 
@@ -386,7 +388,7 @@ const ManageData = () => {
           showToast(`School "${school.name}" created successfully!`, "success");
         }
 
-        await fetchSchools();
+        await fetchInstitutions();
       }
 
       setShowModal(false);
@@ -569,7 +571,9 @@ const ManageData = () => {
         <div className="bg-background-card rounded-lg p-6 min-h-[300px]">
           {activeTab === "college" ? (
             <>
-              {filteredColleges.length === 0 ? (
+              {loadingInstitutions ? (
+                <div className="text-center py-12 text-text-muted">Loading colleges...</div>
+              ) : filteredColleges.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-text-muted text-lg mb-2">
                     {hasActiveFilters
@@ -596,7 +600,9 @@ const ManageData = () => {
             </>
           ) : (
             <>
-              {filteredSchools.length === 0 ? (
+              {loadingInstitutions ? (
+                <div className="text-center py-12 text-text-muted">Loading schools...</div>
+              ) : filteredSchools.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-text-muted text-lg mb-2">
                     {hasActiveFilters
