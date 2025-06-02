@@ -106,7 +106,7 @@ const ManageData = () => {
 
   const fetchColleges = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5001/api/institution");
+      const { data } = await axios.get("https://crm-r5rr.onrender.com/api/institution");
       setColleges(data.data.colleges || []);
     } catch (error) {
       console.error("Error fetching colleges:", error);
@@ -116,7 +116,7 @@ const ManageData = () => {
 
   const fetchSchools = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5001/api/institution");
+      const { data } = await axios.get("https://crm-r5rr.onrender.com/api/institution");
       setSchools(data.data.schools || []);
     } catch (error) {
       console.error("Error fetching schools:", error);
@@ -133,7 +133,7 @@ const ManageData = () => {
     const fetchDistricts = async () => {
       if (selectedState) {
         try {
-          const res = await fetch(`http://localhost:5001/api/cowin/districts/${selectedState}`);
+          const res = await fetch(`https://crm-r5rr.onrender.com/api/cowin/districts/${selectedState}`);
           const data = await res.json();
           const normalizedDistricts = (data.districts || []).map((d) => ({
             ...d,
@@ -278,7 +278,7 @@ const ManageData = () => {
   const handleDelete = async (id, type) => {
     if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
       try {
-        await axios.delete(`http://localhost:5001/api/institution/${id}?type=${type}`);
+        await axios.delete(`https://crm-r5rr.onrender.com/api/institution/${id}?type=${type}`);
 
         showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`, "success");
 
@@ -322,13 +322,13 @@ const ManageData = () => {
         };
 
         if (institution._id) {
-          await axios.put(`http://localhost:5001/api/institution/${institution._id}`, {
+          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${institution._id}`, {
             category: "college",
             data: newCollege,
           });
           showToast(`College "${institution.name}" updated successfully!`, "success");
         } else {
-          await axios.post("http://localhost:5001/api/institution/create", {
+          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
             category: "college",
             data: newCollege,
           });
@@ -361,13 +361,13 @@ const ManageData = () => {
         };
 
         if (school._id) {
-          await axios.put(`http://localhost:5001/api/institution/${school._id}`, {
+          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${school._id}`, {
             category: "school",
             data: newSchool,
           });
           showToast(`School "${school.name}" updated successfully!`, "success");
         } else {
-          await axios.post("http://localhost:5001/api/institution/create", {
+          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
             category: "school",
             data: newSchool,
           });

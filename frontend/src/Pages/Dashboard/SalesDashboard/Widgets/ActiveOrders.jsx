@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const ActiveOrders = () => {
-  const [orders, setOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
+  const [displayedOrders, setDisplayedOrders] = useState([]);
+  const [showingAll, setShowingAll] = useState(false);
 
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/tech-proposals");
+        const response = await fetch("https://crm-r5rr.onrender.com/api/tech-proposals");
         const data = await response.json();
 
         const activeOrders = data.filter(order => order.status !== "Completed" && order.status !== "Rejected");
@@ -31,7 +33,9 @@ const ActiveOrders = () => {
                   : "bg-blue-600 text-white",
         }));
 
-        setOrders(formattedOrders);
+        setAllOrders(formattedOrders);
+        // Initially show only top 10 orders
+        setDisplayedOrders(formattedOrders.slice(0, 10));
       } catch (error) {
         console.error("Failed to fetch tech proposals:", error);
       }
@@ -39,6 +43,18 @@ const ActiveOrders = () => {
 
     fetchProposals();
   }, []);
+
+  const handleShowMore = () => {
+    if (showingAll) {
+      // Show only top 10
+      setDisplayedOrders(allOrders.slice(0, 10));
+      setShowingAll(false);
+    } else {
+      // Show all orders
+      setDisplayedOrders(allOrders);
+      setShowingAll(true);
+    }
+  };
 
   return (
     <div className="bg-background-card p-6 rounded-xl shadow-card border border-border">
@@ -49,7 +65,7 @@ const ActiveOrders = () => {
         </a>
       </div>
       <div className="mt-4 space-y-4">
-        {orders.map((order, index) => (
+        {displayedOrders.map((order, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 10 }}
@@ -73,6 +89,18 @@ const ActiveOrders = () => {
           </motion.div>
         ))}
       </div>
+      
+      {/* Show More/Show Less Button */}
+      {allOrders.length > 10 && (
+        <div className="mt-6 text-center">
+          <button
+            onClick={handleShowMore}
+            className="px-4 py-2 bg-primary-light text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 text-sm font-medium"
+          >
+            {showingAll ? `Show Less` : `Show More (${allOrders.length - 10} more)`}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
