@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, CheckCircle, AlertCircle, X, Search, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -6,6 +6,7 @@ import Sidebar from "./Shared/Sidebar";
 import CollegeList from "./CollegeList";
 import SchoolList from "./SchoolList";
 import InstitutionModal from "./InstitutionModal";
+
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
