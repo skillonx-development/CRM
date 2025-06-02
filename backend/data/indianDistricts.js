@@ -559,6 +559,7 @@ export const stateDistrictMap = {
   26: {
     // Odisha
     districts: [
+<<<<<<< HEAD
       { district_id: 351, district_name: "Angul" },
       { district_id: 352, district_name: "Balangir" },
       { district_id: 353, district_name: "Balasore" },
