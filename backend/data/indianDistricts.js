@@ -866,5 +866,4 @@
          { district_id: 23, district_name: 'Uttar Dinajpur' }
        ]
      }
-
-        };
+};
