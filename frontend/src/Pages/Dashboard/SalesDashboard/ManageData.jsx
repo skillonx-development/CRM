@@ -106,7 +106,7 @@ const ManageData = () => {
 
   const fetchColleges = async () => {
     try {
-      const { data } = await axios.get("https://crm-r5rr.onrender.com/api/institution");
+      const { data } = await axios.get("http://localhost:5001/api/institution");
       setColleges(data.data.colleges || []);
     } catch (error) {
       console.error("Error fetching colleges:", error);
@@ -116,7 +116,7 @@ const ManageData = () => {
 
   const fetchSchools = async () => {
     try {
-      const { data } = await axios.get("https://crm-r5rr.onrender.com/api/institution");
+      const { data } = await axios.get("http://localhost:5001/api/institution");
       setSchools(data.data.schools || []);
     } catch (error) {
       console.error("Error fetching schools:", error);
@@ -133,15 +133,26 @@ const ManageData = () => {
     const fetchDistricts = async () => {
       if (selectedState) {
         try {
-          const res = await fetch(`https://crm-r5rr.onrender.com/api/cowin/districts/${selectedState}`);
+          // Use selectedState directly as it contains the stateId
+                  console.log('selectedState being used in URL:', selectedState);
+                  console.log(typeof(selectedState));
+
+          const res = await fetch(`http://localhost:5001/api/cowin/districts/${selectedState}`);
           const data = await res.json();
-          const normalizedDistricts = (data.districts || []).map((d) => ({
-            ...d,
-            district_id: String(d.district_id),
-          }));
-          setDistricts(normalizedDistricts);
+          
+          if (data.districts) {
+            const normalizedDistricts = data.districts.map((d) => ({
+              ...d,
+              district_id: String(d.district_id),
+            }));
+            setDistricts(normalizedDistricts);
+          } else {
+            console.warn("No districts found in response");
+            setDistricts([]);
+          }
         } catch (err) {
           console.error("Failed to fetch districts:", err);
+          showToast("Failed to fetch districts", "error");
           setDistricts([]);
         }
       } else {
@@ -270,7 +281,8 @@ const ManageData = () => {
       });
     }
 
-    setSelectedState(data.stateName || "");
+    // Set the state ID for fetching districts
+    setSelectedState(data.stateId || "");
     setSelectedDistrict(data.district || "");
     setShowModal(true);
   };
@@ -278,7 +290,7 @@ const ManageData = () => {
   const handleDelete = async (id, type) => {
     if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
       try {
-        await axios.delete(`https://crm-r5rr.onrender.com/api/institution/${id}?type=${type}`);
+        await axios.delete(`http://localhost:5001/api/institution/${id}?type=${type}`);
 
         showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`, "success");
 
@@ -316,19 +328,19 @@ const ManageData = () => {
           type: collegeType,
           contact: cleanedContacts,
           branches: cleanedBranches,
-          stateId: selectedState,
+          stateId: selectedState, // Store the state ID
           stateName: states.find((s) => s.state_id === selectedState)?.state_name || "",
           district: selectedDistrict,
         };
 
         if (institution._id) {
-          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${institution._id}`, {
+          await axios.put(`http://localhost:5001/api/institution/${institution._id}`, {
             category: "college",
             data: newCollege,
           });
           showToast(`College "${institution.name}" updated successfully!`, "success");
         } else {
-          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
+          await axios.post("http://localhost:5001/api/institution/create", {
             category: "college",
             data: newCollege,
           });
@@ -355,19 +367,19 @@ const ManageData = () => {
         const newSchool = {
           ...school,
           contact: cleanedContacts,
-          stateId: selectedState,
+          stateId: selectedState, // Store the state ID
           stateName: states.find((s) => s.state_id === selectedState)?.state_name || "",
           district: selectedDistrict,
         };
 
         if (school._id) {
-          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${school._id}`, {
+          await axios.put(`http://localhost:5001/api/institution/${school._id}`, {
             category: "school",
             data: newSchool,
           });
           showToast(`School "${school.name}" updated successfully!`, "success");
         } else {
-          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
+          await axios.post("http://localhost:5001/api/institution/create", {
             category: "school",
             data: newSchool,
           });
