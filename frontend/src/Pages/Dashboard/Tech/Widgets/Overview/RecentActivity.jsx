@@ -10,7 +10,7 @@ const RecentActivity = () => {
       description: "React Advanced Workshop proposal for Stanford University",
       user: "Alex Chen",
       time: "30 minutes ago",
-      avatar: "https://crm-r5rr.onrender.com/api/placeholder/32/32"
+      avatar: "http://localhost:5001/api/placeholder/32/32"
     },
 
     {
@@ -20,7 +20,7 @@ const RecentActivity = () => {
       description: "Dr. Sarah Johnson assigned to React Workshop",
       user: "Alex Chen",
       time: "5 hours ago",
-      avatar: "https://crm-r5rr.onrender.com/api/placeholder/32/32"
+      avatar: "http://localhost:5001/api/placeholder/32/32"
     }
   ];
 
