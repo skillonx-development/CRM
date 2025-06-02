@@ -6,7 +6,6 @@ import Sidebar from "./Shared/Sidebar";
 import CollegeList from "./CollegeList";
 import SchoolList from "./SchoolList";
 import InstitutionModal from "./InstitutionModal";
-import { indianStates } from "../../../data/indianStates.js";
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -95,7 +94,7 @@ const ManageData = () => {
   const [schools, setSchools] = useState([]);
   const [branchesInput, setBranchesInput] = useState("");
   const [collapsed, setCollapsed] = useState(false);
-  const [states] = useState(indianStates);
+  const [states, setStates] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -129,30 +128,31 @@ const ManageData = () => {
     fetchSchools();
   }, []);
 
+  // Fetch states from backend
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/api/location/states');
+        const data = await res.json();
+        setStates(data.states || []);
+      } catch {
+        showToast('Failed to fetch states', 'error');
+        setStates([]);
+      }
+    };
+    fetchStates();
+  }, [showToast]);
+
+  // Fetch districts when state changes
   useEffect(() => {
     const fetchDistricts = async () => {
       if (selectedState) {
         try {
-          // Use selectedState directly as it contains the stateId
-                  console.log('selectedState being used in URL:', selectedState);
-                  console.log(typeof(selectedState));
-
-          const res = await fetch(`http://localhost:5001/api/cowin/districts/${selectedState}`);
+          const res = await fetch(`http://localhost:5001/api/location/districts/${selectedState}`);
           const data = await res.json();
-          
-          if (data.districts) {
-            const normalizedDistricts = data.districts.map((d) => ({
-              ...d,
-              district_id: String(d.district_id),
-            }));
-            setDistricts(normalizedDistricts);
-          } else {
-            console.warn("No districts found in response");
-            setDistricts([]);
-          }
-        } catch (err) {
-          console.error("Failed to fetch districts:", err);
-          showToast("Failed to fetch districts", "error");
+          setDistricts(data.districts || []);
+        } catch {
+          showToast('Failed to fetch districts', 'error');
           setDistricts([]);
         }
       } else {
@@ -160,7 +160,7 @@ const ManageData = () => {
       }
     };
     fetchDistricts();
-  }, [selectedState]);
+  }, [selectedState, showToast]);
 
   // Enhanced filtering logic
   const applyFilters = (items) => {
