@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, CheckCircle, AlertCircle, X, Search, Filter } from "lucide-react";
+import { Plus, CheckCircle, AlertCircle, X, Search, Filter, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Sidebar from "./Shared/Sidebar";
@@ -100,6 +100,7 @@ const ManageData = () => {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [loadingInstitutions, setLoadingInstitutions] = useState(false);
+  const [downloadingExcel, setDownloadingExcel] = useState(false);
 
   // Toast hook
   const { toasts, showToast, removeToast } = useToast();
@@ -198,6 +199,70 @@ const ManageData = () => {
 
   // Check if any filters are active
   const hasActiveFilters = search || placeSearch || tierFilter;
+
+  // Download Excel function - FIXED
+  const handleDownloadExcel = async () => {
+    setDownloadingExcel(true);
+    try {
+      const currentData = activeTab === "college" ? filteredColleges : filteredSchools;
+      const dataType = activeTab === "college" ? "colleges" : "schools";
+      
+      if (currentData.length === 0) {
+        showToast(`No ${dataType} data available to download`, "error");
+        return;
+      }
+
+      // Use the correct endpoint
+      const response = await axios.post(
+        `http://localhost:5001/api/export/${dataType}`,
+        {
+          data: currentData,
+          filters: {
+            search,
+            placeSearch,
+            tierFilter: activeTab === "college" ? tierFilter : null,
+            activeTab
+          }
+        },
+        {
+          responseType: 'blob',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      // Create blob link to download
+      const blob = new Blob([response.data], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename with timestamp and filter info
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filterSuffix = hasActiveFilters ? '_filtered' : '';
+      const filename = `${dataType}_data${filterSuffix}_${timestamp}.xlsx`;
+      link.setAttribute('download', filename);
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      showToast(`${dataType.charAt(0).toUpperCase() + dataType.slice(1)} data downloaded successfully!`, "success");
+    } catch (error) {
+      console.error('Download error:', error);
+      const errorMessage = error.response?.data?.message || "Failed to download data. Please try again.";
+      showToast(errorMessage, "error");
+    } finally {
+      setDownloadingExcel(false);
+    }
+  };
 
   const handleAddContact = (type) => {
     const update =
@@ -439,7 +504,7 @@ const ManageData = () => {
             />
           </div>
 
-          {/* Filter Toggle Button */}
+          {/* Filter Toggle Button and Download Button */}
           <div className="flex items-center justify-between">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -454,14 +519,33 @@ const ManageData = () => {
               )}
             </button>
 
-            {hasActiveFilters && (
+            <div className="flex items-center gap-3">
+              {hasActiveFilters && (
+                <button
+                  onClick={clearAllFilters}
+                  className="text-text-muted hover:text-white transition text-sm"
+                >
+                  Clear all filters
+                </button>
+              )}
+              
+              {/* Download Excel Button */}
               <button
-                onClick={clearAllFilters}
-                className="text-text-muted hover:text-white transition text-sm"
+                onClick={handleDownloadExcel}
+                disabled={downloadingExcel || (activeTab === "college" ? filteredColleges.length === 0 : filteredSchools.length === 0)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Clear all filters
+                <Download size={16} />
+                {downloadingExcel ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Downloading...
+                  </>
+                ) : (
+                  `Download ${activeTab === "college" ? "Colleges" : "Schools"} Excel`
+                )}
               </button>
-            )}
+            </div>
           </div>
 
           {/* Advanced Filters */}
