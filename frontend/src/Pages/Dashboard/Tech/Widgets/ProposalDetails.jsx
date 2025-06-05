@@ -22,7 +22,7 @@ const ProposalDetails = ({ proposal, onClose }) => {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/resources");
+        const response = await fetch("https://crm-r5rr.onrender.com/api/resources");
         if (!response.ok) throw new Error("Failed to fetch resources");
         const data = await response.json();
         const resourceArray = Array.isArray(data) ? data : data.resources || [];
@@ -78,7 +78,7 @@ const ProposalDetails = ({ proposal, onClose }) => {
     if (file) formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:5001/api/tech-proposals/create", {
+      const response = await fetch("https://crm-r5rr.onrender.com/api/tech-proposals/create", {
         method: "POST",
         body: formData,
       });
