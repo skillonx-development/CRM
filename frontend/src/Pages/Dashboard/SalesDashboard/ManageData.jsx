@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Plus, CheckCircle, AlertCircle, X, Search, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -6,7 +6,6 @@ import Sidebar from "./Shared/Sidebar";
 import CollegeList from "./CollegeList";
 import SchoolList from "./SchoolList";
 import InstitutionModal from "./InstitutionModal";
-
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -130,7 +129,7 @@ const ManageData = () => {
     const fetchStates = async () => {
       setLoadingInstitutions(true);
       try {
-        const res = await fetch('http://localhost:5001/api/location/states');
+        const res = await fetch('http://localhost:5001/api/state-districts/states');
         const data = await res.json();
         setStates(data.states || []);
       } catch {
@@ -149,7 +148,7 @@ const ManageData = () => {
       setLoadingInstitutions(true);
       if (selectedState) {
         try {
-          const res = await fetch(`http://localhost:5001/api/location/districts/${selectedState}`);
+          const res = await fetch(`http://localhost:5001/api/state-districts/districts/${selectedState}`);
           const data = await res.json();
           setDistricts(data.districts || []);
         } catch {

@@ -15,6 +15,7 @@ import institutionRoutes from "./routes/institutionRoutes.js"
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import stateDistrictRoutes from './routes/stateDistrictRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -63,7 +64,7 @@ app.use('/api/tech-proposals', techProposalsRoutes);
 app.use('/api/teachers', teachersRoute);
 app.use('/api/invoice', invoiceRoutes)
 app.use("/api/institution", institutionRoutes);
-
+app.use('/api/state-districts', stateDistrictRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5001;
