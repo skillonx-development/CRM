@@ -146,6 +146,17 @@ const InstitutionModal = ({
                     />
                   </div>
                   <div className="mb-3">
+                    <label className="block text-text mb-1">Website</label>
+                    <input
+                      type="url"
+                      name="website"
+                      value={institution.website || ""}
+                      onChange={handleInstitutionChange}
+                      className="w-full px-3 py-2 rounded bg-background focus:outline-none border border-border-dark text-white"
+                      placeholder="https://college-website.com"
+                    />
+                  </div>
+                  <div className="mb-3">
                     <label className="block text-text mb-1">
                       Principal Name
                     </label>
@@ -424,6 +435,17 @@ const InstitutionModal = ({
                       onChange={handleSchoolChange}
                       className="w-full px-3 py-2 rounded bg-background focus:outline-none border border-border-dark text-white"
                       required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="block text-text mb-1">Website</label>
+                    <input
+                      type="url"
+                      name="website"
+                      value={school.website || ""}
+                      onChange={handleSchoolChange}
+                      className="w-full px-3 py-2 rounded bg-background focus:outline-none border border-border-dark text-white"
+                      placeholder="https://school-website.com"
                     />
                   </div>
                   <div className="mb-3">
