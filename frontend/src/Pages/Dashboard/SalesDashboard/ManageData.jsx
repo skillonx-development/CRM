@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, CheckCircle, AlertCircle, X, Search, Filter, Download } from "lucide-react";
+import { Plus, CheckCircle, AlertCircle, X, Search, Filter, Download, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Sidebar from "./Shared/Sidebar";
@@ -62,6 +62,7 @@ const initialInstitution = {
   name: "",
   principal: "",
   email: "",
+  website: "", // Added website field
   collegeType: "engineering",
   placementOfficer: "",
   placementEmail: "",
@@ -75,8 +76,182 @@ const initialSchool = {
   name: "",
   principal: "",
   email: "",
+  website: "", // Added website field
   contact: [""],
   address: "",
+};
+
+// Enhanced CollegeCard Component
+const CollegeCard = ({ college, onEdit, onDelete }) => {
+  return (
+    <div className="bg-background border border-border-dark rounded-lg p-6 hover:shadow-lg transition-all duration-200">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-white mb-2">{college.name}</h3>
+          {college.website && (
+            <a
+              href={college.website.startsWith('http') ? college.website : `https://${college.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-light transition-colors text-sm mb-2"
+            >
+              <ExternalLink size={14} />
+              Visit Website
+            </a>
+          )}
+          <div className="text-text-muted text-sm space-y-1">
+            <p><span className="font-medium">Principal:</span> {college.principal}</p>
+            <p><span className="font-medium">Email:</span> {college.email}</p>
+            <p><span className="font-medium">Type:</span> {college.type || college.collegeType}</p>
+            {college.tier && <p><span className="font-medium">Tier:</span> {college.tier}</p>}
+            {college.placementOfficer && (
+              <p><span className="font-medium">Placement Officer:</span> {college.placementOfficer}</p>
+            )}
+            {college.placementEmail && (
+              <p><span className="font-medium">Placement Email:</span> {college.placementEmail}</p>
+            )}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onEdit(college)}
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(college._id)}
+            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      
+      {college.branches && college.branches.length > 0 && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-text-muted mb-2">Branches:</p>
+          <div className="flex flex-wrap gap-2">
+            {college.branches.map((branch, idx) => (
+              <span key={idx} className="bg-primary/20 text-primary px-2 py-1 rounded text-xs">
+                {branch}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {college.contact && college.contact.length > 0 && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-text-muted mb-2">Contact:</p>
+          <div className="space-y-1">
+            {college.contact.map((contact, idx) => (
+              <p key={idx} className="text-sm text-text-muted">{contact}</p>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {college.address && (
+        <div>
+          <p className="text-sm font-medium text-text-muted mb-1">Address:</p>
+          <p className="text-sm text-text-muted">{college.address}</p>
+          {college.stateName && (
+            <p className="text-sm text-text-muted">
+              {college.district && `${college.district}, `}{college.stateName}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Enhanced SchoolCard Component
+const SchoolCard = ({ school, onEdit, onDelete }) => {
+  return (
+    <div className="bg-background border border-border-dark rounded-lg p-6 hover:shadow-lg transition-all duration-200">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-white mb-2">{school.name}</h3>
+          {school.website && (
+            <a
+              href={school.website.startsWith('http') ? school.website : `https://${school.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-light transition-colors text-sm mb-2"
+            >
+              <ExternalLink size={14} />
+              Visit Website
+            </a>
+          )}
+          <div className="text-text-muted text-sm space-y-1">
+            <p><span className="font-medium">Principal:</span> {school.principal}</p>
+            <p><span className="font-medium">Email:</span> {school.email}</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onEdit(school)}
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(school._id)}
+            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      
+      {school.contact && school.contact.length > 0 && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-text-muted mb-2">Contact:</p>
+          <div className="space-y-1">
+            {school.contact.map((contact, idx) => (
+              <p key={idx} className="text-sm text-text-muted">{contact}</p>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {school.address && (
+        <div>
+          <p className="text-sm font-medium text-text-muted mb-1">Address:</p>
+          <p className="text-sm text-text-muted">{school.address}</p>
+          {school.stateName && (
+            <p className="text-sm text-text-muted">
+              {school.district && `${school.district}, `}{school.stateName}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Enhanced CollegeList Component
+const EnhancedCollegeList = ({ colleges, onEdit, onDelete }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {colleges.map((college) => (
+        <CollegeCard key={college._id} college={college} onEdit={onEdit} onDelete={onDelete} />
+      ))}
+    </div>
+  );
+};
+
+// Enhanced SchoolList Component
+const EnhancedSchoolList = ({ schools, onEdit, onDelete }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {schools.map((school) => (
+        <SchoolCard key={school._id} school={school} onEdit={onEdit} onDelete={onDelete} />
+      ))}
+    </div>
+  );
 };
 
 const ManageData = () => {
@@ -330,6 +505,7 @@ const ManageData = () => {
         name: data.name || "",
         principal: data.principal || "",
         email: data.email || "",
+        website: data.website || "", // Include website field
         placementOfficer: data.placementOfficer || "",
         placementEmail: data.placementEmail || "",
         contact: data.contact || [""],
@@ -344,6 +520,7 @@ const ManageData = () => {
         name: data.name || "",
         principal: data.principal || "",
         email: data.email || "",
+        website: data.website || "", // Include website field
         contact: data.contact || [""],
         address: data.address || "",
       });
@@ -675,7 +852,7 @@ const ManageData = () => {
                   )}
                 </div>
               ) : (
-                <CollegeList
+                <EnhancedCollegeList
                   colleges={filteredColleges}
                   onEdit={(college) => handleEdit(college, "college")}
                   onDelete={(id) => handleDelete(id, "college")}
@@ -704,7 +881,7 @@ const ManageData = () => {
                   )}
                 </div>
               ) : (
-                <SchoolList
+                <EnhancedSchoolList
                   schools={filteredSchools}
                   onEdit={(school) => handleEdit(school, "school")}
                   onDelete={(id) => handleDelete(id, "school")}
