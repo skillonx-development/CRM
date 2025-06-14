@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Plus, CheckCircle, AlertCircle, X, Search, Filter, Download, ExternalLink } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Plus, CheckCircle, AlertCircle, X, Search, Filter, Download, ExternalLink, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Sidebar from "./Shared/Sidebar";
@@ -56,6 +56,218 @@ const useToast = () => {
   }, []);
 
   return { toasts, showToast, removeToast };
+};
+
+// CSV Import Modal Component
+const CSVImportModal = ({ showModal, onClose, onImport, importType, setImportType }) => {
+  const [csvFile, setCsvFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type === "text/csv" || file.name.endsWith('.csv')) {
+        setCsvFile(file);
+      } else {
+        alert("Please upload a CSV file only");
+      }
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type === "text/csv" || file.name.endsWith('.csv')) {
+        setCsvFile(file);
+      } else {
+        alert("Please upload a CSV file only");
+        e.target.value = '';
+      }
+    }
+  };
+
+  const handleImport = async () => {
+    if (!csvFile) {
+      alert("Please select a CSV file");
+      return;
+    }
+
+    setImporting(true);
+    try {
+      await onImport(csvFile, importType);
+      setCsvFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      onClose();
+    } catch (error) {
+      console.error("Import failed:", error);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const resetModal = () => {
+    setCsvFile(null);
+    setImporting(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  useEffect(() => {
+    if (!showModal) {
+      resetModal();
+    }
+  }, [showModal]);
+
+  if (!showModal) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-background-card rounded-lg p-6 w-full max-w-md border border-border-dark">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold text-white">Import CSV Data</h3>
+          <button
+            onClick={onClose}
+            className="text-text-muted hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Import Type Selection */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-text-muted mb-2">
+            Import Data As
+          </label>
+          <select
+            value={importType}
+            onChange={(e) => setImportType(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg bg-background text-white border border-border-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+            <option value="college">College Information</option>
+            <option value="school">School Information</option>
+          </select>
+        </div>
+
+        {/* File Upload Area */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-text-muted mb-2">
+            Select CSV File
+          </label>
+          
+          {/* Drag and Drop Area */}
+          <div
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              dragActive
+                ? 'border-primary bg-primary/10'
+                : 'border-border-dark hover:border-primary/50'
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            <Upload className="mx-auto h-12 w-12 text-text-muted mb-4" />
+            
+            {csvFile ? (
+              <div className="text-white">
+                <p className="font-medium">{csvFile.name}</p>
+                <p className="text-sm text-text-muted">
+                  {(csvFile.size / 1024).toFixed(1)} KB
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-white mb-2">
+                  Drag and drop your CSV file here, or
+                </p>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-primary hover:text-primary-light transition-colors font-medium"
+                >
+                  browse to upload
+                </button>
+              </div>
+            )}
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+        </div>
+
+        {/* CSV Format Guidelines */}
+        <div className="mb-6 p-4 bg-background rounded-lg border border-border-dark">
+          <h4 className="text-sm font-medium text-white mb-2">CSV Format Guidelines:</h4>
+          <div className="text-xs text-text-muted space-y-1">
+            {importType === 'college' ? (
+              <>
+                <p>• Required columns: name, principal, email</p>
+                <p>• Optional: website, placementOfficer, placementEmail, tier, address, contact, branches</p>
+                <p>• Use semicolon (;) to separate multiple contacts or branches</p>
+              </>
+            ) : (
+              <>
+                <p>• Required columns: name, principal, email</p>
+                <p>• Optional: website, address, contact</p>
+                <p>• Use semicolon (;) to separate multiple contacts</p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 border border-border-dark text-text-muted rounded-lg hover:bg-background-hover transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleImport}
+            disabled={!csvFile || importing}
+            className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {importing ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Importing...
+              </>
+            ) : (
+              <>
+                <Upload size={16} />
+                Import CSV
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const initialInstitution = {
@@ -261,6 +473,8 @@ const ManageData = () => {
   const [tierFilter, setTierFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importType, setImportType] = useState("college");
   const [category, setCategory] = useState("college");
   const [collegeType, setCollegeType] = useState("engineering");
   const [institution, setInstitution] = useState(initialInstitution);
@@ -374,6 +588,43 @@ const ManageData = () => {
 
   // Check if any filters are active
   const hasActiveFilters = search || placeSearch || tierFilter;
+
+  // CSV Import Function
+  const handleCSVImport = async (csvFile, importType) => {
+    try {
+      const formData = new FormData();
+      formData.append('csvFile', csvFile);
+      formData.append('importType', importType);
+
+      const response = await axios.post(
+        'https://crm-r5rr.onrender.com/api/csv/import',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const result = response.data;
+      
+      if (result.success) {
+        showToast(
+          `Successfully imported ${result.imported} ${importType}s. ${result.skipped > 0 ? `Skipped ${result.skipped} duplicates.` : ''}`,
+          "success"
+        );
+        
+        // Refresh the data
+        await fetchInstitutions();
+      } else {
+        showToast(result.message || "Failed to import CSV data", "error");
+      }
+    } catch (error) {
+      console.error('CSV Import error:', error);
+      const errorMessage = error.response?.data?.message || "Failed to import CSV data. Please check the file format and try again.";
+      showToast(errorMessage, "error");
+    }
+  };
 
   // Download Excel function - FIXED
   const handleDownloadExcel = async () => {
@@ -657,15 +908,24 @@ const ManageData = () => {
 
       <Sidebar setActiveTab={setActiveTab} collapsed={collapsed} setCollapsed={setCollapsed} />
       <main className={`flex-1 transition-all duration-300 ${collapsed ? "ml-[80px]" : "ml-[256px]"} p-6 md:p-8`}>
+       
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Manage Data</h2>
-          <button
-            className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-dark transition"
-            onClick={handleModalOpen}
-          >
-            <Plus size={18} /> Add New Institution
-          </button>
-        </div>
+  <h2 className="text-2xl font-bold text-white">Manage Data</h2>
+  <div className="flex items-center gap-3"> {/* Change this line */}
+    <button
+      onClick={() => setShowImportModal(true)}
+      className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition"
+    >
+      <Upload size={18} /> Import CSV
+    </button>
+    <button
+      className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-dark transition"
+      onClick={handleModalOpen}
+    >
+      <Plus size={18} /> Add New Institution
+    </button>
+  </div> {/* Add this closing div */}
+</div>
 
         {/* Enhanced Search and Filter Section */}
         <div className="mb-6 space-y-4">
@@ -918,6 +1178,13 @@ const ManageData = () => {
           selectedDistrict={selectedDistrict}
           setSelectedDistrict={setSelectedDistrict}
           isEditing={isEditing}
+        />
+         <CSVImportModal
+          showModal={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImport={handleCSVImport}
+          importType={importType}
+          setImportType={setImportType}
         />
       </main>
     </div>
