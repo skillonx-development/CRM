@@ -24,7 +24,7 @@ export default function TeacherManagement() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/teachers");
+        const res = await axios.get("https://crm-r5rr.onrender.com/api/teachers");
         const fetchedTeachers = Array.isArray(res.data)
           ? res.data
           : res.data.teachers || [];
@@ -49,7 +49,7 @@ export default function TeacherManagement() {
     const fetchProposals = async () => {
       if (!selectedTeacher) return;
       try {
-        const res = await axios.get("http://localhost:5001/api/tech-proposals");
+        const res = await axios.get("https://crm-r5rr.onrender.com/api/tech-proposals");
         const allProposals = Array.isArray(res.data) ? res.data : res.data.proposals || [];
 
         // Filter only accepted proposals
@@ -86,7 +86,7 @@ export default function TeacherManagement() {
     try {
       // Sending the assignment request to the backend
       await axios.post(
-        `http://localhost:5001/api/teachers/assign/${selectedTeacher}`,
+        `https://crm-r5rr.onrender.com/api/teachers/assign/${selectedTeacher}`,
         {
           workshopTitle: proposal.title,
           status: "Busy",
@@ -267,7 +267,7 @@ export default function TeacherManagement() {
                 e.preventDefault();
                 try {
                   await axios.put(
-                    `http://localhost:5001/api/teachers/${viewTeacher._id}`,
+                    `https://crm-r5rr.onrender.com/api/teachers/${viewTeacher._id}`,
                     viewTeacher
                   );
                   setTeachers((prev) =>
@@ -324,7 +324,7 @@ export default function TeacherManagement() {
             <button
               onClick={async () => {
                 await axios.put(
-                  `http://localhost:5001/api/teachers/unassign/${viewTeacher._id}`
+                  `https://crm-r5rr.onrender.com/api/teachers/unassign/${viewTeacher._id}`
                 );
                 setViewTeacher(null);
                 setTeachers((prev) =>

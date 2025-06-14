@@ -498,8 +498,8 @@ const ManageData = () => {
     setLoadingInstitutions(true);
     try {
       const [collegesRes, schoolsRes] = await Promise.all([
-        axios.get("http://localhost:5001/api/institution"),
-        axios.get("http://localhost:5001/api/institution")
+        axios.get("https://crm-r5rr.onrender.com/api/institution"),
+        axios.get("https://crm-r5rr.onrender.com/api/institution")
       ]);
       setColleges(collegesRes.data.data.colleges || []);
       setSchools(schoolsRes.data.data.schools || []);
@@ -519,7 +519,7 @@ const ManageData = () => {
     const fetchStates = async () => {
       setLoadingInstitutions(true);
       try {
-        const res = await fetch('http://localhost:5001/api/state-districts/states');
+        const res = await fetch('https://crm-r5rr.onrender.com/api/state-districts/states');
         const data = await res.json();
         setStates(data.states || []);
       } catch {
@@ -538,7 +538,7 @@ const ManageData = () => {
       setLoadingInstitutions(true);
       if (selectedState) {
         try {
-          const res = await fetch(`http://localhost:5001/api/state-districts/districts/${selectedState}`);
+          const res = await fetch(`https://crm-r5rr.onrender.com/api/state-districts/districts/${selectedState}`);
           const data = await res.json();
           setDistricts(data.districts || []);
         } catch {
@@ -597,7 +597,7 @@ const ManageData = () => {
       formData.append('importType', importType);
 
       const response = await axios.post(
-        'http://localhost:5001/api/csv/import',
+        'https://crm-r5rr.onrender.com/api/csv/import',
         formData,
         {
           headers: {
@@ -640,7 +640,7 @@ const ManageData = () => {
 
       // Use the correct endpoint
       const response = await axios.post(
-        `http://localhost:5001/api/export/${dataType}`,
+        `https://crm-r5rr.onrender.com/api/export/${dataType}`,
         {
           data: currentData,
           filters: {
@@ -786,7 +786,7 @@ const ManageData = () => {
   const handleDelete = async (id, type) => {
     if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
       try {
-        await axios.delete(`http://localhost:5001/api/institution/${id}?type=${type}`);
+        await axios.delete(`https://crm-r5rr.onrender.com/api/institution/${id}?type=${type}`);
 
         showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`, "success");
 
@@ -829,13 +829,13 @@ const ManageData = () => {
         };
 
         if (institution._id) {
-          await axios.put(`http://localhost:5001/api/institution/${institution._id}`, {
+          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${institution._id}`, {
             category: "college",
             data: newCollege,
           });
           showToast(`College "${institution.name}" updated successfully!`, "success");
         } else {
-          await axios.post("http://localhost:5001/api/institution/create", {
+          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
             category: "college",
             data: newCollege,
           });
@@ -868,13 +868,13 @@ const ManageData = () => {
         };
 
         if (school._id) {
-          await axios.put(`http://localhost:5001/api/institution/${school._id}`, {
+          await axios.put(`https://crm-r5rr.onrender.com/api/institution/${school._id}`, {
             category: "school",
             data: newSchool,
           });
           showToast(`School "${school.name}" updated successfully!`, "success");
         } else {
-          await axios.post("http://localhost:5001/api/institution/create", {
+          await axios.post("https://crm-r5rr.onrender.com/api/institution/create", {
             category: "school",
             data: newSchool,
           });
