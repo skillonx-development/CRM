@@ -17,6 +17,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import stateDistrictRoutes from './routes/stateDistrictRoutes.js';
 import exportRoutes from './routes/exportRoutes.js';
+import csvImportRoutes from './routes/csvImportRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -67,6 +68,7 @@ app.use('/api/invoice', invoiceRoutes)
 app.use("/api/institution", institutionRoutes);
 app.use('/api/state-districts', stateDistrictRoutes);
 app.use('/api/export',exportRoutes);
+app.use('/api/csv', csvImportRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5001;
